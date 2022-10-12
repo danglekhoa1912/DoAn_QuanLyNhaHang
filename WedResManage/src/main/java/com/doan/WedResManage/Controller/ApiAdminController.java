@@ -9,7 +9,6 @@ import com.doan.WedResManage.pojo.Dish;
 import com.doan.WedResManage.pojo.User;
 import com.doan.WedResManage.pojo.WeddingHall;
 import com.doan.WedResManage.service.CloudinaryService;
-import org.apache.catalina.Store;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

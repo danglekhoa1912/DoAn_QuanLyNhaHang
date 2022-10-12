@@ -21,7 +21,7 @@ import java.util.Map;
 
 @Validated
 @RestController
-@RequestMapping("/feedback")
+@RequestMapping("api/order/feedback")
 public class FeedbackController {
     private static final int pageSize=20;
     @Autowired
