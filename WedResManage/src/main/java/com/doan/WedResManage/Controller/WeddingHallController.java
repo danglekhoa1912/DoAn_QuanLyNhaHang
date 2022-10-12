@@ -22,11 +22,5 @@ import java.util.Map;
 @RestController
 @RequestMapping("/weddinghall")
 public class WeddingHallController {
-    @Autowired
-    private Cloudinary cloudinary;
-    @Autowired(required = false)
-    private CloudinaryService cloudinaryService;
-    @Autowired
-    private WeddingHallRepository weddingHall;
 
 }
