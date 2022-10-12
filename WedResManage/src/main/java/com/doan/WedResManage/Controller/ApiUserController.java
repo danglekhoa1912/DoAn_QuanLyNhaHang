@@ -19,7 +19,7 @@ import java.util.Map;
 
 @Validated
 @RestController
-@RequestMapping("/api")
+@RequestMapping("/api/order")
 public class ApiUserController {
     public static final int pageSize = 20;
     @Autowired

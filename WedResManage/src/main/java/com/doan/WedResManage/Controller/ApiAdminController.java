@@ -6,6 +6,7 @@ import com.doan.WedResManage.Controller.DTO.WeddingHallRq;
 import com.doan.WedResManage.Repository.*;
 import com.doan.WedResManage.pojo.CategoryDish;
 import com.doan.WedResManage.pojo.Dish;
+import com.doan.WedResManage.pojo.User;
 import com.doan.WedResManage.pojo.WeddingHall;
 import com.doan.WedResManage.service.CloudinaryService;
 import org.apache.catalina.Store;
@@ -16,11 +17,12 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.Map;
 
 @Validated
 @RestController
-@RequestMapping("/admin")
+@RequestMapping("/api/admin")
 public class ApiAdminController {
     public static final int pageSize = 20;
     @Autowired
@@ -40,6 +42,8 @@ public class ApiAdminController {
     private TypePartyController typePartyController;
     @Autowired
     private ServiceRepository serviceRepository;
+    @Autowired
+    private UserRepository userRepository;
     @Autowired
     private WeddingHallRepository weddingHall;
 
@@ -125,4 +129,9 @@ public class ApiAdminController {
             return ResponseEntity.ok(false);
         }
     }
+    @GetMapping(value="/user/getall")
+    public ResponseEntity<List<User>> getAllUser(){
+        return new ResponseEntity<>(userRepository.findAll(),HttpStatus.OK);
+    }
+
 }
