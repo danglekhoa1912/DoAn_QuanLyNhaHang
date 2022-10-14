@@ -3,7 +3,9 @@ package com.doan.WedResManage.Controller;
 import com.cloudinary.Cloudinary;
 import com.doan.WedResManage.Repository.*;
 import com.doan.WedResManage.pojo.Dish;
+import com.doan.WedResManage.pojo.PriceWeddingTime;
 import com.doan.WedResManage.pojo.WeddingHall;
+import com.doan.WedResManage.pojo.WeddingPartyOrders;
 import com.doan.WedResManage.service.CloudinaryService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -14,6 +16,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -41,6 +46,11 @@ public class ApiUserController {
     private ServiceRepository serviceRepository;
     @Autowired
     private WeddingHallRepository weddingHall;
+    @Autowired
+    private WeddingPartyOrdersRepository weddingPartyOrders;
+    @Autowired
+    private PriceWeddingTimeRepository priceWeddingTimeRepository;
+
 
     @RequestMapping(value = "/dish/categoryId={i}", method = RequestMethod.GET)
     public ResponseEntity<List<Dish>> findDishByCategoryId(@PathVariable("i") int i, @RequestParam Map<String, String> params) {
@@ -77,5 +87,13 @@ public class ApiUserController {
     @RequestMapping(value = "/weddinghall/getall", method = RequestMethod.GET)
     public ResponseEntity<List<WeddingHall>> getAllWeddingHall(){
         return new ResponseEntity<>(weddingHall.findAll(), HttpStatus.OK);
+    }
+    @PutMapping("/checktime")
+    public ResponseEntity<?> getCheckTime(@RequestBody Map<String,String> params) throws ParseException {
+        String simpleDate=params.getOrDefault("date",null);
+        int time=Integer.parseInt(params.getOrDefault("time",null));
+        Date date=new SimpleDateFormat("yyyy-MM-dd").parse(simpleDate);
+        PriceWeddingTime prw=priceWeddingTimeRepository.findById(time).orElseThrow();
+        return ResponseEntity.ok(weddingPartyOrders.findByOrderDateAndPwtId(date,prw)!=null?false:true);
     }
 }

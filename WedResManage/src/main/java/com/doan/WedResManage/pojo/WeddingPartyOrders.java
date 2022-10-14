@@ -4,6 +4,8 @@
  */
 package com.doan.WedResManage.pojo;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import java.io.Serializable;
 import java.util.Date;
 import javax.persistence.Basic;
@@ -75,20 +77,26 @@ public class WeddingPartyOrders implements Serializable {
     private String note;
     @JoinColumn(name = "list_service_id", referencedColumnName = "id")
     @OneToOne(optional = false)
+    @JsonIgnore
     private ListService listServiceId;
     @JoinColumn(name = "menu_id", referencedColumnName = "id")
     @OneToOne(optional = false)
+    @JsonIgnore
     private Menu menuId;
     @JoinColumn(name = "pwt_id", referencedColumnName = "id")
+    @JsonIgnore
     @ManyToOne
     private PriceWeddingTime pwtId;
     @JoinColumn(name = "type_party", referencedColumnName = "id")
     @ManyToOne
+    @JsonIgnore
     private TypeParty typeParty;
     @JoinColumn(name = "user_id", referencedColumnName = "id")
+    @JsonIgnore
     @ManyToOne(optional = false)
     private User userId;
     @JoinColumn(name = "wh_id", referencedColumnName = "id")
+    @JsonIgnore
     @ManyToOne
     private WeddingHall whId;
 

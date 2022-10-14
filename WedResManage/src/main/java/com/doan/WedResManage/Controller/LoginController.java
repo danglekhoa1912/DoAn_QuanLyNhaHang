@@ -8,6 +8,7 @@ import com.doan.WedResManage.Utils.LoginRequest;
 import com.doan.WedResManage.Utils.LoginResponse;
 import com.doan.WedResManage.pojo.User;
 import com.doan.WedResManage.service.CloudinaryService;
+import com.doan.WedResManage.service.jwt.JwtAuthenticationFilter;
 import com.doan.WedResManage.service.jwt.JwtTokenProvider;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -19,7 +20,9 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
+import java.util.Map;
 
 @RestController
 @RequestMapping("api/auth/")
@@ -36,6 +39,8 @@ public class LoginController {
     UserRepository userRepository;
     @Autowired
     private JwtTokenProvider tokenProvider;
+    @Autowired
+    private JwtAuthenticationFilter jwtAuthenticationFilter;
 
     @PostMapping("/login")
     public LoginResponse authenticateUser(@Valid @RequestBody LoginRequest loginRequest) {
@@ -77,5 +82,48 @@ public class LoginController {
         user.setRole("ROLE_USER");
         userRepository.save(user);
         return ResponseEntity.ok("Đăng ký thành công");
+    }
+    @GetMapping("/user/profile")
+    public ResponseEntity<?> userDetail(HttpServletRequest request){
+        if (jwtAuthenticationFilter.getJwtFromRequest(request)!=null){
+            User detail=userRepository.findByEmail(tokenProvider.getUserIdFromJWT(jwtAuthenticationFilter.getJwtFromRequest(request)));
+            return ResponseEntity.ok(detail);
+        }
+        return ResponseEntity.ok("Không có quyền truy cập");
+    }
+    @PostMapping("/user/profile")
+    public ResponseEntity<?> userDetailEdit(HttpServletRequest request, @ModelAttribute UserRequest model){
+        if (jwtAuthenticationFilter.getJwtFromRequest(request)!=null){
+            User detail=userRepository.findByEmail(tokenProvider.getUserIdFromJWT(jwtAuthenticationFilter.getJwtFromRequest(request)));
+            detail.setName(model.getName());
+            detail.setMobile(model.getMobile());
+            detail.setBirthday(model.getBirthday());
+            if (model.getAvt()!=null)
+                detail.setAvatar(cloudinaryService.uploadImg(model.getAvt(), cloudinary));
+            userRepository.save(detail);
+            return ResponseEntity.ok("Done");
+        }
+        return ResponseEntity.ok("Không có quyền truy cập");
+    }
+    @PostMapping("/user/pass")
+    public ResponseEntity<?> userChangePass(HttpServletRequest request, @RequestBody Map<String,String> params){
+        String pass=params.getOrDefault("pass",null);
+        String newPass=params.getOrDefault("newPass",null);
+        if (jwtAuthenticationFilter.getJwtFromRequest(request)!=null){
+            User detail=userRepository.findByEmail(tokenProvider.getUserIdFromJWT(jwtAuthenticationFilter.getJwtFromRequest(request)));
+            Authentication authentication = authenticationManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(
+                            detail.getEmail(),
+                            pass
+                    )
+            );
+            if (authentication.isAuthenticated()){
+                detail.setPassword(encoder.encode(newPass));
+                userRepository.save(detail);
+                return ResponseEntity.ok("Done");
+            }
+            return ResponseEntity.ok("Wrong password");
+        }
+        return ResponseEntity.ok(false);
     }
 }
