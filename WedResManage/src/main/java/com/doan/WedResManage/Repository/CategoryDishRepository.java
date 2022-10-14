@@ -4,6 +4,8 @@ import com.doan.WedResManage.pojo.CategoryDish;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 
-public interface CategoryDishRepository extends JpaRepository<CategoryDish, Integer>, JpaSpecificationExecutor<CategoryDish> {
+import java.util.List;
 
+public interface CategoryDishRepository extends JpaRepository<CategoryDish, Integer>, JpaSpecificationExecutor<CategoryDish> {
+    List<CategoryDish> findAllById(int id);
 }
