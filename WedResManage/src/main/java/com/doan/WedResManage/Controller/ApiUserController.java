@@ -62,6 +62,14 @@ public class ApiUserController {
     private TypePartyRepository typePartyRepository;
 
     //Dish
+    @GetMapping("/dish/getcate")
+    public  ResponseEntity<?> cate(@RequestParam Map<String,String> params){
+        int id=Integer.parseInt(params.getOrDefault("id","0"));
+        if (id==0){
+            return ResponseEntity.ok(categoryDishRepository.findAll());
+        }
+        else return ResponseEntity.ok(categoryDishRepository.findAllById(id).get(0));
+    }
     @RequestMapping(value = "/dish/categoryId={i}", method = RequestMethod.GET)
     public ResponseEntity<List<Dish>> findDishByCategoryId(@PathVariable("i") int i, @RequestParam Map<String, String> params) {
         Pageable pageable = PageRequest.of(Integer.parseInt(params.getOrDefault("page", "0")), pageSize);

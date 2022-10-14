@@ -4,6 +4,8 @@
  */
 package com.doan.WedResManage.pojo;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import java.io.Serializable;
 import java.util.Set;
 import javax.persistence.Basic;
@@ -47,6 +49,7 @@ public class CategoryDish implements Serializable {
     @Column(name = "name")
     private String name;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "categoryId")
+    @JsonIgnore
     private Set<Dish> dishSet;
 
     public CategoryDish() {
