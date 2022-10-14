@@ -93,9 +93,6 @@ public class User implements Serializable {
     private Set<WeddingPartyOrders> weddingPartyOrdersSet;
 
     @Transient
-    private String confirmPassword;
-
-    @Transient
     @Nullable
     @JsonIgnore
     private MultipartFile img;
@@ -188,13 +185,6 @@ public class User implements Serializable {
         this.feedbackSet = feedbackSet;
     }
 
-    public String getConfirmPassword() {
-        return confirmPassword;
-    }
-
-    public void setConfirmPassword(String confirmPassword) {
-        this.confirmPassword = confirmPassword;
-    }
 
     public String getPassword() {
         return password;

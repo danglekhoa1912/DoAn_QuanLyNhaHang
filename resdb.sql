@@ -96,7 +96,6 @@ CREATE TABLE `feedback` (
 
 LOCK TABLES `feedback` WRITE;
 /*!40000 ALTER TABLE `feedback` DISABLE KEYS */;
-INSERT INTO `feedback` VALUES (6,11,'hello','2022-09-03 22:23:44'),(7,11,'gà vcl','2022-09-03 22:47:15');
 /*!40000 ALTER TABLE `feedback` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -282,6 +281,7 @@ CREATE TABLE `type_party` (
 
 LOCK TABLES `type_party` WRITE;
 /*!40000 ALTER TABLE `type_party` DISABLE KEYS */;
+INSERT INTO `type_party` VALUES (1,'Tiệc cưới','\'https://naifood.com/wp-content/uploads/2022/02/cha-gio-re-dat-tiec-buffet9.jpg\''),(2,'Hội nghị','\'https://naifood.com/wp-content/uploads/2022/02/cha-gio-re-dat-tiec-buffet9.jpg\''),(3,'Sinh nhật','\'https://naifood.com/wp-content/uploads/2022/02/cha-gio-re-dat-tiec-buffet9.jpg\'');
 /*!40000 ALTER TABLE `type_party` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -306,7 +306,7 @@ CREATE TABLE `user` (
   UNIQUE KEY `mobile_UNIQUE` (`mobile`),
   UNIQUE KEY `UKob8kqyqqgmefl0aco34akdtpe` (`email`),
   UNIQUE KEY `UKcnjwxx5favk5ycqajjt17fwy1` (`mobile`)
-) ENGINE=InnoDB AUTO_INCREMENT=30 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=34 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -315,7 +315,7 @@ CREATE TABLE `user` (
 
 LOCK TABLES `user` WRITE;
 /*!40000 ALTER TABLE `user` DISABLE KEYS */;
-INSERT INTO `user` VALUES (11,'dan12gkhoa123bn@gmail.com','$2a$10$exSrFxGh4KoMIkT5tNry8uGa5n117ybwmYExbV0jJDeJkCFH0R0Ay','Ho112','2002-12-19','ROLE_ADMIN','https://res.cloudinary.com/dzznkotwg/image/upload/v1662212938/cly4agr9gnnenmmmmcgh.jpg','0972257123'),(12,'dangkhoa123bn@gmail.com','$2a$10$JfAK.83LdMkDSPpAy2WEXeSbyzIsFaZ/zr/9wkNNQDbttFUnkSefG','Khoa12','2001-12-19','ROLE_USER','https://res.cloudinary.com/dzznkotwg/image/upload/v1662217054/q4mzax97snlrvdm04rr2.jpg','0972257687'),(13,'khoa@gmail.com','$2a$10$jYbbBLc/e4OLP8kkLYj0HOR7QPidGB1zxgT6tHtiwzD8FgqnlErw2','khoa','2001-12-19','ROLE_STAFF','https://res.cloudinary.com/dzznkotwg/image/upload/v1662226668/b6droti0livth1warkik.png','1111111111'),(14,'giahuyoke01@gmail.com','$2a$10$eSuTiTt88fof1JAK/ydfy..haRc0SOnVLRKWDo8gAoMH2aGSNR9Yq','Lưu Gia Huy','2001-12-10','ROLE_STAFF','https://res.cloudinary.com/dzznkotwg/image/upload/v1662292224/xuugnanknlpz4hxzdyph.jpg','0947549001'),(15,'giahuyoke02@gmail.com','$2a$10$4y2lMG0PkdHtuddwhl19fe9nPpM75z3PSvAlGQD16ZHkhYgNEtCse','Huy','2001-12-10','ROLE_ADMIN','https://res.cloudinary.com/dzznkotwg/image/upload/v1662292224/xuugnanknlpz4hxzdyph.jpg','0947549002'),(16,'hello@gmail.com','$2a$10$3vrh3BNHyROn1L.HMoyl/.2vt/pAkkzILq03x6G0FrHI6GNsm1B46','Huy','2001-12-10','ROLE_USER','https://res.cloudinary.com/dzznkotwg/image/upload/v1662299546/pry8fso8br4nfi6ad8pq.jpg','1234567890'),(17,'dangkhoa123bnn@gmail.com','$2a$10$3vrh3BNHyROn1L.HMoyl/.2vt/pAkkzILq03x6G0FrHI6GNsm1B46','Khoa','2001-12-10','ROLE_USER','https://res.cloudinary.com/dzznkotwg/image/upload/v1662299546/pry8fso8br4nfi6ad8pq.jpg','0947549003'),(18,'hello1@gmail.com','$2a$10$3vrh3BNHyROn1L.HMoyl/.2vt/pAkkzILq03x6G0FrHI6GNsm1B46','Đạt','2001-12-10','ROLE_USER','https://res.cloudinary.com/dzznkotwg/image/upload/v1662299546/pry8fso8br4nfi6ad8pq.jpg','0947549007'),(19,'hello2@gmail.com','$2a$10$3vrh3BNHyROn1L.HMoyl/.2vt/pAkkzILq03x6G0FrHI6GNsm1B46','Hưng','2001-12-10','ROLE_USER','https://res.cloudinary.com/dzznkotwg/image/upload/v1662299546/pry8fso8br4nfi6ad8pq.jpg','0947549012'),(20,'hello3@gmail.com','$2a$10$3vrh3BNHyROn1L.HMoyl/.2vt/pAkkzILq03x6G0FrHI6GNsm1B46','Kiên','2001-12-10','ROLE_USER','https://res.cloudinary.com/dzznkotwg/image/upload/v1662299546/pry8fso8br4nfi6ad8pq.jpg','0947549015'),(21,'hello4@gmail.com','$2a$10$3vrh3BNHyROn1L.HMoyl/.2vt/pAkkzILq03x6G0FrHI6GNsm1B46','Lâm','2001-12-10','ROLE_USER','https://res.cloudinary.com/dzznkotwg/image/upload/v1662299546/pry8fso8br4nfi6ad8pq.jpg','0947549020'),(22,'hello5@gmail.com','$2a$10$3vrh3BNHyROn1L.HMoyl/.2vt/pAkkzILq03x6G0FrHI6GNsm1B46','Tâm','2001-12-10','ROLE_USER','https://res.cloudinary.com/dzznkotwg/image/upload/v1662299546/pry8fso8br4nfi6ad8pq.jpg','0947549021'),(23,'hello6@gmail.com','$2a$10$3vrh3BNHyROn1L.HMoyl/.2vt/pAkkzILq03x6G0FrHI6GNsm1B46','My','2001-12-10','ROLE_USER','https://res.cloudinary.com/dzznkotwg/image/upload/v1662299546/pry8fso8br4nfi6ad8pq.jpg','0947549022'),(24,'hello7@gmail.com','$2a$10$3vrh3BNHyROn1L.HMoyl/.2vt/pAkkzILq03x6G0FrHI6GNsm1B46','Hưng','2001-12-10','ROLE_STAFF','https://res.cloudinary.com/dzznkotwg/image/upload/v1662299546/pry8fso8br4nfi6ad8pq.jpg','0947549023'),(25,'hello8@gmail.com','$2a$10$3vrh3BNHyROn1L.HMoyl/.2vt/pAkkzILq03x6G0FrHI6GNsm1B46','Sơn','2001-12-10','ROLE_STAFF','https://res.cloudinary.com/dzznkotwg/image/upload/v1662299546/pry8fso8br4nfi6ad8pq.jpg','0947549024'),(26,'hello9@gmail.com','$2a$10$3vrh3BNHyROn1L.HMoyl/.2vt/pAkkzILq03x6G0FrHI6GNsm1B46','Thái','2001-12-10','ROLE_STAFF','https://res.cloudinary.com/dzznkotwg/image/upload/v1662299546/pry8fso8br4nfi6ad8pq.jpg','0947549025'),(27,'hello10@gmail.com','$2a$10$3vrh3BNHyROn1L.HMoyl/.2vt/pAkkzILq03x6G0FrHI6GNsm1B46','Khoa bé ba','2001-12-10','ROLE_STAFF','https://res.cloudinary.com/dzznkotwg/image/upload/v1662299546/pry8fso8br4nfi6ad8pq.jpg','0947549026'),(28,'hello11@gmail.com','$2a$10$3vrh3BNHyROn1L.HMoyl/.2vt/pAkkzILq03x6G0FrHI6GNsm1B46','Thanh','2001-12-10','ROLE_STAFF','https://res.cloudinary.com/dzznkotwg/image/upload/v1662299546/pry8fso8br4nfi6ad8pq.jpg','0947549027'),(29,'test','$2a$10$eSuTiTt88fof1JAK/ydfy..haRc0SOnVLRKWDo8gAoMH2aGSNR9Yq','test','2001-12-10','ROLE_STAFF','https://res.cloudinary.com/dzznkotwg/image/upload/v1662299546/pry8fso8br4nfi6ad8pq.jpg','0947549227');
+INSERT INTO `user` VALUES (29,'test','$2a$10$eSuTiTt88fof1JAK/ydfy..haRc0SOnVLRKWDo8gAoMH2aGSNR9Yq','test','2001-12-10','ROLE_ADMIN','https://res.cloudinary.com/dzznkotwg/image/upload/v1662299546/pry8fso8br4nfi6ad8pq.jpg','0947549227'),(30,'giahuyoke','$2a$10$P1bttd9qXC671pHPwDlSs.Du6wSEThvyCSacjzY1qg/.vztpexv82','huy','2001-10-10','ROLE_STAFF','https://res.cloudinary.com/giahuyoke/image/upload/v1665695938/mmr5ngkvhrrfkccta6cs.jpg','0929392932'),(31,'huygiaoke','$2a$10$umE6b0z6H0gRmRPPbCLbN./VuudRhyBitiWBNGPPhEJa2hk8zF4Nm','huy','2001-10-10','ROLE_USER','https://res.cloudinary.com/giahuyoke/image/upload/v1665591364/b83d51hndzcfx1ijbywo.jpg','0929392939'),(32,'huygiaoke01','$2a$10$0/2jNvfkIV90mbt6T0cFqOASNNy9lyWkv6UNhK/UAbCgfRNhlY8l2','huy','2001-10-10','ROLE_USER','https://res.cloudinary.com/giahuyoke/image/upload/v1665593695/h1rxxfls5wnp5wsvvjqy.jpg','0929392931'),(33,'huygiaoke02','$2a$10$liDZf9l3j2fmpX4MHUat4OrjQZ9qvWvzYtm0Efm0nH05.Jcqm9WeC','huy','2001-10-10','ROLE_USER','https://res.cloudinary.com/giahuyoke/image/upload/v1665693693/ippkmjizxkfsahegcwef.jpg','0929392930');
 /*!40000 ALTER TABLE `user` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -397,7 +397,7 @@ CREATE TABLE `wedding_party_orders` (
 
 LOCK TABLES `wedding_party_orders` WRITE;
 /*!40000 ALTER TABLE `wedding_party_orders` DISABLE KEYS */;
-INSERT INTO `wedding_party_orders` VALUES (104,11,1,2,'2022-09-21',82,7400,1,'momo',20,NULL,75,NULL),(105,11,1,1,'2022-12-12',83,23500,1,'momo-card',20,NULL,76,NULL),(106,11,1,3,'2022-09-16',84,20000,1,'momo',20,NULL,77,NULL),(107,11,1,3,'2022-09-07',85,12000,1,'momo-card',20,NULL,78,NULL),(108,13,1,1,'2022-09-21',86,33500,1,'momo',80,NULL,80,NULL),(109,13,1,1,'2022-09-21',87,33500,0,'momo',80,NULL,79,NULL),(110,13,1,1,'2022-09-21',88,10500,0,'momo',20,NULL,81,NULL),(111,15,3,3,'2022-09-06',118,61550,0,'momo',20,NULL,82,NULL),(112,15,3,3,'2022-09-06',119,61550,0,'momo',20,NULL,83,NULL),(113,16,8,2,'2022-09-08',120,28360,0,'momo',20,NULL,84,NULL),(114,16,5,1,'2022-09-07',121,37000,0,'momo',20,NULL,85,NULL),(115,16,5,1,'2022-09-07',122,37000,1,'momo',20,NULL,86,NULL),(116,16,7,2,'2022-09-06',123,36700,1,'momo',20,NULL,87,NULL);
+INSERT INTO `wedding_party_orders` VALUES (104,29,1,2,'2022-09-21',82,7400,1,'momo',20,NULL,75,1),(105,29,1,1,'2022-12-12',83,23500,1,'momo-card',20,NULL,78,2),(106,29,1,3,'2022-09-16',84,20000,1,'momo',20,'null',80,3),(107,29,1,2,'2022-09-15',85,20000,1,'momo',20,'null',82,3);
 /*!40000 ALTER TABLE `wedding_party_orders` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
@@ -410,4 +410,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2022-10-11 16:37:42
+-- Dump completed on 2022-10-14 10:28:58
