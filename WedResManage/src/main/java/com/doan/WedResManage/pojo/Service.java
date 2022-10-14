@@ -4,6 +4,8 @@
  */
 package com.doan.WedResManage.pojo;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import java.io.Serializable;
 import java.util.Set;
 import javax.persistence.Basic;
@@ -62,6 +64,7 @@ public class Service implements Serializable {
     @Column(name = "image")
     private String image;
     @OneToMany(mappedBy = "serviceId")
+    @JsonIgnore
     private Set<ServicesDetail> servicesDetailSet;
 
     public Service() {

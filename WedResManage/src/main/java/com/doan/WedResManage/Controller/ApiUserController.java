@@ -1,11 +1,9 @@
 package com.doan.WedResManage.Controller;
 
 import com.cloudinary.Cloudinary;
+import com.doan.WedResManage.Controller.DTO.OrderRequest;
 import com.doan.WedResManage.Repository.*;
-import com.doan.WedResManage.pojo.Dish;
-import com.doan.WedResManage.pojo.PriceWeddingTime;
-import com.doan.WedResManage.pojo.WeddingHall;
-import com.doan.WedResManage.pojo.WeddingPartyOrders;
+import com.doan.WedResManage.pojo.*;
 import com.doan.WedResManage.service.CloudinaryService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -16,6 +14,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -50,8 +49,19 @@ public class ApiUserController {
     private WeddingPartyOrdersRepository weddingPartyOrders;
     @Autowired
     private PriceWeddingTimeRepository priceWeddingTimeRepository;
+    @Autowired
+    private MenuDishRepository menuDishRepository;
+    @Autowired
+    private ListServiceRepository listService;
+    @Autowired
+    private ServicesDetailRepository servicesDetailRepository;
 
+    @Autowired
+    private UserRepository userRepository;
+    @Autowired
+    private TypePartyRepository typePartyRepository;
 
+    //Dish
     @RequestMapping(value = "/dish/categoryId={i}", method = RequestMethod.GET)
     public ResponseEntity<List<Dish>> findDishByCategoryId(@PathVariable("i") int i, @RequestParam Map<String, String> params) {
         Pageable pageable = PageRequest.of(Integer.parseInt(params.getOrDefault("page", "0")), pageSize);
@@ -70,7 +80,7 @@ public class ApiUserController {
         List<Dish> allDish=dishRepository.findAll();
         return new ResponseEntity<>(allDish,HttpStatus.OK);
     }
-    @RequestMapping(value="/ish/getAllDish",method = RequestMethod.GET)
+    @RequestMapping(value="/dish/getAllDish",method = RequestMethod.GET)
     public ResponseEntity<List<Dish>> getAllDish(@RequestParam Map<String,String> params){
         Pageable pageable = PageRequest.of(Integer.parseInt(params.getOrDefault("page","0")), pageSize);
         String search=params.getOrDefault("key","");
@@ -84,6 +94,7 @@ public class ApiUserController {
         }
         return new ResponseEntity<>(dishRepository.findAll().size(),HttpStatus.OK);
     }
+    //Wedding hall
     @RequestMapping(value = "/weddinghall/getall", method = RequestMethod.GET)
     public ResponseEntity<List<WeddingHall>> getAllWeddingHall(){
         return new ResponseEntity<>(weddingHall.findAll(), HttpStatus.OK);
@@ -95,5 +106,64 @@ public class ApiUserController {
         Date date=new SimpleDateFormat("yyyy-MM-dd").parse(simpleDate);
         PriceWeddingTime prw=priceWeddingTimeRepository.findById(time).orElseThrow();
         return ResponseEntity.ok(weddingPartyOrders.findByOrderDateAndPwtId(date,prw)!=null?false:true);
+    }
+    //Service
+    @GetMapping("/service/getall")
+    public ResponseEntity<?> getService(@RequestParam Map<String,String> params){
+        Pageable pageable = PageRequest.of(Integer.parseInt(params.getOrDefault("page", "0")), pageSize);
+        String key = params.getOrDefault("key", "");
+        return ResponseEntity.ok(serviceRepository.searchServiceByNameContains(key,pageable).getContent());
+    }
+    @PostMapping("/add")
+    public ResponseEntity<?> add(@RequestBody OrderRequest order){
+        WeddingPartyOrders wedOrder=new WeddingPartyOrders();
+        int total=0;
+        //Add wedding hall
+        WeddingHall wdh=weddingHall.findAllById(order.getWhId()).get(0);
+        wedOrder.setWhId(wdh);
+        //add user id
+        User user=userRepository.findAllById(order.getIdUser()).get(0);
+        wedOrder.setUserId(user);
+        //add time
+        PriceWeddingTime time=priceWeddingTimeRepository.findAllById(order.getPwtId()).get(0);
+        total= (int) (wdh.getPrice()*time.getPrice());
+        wedOrder.setPwtId(time);
+        //add order_date
+        wedOrder.setOrderDate(order.getOrderDate());
+        //add menu
+        Menu menu=new Menu();
+        menu.setPrice(0);
+        Menu menuNew =menuRepository.save(menu);
+        order.getMenu().forEach(item->{
+            MenuDish menuDish=new MenuDish();
+            menuDish.setMenuId(menuNew);
+            menuDish.setDishId(dishRepository.findAllById(item).get(0));
+            menuNew.setPrice(menuNew.getPrice()+menuDish.getDishId().getPrice());
+            menuRepository.save(menuNew);
+            menuDishRepository.save(menuDish);
+        });
+        wedOrder.setMenuId(menuNew);
+        total+=menuNew.getPrice();
+        //add service
+        ListService listservice=new ListService();
+        listservice.setPrice(0);
+        ListService listServiceNew=listService.save(listservice);
+        order.getService().forEach(item->{
+            ServicesDetail servicesDetail=new ServicesDetail();
+            servicesDetail.setListServiceId(listServiceNew);
+            servicesDetail.setServiceId(serviceRepository.findAllById(item).get(0));
+            listServiceNew.setPrice(listServiceNew.getPrice()+servicesDetail.getServiceId().getPrice());
+            servicesDetailRepository.save(servicesDetail);
+            listService.save(listServiceNew);
+        });
+        wedOrder.setListServiceId(listServiceNew);
+        total+=listServiceNew.getPrice();
+        wedOrder.setAmount(total);
+        wedOrder.setPaymentStatus(order.getPaymentStatus());
+        wedOrder.setTypePay(order.getTypePay());
+        wedOrder.setQuantityTable(order.getQuantity());
+        wedOrder.setNote(order.getNote());
+        wedOrder.setTypeParty(typePartyRepository.findAllById(order.getType_party()).get(0));
+        return ResponseEntity.ok(weddingPartyOrders.save(wedOrder));
     }
 }
