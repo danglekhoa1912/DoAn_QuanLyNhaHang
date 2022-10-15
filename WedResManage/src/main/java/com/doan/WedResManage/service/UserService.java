@@ -1,7 +1,7 @@
 package com.doan.WedResManage.service;
 
 import com.doan.WedResManage.Repository.UserRepository;
-import com.doan.WedResManage.Utils.CustomUserDetails;
+import com.doan.WedResManage.Response.CustomUserDetails;
 import com.doan.WedResManage.pojo.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;

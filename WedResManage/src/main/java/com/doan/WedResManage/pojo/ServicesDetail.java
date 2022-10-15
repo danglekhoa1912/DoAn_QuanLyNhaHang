@@ -4,6 +4,8 @@
  */
 package com.doan.WedResManage.pojo;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import java.io.Serializable;
 import javax.persistence.Basic;
 import javax.persistence.Column;
@@ -38,6 +40,7 @@ public class ServicesDetail implements Serializable {
     private Integer id;
     @JoinColumn(name = "list_service_id", referencedColumnName = "id")
     @ManyToOne(optional = false)
+    @JsonIgnore
     private ListService listServiceId;
     @JoinColumn(name = "service_id", referencedColumnName = "id")
     @ManyToOne

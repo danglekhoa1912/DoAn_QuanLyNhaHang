@@ -4,18 +4,22 @@ import com.cloudinary.Cloudinary;
 import com.doan.WedResManage.Controller.DTO.DishRq;
 import com.doan.WedResManage.Controller.DTO.WeddingHallRq;
 import com.doan.WedResManage.Repository.*;
+import com.doan.WedResManage.Response.OrderResponse;
 import com.doan.WedResManage.pojo.CategoryDish;
 import com.doan.WedResManage.pojo.Dish;
 import com.doan.WedResManage.pojo.User;
 import com.doan.WedResManage.pojo.WeddingHall;
 import com.doan.WedResManage.service.CloudinaryService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -37,14 +41,15 @@ public class ApiAdminController {
     private FeedbackRepository feedbackRepository;
     @Autowired
     private MenuRepository menuRepository;
-    @Autowired
-    private TypePartyController typePartyController;
+
     @Autowired
     private ServiceRepository serviceRepository;
     @Autowired
     private UserRepository userRepository;
     @Autowired
     private WeddingHallRepository weddingHall;
+    @Autowired
+    private WeddingPartyOrdersRepository weddingPartyOrder;
 
     @PutMapping(value = "/dish/change/id={i}")
     public String changeNameDish(@ModelAttribute DishRq params, @PathVariable("i") int id) {
@@ -129,8 +134,18 @@ public class ApiAdminController {
         }
     }
     @GetMapping(value="/user/getall")
-    public ResponseEntity<List<User>> getAllUser(){
-        return new ResponseEntity<>(userRepository.findAll(),HttpStatus.OK);
+    public ResponseEntity<?> getAllUser(){
+        return ResponseEntity.ok(userRepository.findAll());
+    }
+    @GetMapping("/order/all")
+    public ResponseEntity<?> getAllOrder(@RequestParam Map<String,String> params){
+        Pageable pageable = PageRequest.of(Integer.parseInt(params.getOrDefault("page", "0")), pageSize);
+        List<OrderResponse> orderResponseList=new ArrayList<>();
+        weddingPartyOrder.findAll(pageable).getContent().forEach(item->{
+            OrderResponse temp=new OrderResponse(item);
+            orderResponseList.add(temp);
+        });
+        return ResponseEntity.ok(orderResponseList);
     }
 
 }

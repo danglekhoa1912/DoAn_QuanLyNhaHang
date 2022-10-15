@@ -47,7 +47,7 @@ public class ListService implements Serializable {
     @NotNull
     @Column(name = "price")
     private int price;
-    @JsonIgnore
+    //@JsonIgnore
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "listServiceId")
     private Set<ServicesDetail> servicesDetailSet;
     @JsonIgnore

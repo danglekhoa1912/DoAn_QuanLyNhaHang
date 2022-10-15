@@ -52,7 +52,7 @@ public class Menu implements Serializable {
     @NotNull
     @Column(name = "price")
     private int price;
-    @JsonIgnore
+    //@JsonIgnore
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "menuId")
     private Set<MenuDish> menuDishSet;
     @JsonIgnore

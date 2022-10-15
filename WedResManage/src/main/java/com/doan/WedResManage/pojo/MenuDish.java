@@ -38,7 +38,7 @@ public class MenuDish implements Serializable {
     @Basic(optional = false)
     @Column(name = "id")
     private Integer id;
-    @JsonIgnore
+    //@JsonIgnore
     @JoinColumn(name = "dish_id", referencedColumnName = "id")
     @ManyToOne
     private Dish dishId;
