@@ -1,4 +1,4 @@
-package com.doan.WedResManage.Utils;
+package com.doan.WedResManage.Response;
 
 import lombok.Data;
 

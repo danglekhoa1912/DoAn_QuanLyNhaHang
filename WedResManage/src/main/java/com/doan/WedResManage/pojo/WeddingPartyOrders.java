@@ -77,11 +77,11 @@ public class WeddingPartyOrders implements Serializable {
     private String note;
     @JoinColumn(name = "list_service_id", referencedColumnName = "id")
     @OneToOne(optional = false)
-    @JsonIgnore
+    //@JsonIgnore
     private ListService listServiceId;
     @JoinColumn(name = "menu_id", referencedColumnName = "id")
     @OneToOne(optional = false)
-    @JsonIgnore
+    //@JsonIgnore
     private Menu menuId;
     @JoinColumn(name = "pwt_id", referencedColumnName = "id")
     @JsonIgnore
@@ -89,14 +89,14 @@ public class WeddingPartyOrders implements Serializable {
     private PriceWeddingTime pwtId;
     @JoinColumn(name = "type_party", referencedColumnName = "id")
     @ManyToOne
-    @JsonIgnore
+    //@JsonIgnore
     private TypeParty typeParty;
     @JoinColumn(name = "user_id", referencedColumnName = "id")
-    @JsonIgnore
+    //@JsonIgnore
     @ManyToOne(optional = false)
     private User userId;
     @JoinColumn(name = "wh_id", referencedColumnName = "id")
-    @JsonIgnore
+    //@JsonIgnore
     @ManyToOne
     private WeddingHall whId;
 

@@ -1,4 +1,4 @@
-package com.doan.WedResManage.Utils;
+package com.doan.WedResManage.Response;
 import com.doan.WedResManage.pojo.User;
 import lombok.AllArgsConstructor;
 import lombok.Data;

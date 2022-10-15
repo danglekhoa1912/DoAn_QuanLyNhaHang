@@ -3,6 +3,7 @@ package com.doan.WedResManage.Controller;
 import com.cloudinary.Cloudinary;
 import com.doan.WedResManage.Controller.DTO.OrderRequest;
 import com.doan.WedResManage.Repository.*;
+import com.doan.WedResManage.Response.OrderResponse;
 import com.doan.WedResManage.pojo.*;
 import com.doan.WedResManage.service.CloudinaryService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,6 +18,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.servlet.http.HttpServletRequest;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -39,8 +41,7 @@ public class ApiUserController {
     private FeedbackRepository feedbackRepository;
     @Autowired
     private MenuRepository menuRepository;
-    @Autowired
-    private TypePartyController typePartyController;
+
     @Autowired
     private ServiceRepository serviceRepository;
     @Autowired
@@ -104,8 +105,9 @@ public class ApiUserController {
     }
     //Wedding hall
     @RequestMapping(value = "/weddinghall/getall", method = RequestMethod.GET)
-    public ResponseEntity<List<WeddingHall>> getAllWeddingHall(){
-        return new ResponseEntity<>(weddingHall.findAll(), HttpStatus.OK);
+    public ResponseEntity<?> getAllWeddingHall(@RequestParam Map<String,String> param){
+        int id=Integer.parseInt(param.getOrDefault("id","0"));
+        return id!=0?ResponseEntity.ok(weddingHall.findAllById(id)):ResponseEntity.ok(weddingHall.findAll());
     }
     @PutMapping("/checktime")
     public ResponseEntity<?> getCheckTime(@RequestBody Map<String,String> params) throws ParseException {
@@ -173,5 +175,17 @@ public class ApiUserController {
         wedOrder.setNote(order.getNote());
         wedOrder.setTypeParty(typePartyRepository.findAllById(order.getType_party()).get(0));
         return ResponseEntity.ok(weddingPartyOrders.save(wedOrder));
+    }
+    @GetMapping("/allorder")
+    public ResponseEntity<?> getAllOrder(@RequestParam Map<String,String> params){
+        Pageable pageable = PageRequest.of(Integer.parseInt(params.getOrDefault("page", "0")), pageSize);
+        List<OrderResponse> orderResponseList=new ArrayList<>();
+        int id=Integer.parseInt(params.getOrDefault("id","0"));
+        if (id==0) return ResponseEntity.badRequest().body("ERROR");
+        weddingPartyOrders.searchWeddingPartyOrdersByUserId(userRepository.findAllById(id).get(0),pageable).getContent().forEach(item->{
+            OrderResponse temp=new OrderResponse(item);
+            orderResponseList.add(temp);
+        });
+        return ResponseEntity.ok(orderResponseList);
     }
 }

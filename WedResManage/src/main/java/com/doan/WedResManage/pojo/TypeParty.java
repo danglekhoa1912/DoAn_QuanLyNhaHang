@@ -4,6 +4,8 @@
  */
 package com.doan.WedResManage.pojo;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import java.io.Serializable;
 import java.util.Set;
 import javax.persistence.Basic;
@@ -50,6 +52,7 @@ public class TypeParty implements Serializable {
     @Column(name = "image_type")
     private String imageType;
     @OneToMany(mappedBy = "typeParty")
+    @JsonIgnore
     private Set<WeddingPartyOrders> weddingPartyOrdersSet;
 
     public TypeParty() {

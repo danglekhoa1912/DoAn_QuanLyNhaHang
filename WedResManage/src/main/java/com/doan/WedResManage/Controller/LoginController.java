@@ -3,9 +3,10 @@ package com.doan.WedResManage.Controller;
 import com.cloudinary.Cloudinary;
 import com.doan.WedResManage.Controller.DTO.UserRequest;
 import com.doan.WedResManage.Repository.UserRepository;
-import com.doan.WedResManage.Utils.CustomUserDetails;
-import com.doan.WedResManage.Utils.LoginRequest;
-import com.doan.WedResManage.Utils.LoginResponse;
+import com.doan.WedResManage.Response.BadLoginResponse;
+import com.doan.WedResManage.Response.CustomUserDetails;
+import com.doan.WedResManage.Response.LoginRequest;
+import com.doan.WedResManage.Response.LoginResponse;
 import com.doan.WedResManage.pojo.User;
 import com.doan.WedResManage.service.CloudinaryService;
 import com.doan.WedResManage.service.jwt.JwtAuthenticationFilter;
@@ -15,8 +16,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
@@ -43,21 +44,26 @@ public class LoginController {
     private JwtAuthenticationFilter jwtAuthenticationFilter;
 
     @PostMapping("/login")
-    public LoginResponse authenticateUser(@Valid @RequestBody LoginRequest loginRequest) {
+    public ResponseEntity<?> authenticateUser(@Valid @RequestBody LoginRequest loginRequest) {
 
         // Xác thực từ username và password.
-        Authentication authentication = authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(
-                        loginRequest.getUsername(),
-                        loginRequest.getPassword()
-                )
-        );
+        Authentication authentication;
+        try {
+            authentication = authenticationManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(
+                            loginRequest.getUsername(),
+                            loginRequest.getPassword()
+                    )
+            );
 
+        }catch (AuthenticationException exception){
+            return ResponseEntity.ok(new BadLoginResponse("200","Thông tin đăng nhập không chính xác"));
+        }
         SecurityContextHolder.getContext().setAuthentication(authentication);
-
+        System.out.println(authentication);
         // Trả về jwt cho người dùng.
         String jwt = tokenProvider.generateToken((CustomUserDetails) authentication.getPrincipal());
-        return new LoginResponse(jwt);
+        return ResponseEntity.ok(new LoginResponse(jwt));
     }
     @PostMapping("/signup")
     public ResponseEntity<?> signUp(@ModelAttribute UserRequest userRequest) {
