@@ -74,11 +74,12 @@ public class Service implements Serializable {
         this.id = id;
     }
 
-    public Service(Integer id, int price, String name, String image) {
+    public Service(Integer id, int price, String name, String image,String serviceDescribe) {
         this.id = id;
         this.price = price;
         this.name = name;
         this.image = image;
+        this.serviceDescribe=serviceDescribe;
     }
 
     public Integer getId() {

@@ -55,7 +55,7 @@ public class Dish implements Serializable {
     private Set<MenuDish> menuDishSet;
     @JoinColumn(name = "category_id", referencedColumnName = "id")
     @ManyToOne(optional = false)
-    @JsonIgnore
+    //@JsonIgnore
     private CategoryDish categoryId;
 
 

@@ -36,6 +36,7 @@ public class ServicesDetail implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Basic(optional = false)
+    @JsonIgnore
     @Column(name = "id")
     private Integer id;
     @JoinColumn(name = "list_service_id", referencedColumnName = "id")
