@@ -198,4 +198,9 @@ public class ApiUserController {
     public ResponseEntity<?> getTypeTime(){
         return ResponseEntity.ok(priceWeddingTimeRepository.findAll());
     }
+    @GetMapping("/gettypetime")
+    public ResponseEntity<?> getTypeTimeById(@RequestParam Map<String,String> param){
+        int id=Integer.parseInt(param.getOrDefault("id",null));
+        return ResponseEntity.ok(typePartyRepository.findAllById(id).get(0));
+    }
 }
