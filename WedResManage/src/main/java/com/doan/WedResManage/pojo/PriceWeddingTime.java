@@ -4,6 +4,8 @@
  */
 package com.doan.WedResManage.pojo;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import java.io.Serializable;
 import java.util.Set;
 import javax.persistence.Basic;
@@ -50,6 +52,7 @@ public class PriceWeddingTime implements Serializable {
     @Size(min = 1, max = 25)
     @Column(name = "session")
     private String session;
+    @JsonIgnore
     @OneToMany(mappedBy = "pwtId")
     private Set<WeddingPartyOrders> weddingPartyOrdersSet;
 
