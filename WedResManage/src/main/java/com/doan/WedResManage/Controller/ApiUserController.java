@@ -153,7 +153,8 @@ public class ApiUserController {
             menuDishRepository.save(menuDish);
         });
         wedOrder.setMenuId(menuNew);
-        total+=menuNew.getPrice();
+        wedOrder.setQuantityTable(order.getQuantity());
+        total+=menuNew.getPrice()*order.getQuantity();
         //add service
         ListService listservice=new ListService();
         listservice.setPrice(0);
@@ -171,7 +172,6 @@ public class ApiUserController {
         wedOrder.setAmount(total);
         wedOrder.setPaymentStatus(order.getPaymentStatus());
         wedOrder.setTypePay(order.getTypePay());
-        wedOrder.setQuantityTable(order.getQuantity());
         wedOrder.setNote(order.getNote());
         wedOrder.setTypeParty(typePartyRepository.findAllById(order.getType_party()).get(0));
         return ResponseEntity.ok(weddingPartyOrders.save(wedOrder));

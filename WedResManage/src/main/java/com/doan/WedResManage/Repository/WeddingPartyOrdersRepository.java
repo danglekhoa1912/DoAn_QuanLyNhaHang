@@ -10,9 +10,13 @@ import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.stereotype.Repository;
 
 import java.util.Date;
+import java.util.List;
+
 @Repository
 public interface WeddingPartyOrdersRepository extends JpaRepository<WeddingPartyOrders, Integer>, JpaSpecificationExecutor<WeddingPartyOrders> {
     WeddingPartyOrders findByOrderDateAndPwtId(Date orderDate, PriceWeddingTime ptwId);
     Page<WeddingPartyOrders> searchWeddingPartyOrdersByUserId(User userId, Pageable pageable);
     Page<WeddingPartyOrders> findAll(Pageable pageable);
+    List<WeddingPartyOrders> findByOrderDateBetween(Date start,Date end);
+    long countAllByOrderDateBetween(Date start,Date end);
 }

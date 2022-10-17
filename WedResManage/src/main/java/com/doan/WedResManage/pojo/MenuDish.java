@@ -36,6 +36,7 @@ public class MenuDish implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Basic(optional = false)
+    @JsonIgnore
     @Column(name = "id")
     private Integer id;
     //@JsonIgnore
