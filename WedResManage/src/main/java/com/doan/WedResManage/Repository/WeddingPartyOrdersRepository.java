@@ -2,6 +2,7 @@ package com.doan.WedResManage.Repository;
 
 import com.doan.WedResManage.pojo.PriceWeddingTime;
 import com.doan.WedResManage.pojo.User;
+import com.doan.WedResManage.pojo.WeddingHall;
 import com.doan.WedResManage.pojo.WeddingPartyOrders;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -14,7 +15,7 @@ import java.util.List;
 
 @Repository
 public interface WeddingPartyOrdersRepository extends JpaRepository<WeddingPartyOrders, Integer>, JpaSpecificationExecutor<WeddingPartyOrders> {
-    WeddingPartyOrders findByOrderDateAndPwtId(Date orderDate, PriceWeddingTime ptwId);
+    WeddingPartyOrders findByOrderDateAndPwtIdAndWhId(Date orderDate, PriceWeddingTime ptwId, WeddingHall whId);
     Page<WeddingPartyOrders> searchWeddingPartyOrdersByUserId(User userId, Pageable pageable);
     Page<WeddingPartyOrders> findAll(Pageable pageable);
     List<WeddingPartyOrders> findByOrderDateBetween(Date start,Date end);

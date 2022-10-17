@@ -113,9 +113,11 @@ public class ApiUserController {
     public ResponseEntity<?> getCheckTime(@RequestBody Map<String,String> params) throws ParseException {
         String simpleDate=params.getOrDefault("date",null);
         int time=Integer.parseInt(params.getOrDefault("time",null));
+        int hall= Integer.parseInt(params.getOrDefault("hall", null));
         Date date=new SimpleDateFormat("yyyy-MM-dd").parse(simpleDate);
         PriceWeddingTime prw=priceWeddingTimeRepository.findById(time).orElseThrow();
-        return ResponseEntity.ok(weddingPartyOrders.findByOrderDateAndPwtId(date,prw)!=null?false:true);
+        WeddingHall wdh=weddingHall.findAllById(hall).get(0);
+        return ResponseEntity.ok(weddingPartyOrders.findByOrderDateAndPwtIdAndWhId(date,prw,wdh)!=null?false:true);
     }
     //Service
     @GetMapping("/service/getall")
@@ -187,5 +189,13 @@ public class ApiUserController {
             orderResponseList.add(temp);
         });
         return ResponseEntity.ok(orderResponseList);
+    }
+    @GetMapping("/typeparty")
+    public ResponseEntity<?> getTypeParty(){
+        return ResponseEntity.ok(typePartyRepository.findAll());
+    }
+    @GetMapping("/typetime")
+    public ResponseEntity<?> getTypeTime(){
+        return ResponseEntity.ok(priceWeddingTimeRepository.findAll());
     }
 }
