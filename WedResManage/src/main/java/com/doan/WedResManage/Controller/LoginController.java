@@ -99,15 +99,19 @@ public class LoginController {
     }
     @PostMapping("/user/profile")
     public ResponseEntity<?> userDetailEdit(HttpServletRequest request, @ModelAttribute UserRequest model){
-        if (jwtAuthenticationFilter.getJwtFromRequest(request)!=null){
-            User detail=userRepository.findByEmail(tokenProvider.getUserIdFromJWT(jwtAuthenticationFilter.getJwtFromRequest(request)));
-            detail.setName(model.getName());
-            detail.setMobile(model.getMobile());
-            detail.setBirthday(model.getBirthday());
-            if (model.getAvt()!=null)
-                detail.setAvatar(cloudinaryService.uploadImg(model.getAvt(), cloudinary));
-            userRepository.save(detail);
-            return ResponseEntity.ok("Done");
+        try{
+            if (jwtAuthenticationFilter.getJwtFromRequest(request)!=null){
+                User detail=userRepository.findByEmail(tokenProvider.getUserIdFromJWT(jwtAuthenticationFilter.getJwtFromRequest(request)));
+                detail.setName(model.getName());
+                detail.setMobile(model.getMobile());
+                detail.setBirthday(model.getBirthday());
+                if (model.getAvt()!=null)
+                    detail.setAvatar(cloudinaryService.uploadImg(model.getAvt(), cloudinary));
+                User newUser= userRepository.save(detail);
+                return ResponseEntity.ok(newUser);
+            }
+        }catch (Exception e){
+            return ResponseEntity.badRequest().body("Vui lòng kiểm tra lại thông tin !");
         }
         return ResponseEntity.ok("Không có quyền truy cập");
     }

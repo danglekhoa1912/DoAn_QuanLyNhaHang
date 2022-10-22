@@ -223,4 +223,5 @@ public class ApiAdminController {
         });
         return ResponseEntity.ok(new StatisticalResponse((int) weddingPartyOrder.countAllByOrderDateBetween(dateStart,dateEnd), count[0]));
     }
+
 }
