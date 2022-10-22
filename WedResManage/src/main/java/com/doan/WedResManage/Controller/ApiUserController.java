@@ -62,6 +62,7 @@ public class ApiUserController {
     @Autowired
     private TypePartyRepository typePartyRepository;
 
+
     //Dish
     @GetMapping("/dish/getcate")
     public  ResponseEntity<?> cate(@RequestParam Map<String,String> params){
@@ -201,6 +202,6 @@ public class ApiUserController {
     @GetMapping("/gettypetime")
     public ResponseEntity<?> getTypeTimeById(@RequestParam Map<String,String> param){
         int id=Integer.parseInt(param.getOrDefault("id",null));
-        return ResponseEntity.ok(typePartyRepository.findAllById(id).get(0));
+        return ResponseEntity.ok(priceWeddingTimeRepository.findAllById(id).get(0));
     }
 }
