@@ -1,11 +1,13 @@
 package com.doan.WedResManage.Controller;
 
 import com.cloudinary.Cloudinary;
+import com.doan.WedResManage.Controller.DTO.MailRs;
 import com.doan.WedResManage.Controller.DTO.OrderRequest;
 import com.doan.WedResManage.Repository.*;
 import com.doan.WedResManage.Response.OrderResponse;
 import com.doan.WedResManage.pojo.*;
 import com.doan.WedResManage.service.CloudinaryService;
+import com.doan.WedResManage.service.SendGridMailService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -15,13 +17,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-import javax.servlet.http.HttpServletRequest;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Validated
 @RestController
@@ -41,7 +39,8 @@ public class ApiUserController {
     private FeedbackRepository feedbackRepository;
     @Autowired
     private MenuRepository menuRepository;
-
+    @Autowired
+    private SendGridMailService sendGridMailService;
     @Autowired
     private ServiceRepository serviceRepository;
     @Autowired
@@ -157,7 +156,7 @@ public class ApiUserController {
         });
         wedOrder.setMenuId(menuNew);
         wedOrder.setQuantityTable(order.getQuantity());
-        total+=menuNew.getPrice()*order.getQuantity();
+        total=(total+ menuNew.getPrice())*order.getQuantity();
         //add service
         ListService listservice=new ListService();
         listservice.setPrice(0);
@@ -177,7 +176,19 @@ public class ApiUserController {
         wedOrder.setTypePay(order.getTypePay());
         wedOrder.setNote(order.getNote());
         wedOrder.setTypeParty(typePartyRepository.findAllById(order.getType_party()).get(0));
-        return ResponseEntity.ok(weddingPartyOrders.save(wedOrder));
+        WeddingPartyOrders finalOrder;
+        try{
+            finalOrder=weddingPartyOrders.save(wedOrder);
+        } catch (Exception ex){
+            return ResponseEntity.badRequest().body("Lỗi khi đặt bàn");
+        }
+        MailRs mailRs=new MailRs(finalOrder.getUserId().getName(),finalOrder.getId(),finalOrder.getWhId().getName(), (int) finalOrder.getWhId().getPrice(),finalOrder.getListServiceId().getPrice(),finalOrder.getMenuId().getPrice(),finalOrder.getOrderDate(),finalOrder.getUserId().getMobile(),finalOrder.getPaymentStatus()==true?"Đã thanh toán":"Chưa thanh toán",finalOrder.getQuantityTable(), finalOrder.getAmount());
+        sendGridMailService.sendMail(
+                "customer",
+                Collections.singletonList(finalOrder.getUserId().getEmail()),
+                mailRs
+        );
+        return ResponseEntity.ok(finalOrder);
     }
     @GetMapping("/allorder")
     public ResponseEntity<?> getAllOrder(@RequestParam Map<String,String> params){
