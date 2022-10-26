@@ -230,18 +230,59 @@ public class ApiAdminController {
         return ResponseEntity.ok(new StatisticalResponse((int) weddingPartyOrder.countAllByOrderDateBetween(dateStart,dateEnd), count[0]));
     }
     @GetMapping("/statistical/hall/thismonth")
-    public ResponseEntity<?> statisByHall(){
-        Calendar start_calendar=Calendar.getInstance();
-        Calendar end=Calendar.getInstance();
-        start_calendar.set(Calendar.DATE,1);
-        Date dateStart= start_calendar.getTime();
-        Date dateEnd=end.getTime();
-        List<StatisHallResponse> detail=new ArrayList<>();
-        weddingHall.findAll().forEach(item->{
-            int total= weddingPartyOrder.findByOrderDateBetweenAndWhId(dateStart, dateEnd, item).stream().mapToInt(WeddingPartyOrders::getAmount).sum();
-            StatisHallResponse temp=new StatisHallResponse(item.getName(), Math.toIntExact(weddingPartyOrder.countAllByWhIdAndOrderDateBetween(item, dateStart, dateEnd)),total);
+    public ResponseEntity<?> statisByHall() {
+        Calendar start_calendar = Calendar.getInstance();
+        Calendar end = Calendar.getInstance();
+        start_calendar.set(Calendar.DATE, 1);
+        Date dateStart = start_calendar.getTime();
+        Date dateEnd = end.getTime();
+        List<StatisHallResponse> detail = new ArrayList<>();
+        weddingHall.findAll().forEach(item -> {
+            int total = weddingPartyOrder.findByOrderDateBetweenAndWhId(dateStart, dateEnd, item).stream().mapToInt(WeddingPartyOrders::getAmount).sum();
+            StatisHallResponse temp = new StatisHallResponse(item.getName(), Math.toIntExact(weddingPartyOrder.countAllByWhIdAndOrderDateBetween(item, dateStart, dateEnd)), total);
             detail.add(temp);
         });
         return ResponseEntity.ok(detail);
+    }
+    @GetMapping("/statistical/hall/lastmonth")
+    public ResponseEntity<?> statisLast(){
+        Calendar start_calendar=Calendar.getInstance();
+        start_calendar.set(Calendar.DATE,1);
+        start_calendar.add(Calendar.MONTH,-1);
+        Calendar end=Calendar.getInstance();
+        end.set(Calendar.DATE,1);
+        Date dateStart= start_calendar.getTime();
+        Date dateEnd=end.getTime();
+        List<StatisHallResponse> detail = new ArrayList<>();
+        weddingHall.findAll().forEach(item -> {
+            int total = weddingPartyOrder.findByOrderDateBetweenAndWhId(dateStart, dateEnd, item).stream().mapToInt(WeddingPartyOrders::getAmount).sum();
+            StatisHallResponse temp = new StatisHallResponse(item.getName(), Math.toIntExact(weddingPartyOrder.countAllByWhIdAndOrderDateBetween(item, dateStart, dateEnd)), total);
+            detail.add(temp);
+        });
+        return ResponseEntity.ok(detail);
+    }
+    @GetMapping("statistical/hall/search")
+    public ResponseEntity<?> statisticalSearch(@RequestBody Map<String,Date> params) {
+        Date dateStart = params.getOrDefault("start", null);
+        Date dateEnd = params.getOrDefault("end", null);
+        List<StatisHallResponse> detail = new ArrayList<>();
+        weddingHall.findAll().forEach(item -> {
+            int total = weddingPartyOrder.findByOrderDateBetweenAndWhId(dateStart, dateEnd, item).stream().mapToInt(WeddingPartyOrders::getAmount).sum();
+            StatisHallResponse temp = new StatisHallResponse(item.getName(), Math.toIntExact(weddingPartyOrder.countAllByWhIdAndOrderDateBetween(item, dateStart, dateEnd)), total);
+            detail.add(temp);
+        });
+        return ResponseEntity.ok(detail);
+    }
+    @PostMapping("order/updatestt")
+    public ResponseEntity<?> updateStatusPayment(@RequestBody Map<String,String> params){
+        int id=Integer.parseInt(params.getOrDefault("id",null));
+        WeddingPartyOrders wpo=weddingPartyOrder.findById(id).orElseThrow();
+        wpo.setPaymentStatus(true);
+        return ResponseEntity.ok(weddingPartyOrder.save(wpo));
+    }
+    @GetMapping("feedback/getall")
+    public ResponseEntity<?> feedback(@RequestParam Map<String,String> params){
+        Pageable pageable= PageRequest.of(Integer.parseInt(params.getOrDefault("page", "0")), pageSize);
+        return ResponseEntity.ok(feedbackRepository.findAll(pageable).getContent());
     }
 }
