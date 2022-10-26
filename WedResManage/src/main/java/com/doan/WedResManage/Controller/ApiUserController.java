@@ -127,11 +127,6 @@ public class ApiUserController {
         String key = params.getOrDefault("key", "");
         return ResponseEntity.ok(serviceRepository.searchServiceByNameContains(key,pageable).getContent());
     }
-    @GetMapping("feedback/getall")
-    public ResponseEntity<?> feedback(@RequestParam Map<String,String> params){
-        Pageable pageable= PageRequest.of(Integer.parseInt(params.getOrDefault("page", "0")), pageSize);
-        return ResponseEntity.ok(feedbackRepository.findAll(pageable).getContent());
-    }
     @PostMapping("feedback/add")
     public ResponseEntity<?> addFb(@RequestBody Map<String,String> params){
         int id=Integer.parseInt(params.getOrDefault("id",null));
