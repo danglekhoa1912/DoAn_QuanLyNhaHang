@@ -20,4 +20,7 @@ public interface WeddingPartyOrdersRepository extends JpaRepository<WeddingParty
     Page<WeddingPartyOrders> findAll(Pageable pageable);
     List<WeddingPartyOrders> findByOrderDateBetween(Date start,Date end);
     long countAllByOrderDateBetween(Date start,Date end);
+
+    long countAllByWhIdAndOrderDateBetween(WeddingHall whId,Date start, Date end);
+    List<WeddingPartyOrders> findByOrderDateBetweenAndWhId(Date start,Date end,WeddingHall whId);
 }
