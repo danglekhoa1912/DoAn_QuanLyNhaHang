@@ -59,6 +59,8 @@ public class User implements Serializable {
     @Basic(optional = false)
     @NotNull
     @Size(min = 1, max = 45)
+    @JsonIgnore
+//    @UserPhone(message = "{user.email.error.alreadyExists}")
     @Column(name = "role")
     private String role;
     @Size(max = 150)
