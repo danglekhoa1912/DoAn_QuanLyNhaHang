@@ -1,10 +1,7 @@
 package com.doan.WedResManage.Controller;
 
 import com.cloudinary.Cloudinary;
-import com.doan.WedResManage.Controller.DTO.DishRq;
-import com.doan.WedResManage.Controller.DTO.ServicesRequest;
-import com.doan.WedResManage.Controller.DTO.StatisticalResponse;
-import com.doan.WedResManage.Controller.DTO.WeddingHallRq;
+import com.doan.WedResManage.Controller.DTO.*;
 import com.doan.WedResManage.Repository.*;
 import com.doan.WedResManage.Response.OrderResponse;
 import com.doan.WedResManage.pojo.*;
@@ -144,6 +141,15 @@ public class ApiAdminController {
     public ResponseEntity<?> getAllUser(){
         return ResponseEntity.ok(userRepository.findAll());
     }
+    @Transactional
+    @DeleteMapping("/user/delete")
+    public ResponseEntity<?> deleteStaff(@RequestBody Map<String, Integer> params){
+        int id=params.getOrDefault("id",null);
+        if (userRepository.findAllById(id).get(0).getRole().equals("ROLE_STAFF")){
+            return ResponseEntity.ok(userRepository.deleteUsersById(id)==1?"Thành công":"Không thành công");
+        }
+        return ResponseEntity.badRequest().body("Không thành công !");
+    }
     @GetMapping("/order/all")
     public ResponseEntity<?> getAllOrder(@RequestParam Map<String,String> params){
         Pageable pageable = PageRequest.of(Integer.parseInt(params.getOrDefault("page", "0")), pageSize);
@@ -223,5 +229,19 @@ public class ApiAdminController {
         });
         return ResponseEntity.ok(new StatisticalResponse((int) weddingPartyOrder.countAllByOrderDateBetween(dateStart,dateEnd), count[0]));
     }
-
+    @GetMapping("/statistical/hall/thismonth")
+    public ResponseEntity<?> statisByHall(){
+        Calendar start_calendar=Calendar.getInstance();
+        Calendar end=Calendar.getInstance();
+        start_calendar.set(Calendar.DATE,1);
+        Date dateStart= start_calendar.getTime();
+        Date dateEnd=end.getTime();
+        List<StatisHallResponse> detail=new ArrayList<>();
+        weddingHall.findAll().forEach(item->{
+            int total= weddingPartyOrder.findByOrderDateBetweenAndWhId(dateStart, dateEnd, item).stream().mapToInt(WeddingPartyOrders::getAmount).sum();
+            StatisHallResponse temp=new StatisHallResponse(item.getName(), Math.toIntExact(weddingPartyOrder.countAllByWhIdAndOrderDateBetween(item, dateStart, dateEnd)),total);
+            detail.add(temp);
+        });
+        return ResponseEntity.ok(detail);
+    }
 }

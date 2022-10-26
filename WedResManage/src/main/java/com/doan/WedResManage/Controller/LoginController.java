@@ -56,8 +56,8 @@ public class LoginController {
                     )
             );
 
-        }catch (AuthenticationException exception){
-            return ResponseEntity.ok(new BadLoginResponse("200","Thông tin đăng nhập không chính xác"));
+        } catch (AuthenticationException exception) {
+            return ResponseEntity.ok(new BadLoginResponse("200", "Thông tin đăng nhập không chính xác"));
         }
         SecurityContextHolder.getContext().setAuthentication(authentication);
         System.out.println(authentication);
@@ -65,6 +65,7 @@ public class LoginController {
         String jwt = tokenProvider.generateToken((CustomUserDetails) authentication.getPrincipal());
         return ResponseEntity.ok(new LoginResponse(jwt));
     }
+
     @PostMapping("/signup")
     public ResponseEntity<?> signUp(@ModelAttribute UserRequest userRequest) {
         if (userRepository.existsUserByEmail(userRequest.getEmail())) {
@@ -78,7 +79,7 @@ public class LoginController {
                     .badRequest()
                     .body("Error: Mobile is already in use!");
         }
-        User user=new User();
+        User user = new User();
         user.setEmail(userRequest.getEmail());
         user.setName(userRequest.getName());
         user.setBirthday(userRequest.getBirthday());
@@ -89,45 +90,87 @@ public class LoginController {
         userRepository.save(user);
         return ResponseEntity.ok("Đăng ký thành công");
     }
+
+    @PostMapping("/addStaff")
+    public ResponseEntity<?> addStaff(@ModelAttribute UserRequest userRequest) {
+        if (userRepository.existsUserByEmail(userRequest.getEmail())) {
+            return ResponseEntity
+                    .badRequest()
+                    .body("Error: Email is already taken!");
+        }
+
+        if (userRepository.existsUserByMobile(userRequest.getMobile())) {
+            return ResponseEntity
+                    .badRequest()
+                    .body("Error: Mobile is already in use!");
+        }
+        User user = new User();
+        user.setEmail(userRequest.getEmail());
+        user.setName(userRequest.getName());
+        user.setBirthday(userRequest.getBirthday());
+        user.setMobile(userRequest.getMobile());
+        user.setPassword(encoder.encode(userRequest.getPassword()));
+        user.setAvatar(cloudinaryService.uploadImg(userRequest.getAvt(), cloudinary));
+        user.setRole("ROLE_STAFF");
+        userRepository.save(user);
+        return ResponseEntity.ok("Đăng ký thành công");
+    }
+
     @GetMapping("/user/profile")
-    public ResponseEntity<?> userDetail(HttpServletRequest request){
-        if (jwtAuthenticationFilter.getJwtFromRequest(request)!=null){
-            User detail=userRepository.findByEmail(tokenProvider.getUserIdFromJWT(jwtAuthenticationFilter.getJwtFromRequest(request)));
+    public ResponseEntity<?> userDetail(HttpServletRequest request) {
+        if (jwtAuthenticationFilter.getJwtFromRequest(request) != null) {
+            User detail = userRepository.findByEmail(tokenProvider.getUserIdFromJWT(jwtAuthenticationFilter.getJwtFromRequest(request)));
             return ResponseEntity.ok(detail);
         }
         return ResponseEntity.ok("Không có quyền truy cập");
     }
+
     @PostMapping("/user/profile")
-    public ResponseEntity<?> userDetailEdit(HttpServletRequest request, @ModelAttribute UserRequest model){
-        try{
-            if (jwtAuthenticationFilter.getJwtFromRequest(request)!=null){
-                User detail=userRepository.findByEmail(tokenProvider.getUserIdFromJWT(jwtAuthenticationFilter.getJwtFromRequest(request)));
+    public ResponseEntity<?> userDetailEdit(HttpServletRequest request, @ModelAttribute UserRequest model) {
+        try {
+            if (jwtAuthenticationFilter.getJwtFromRequest(request) != null) {
+                User detail = userRepository.findByEmail(tokenProvider.getUserIdFromJWT(jwtAuthenticationFilter.getJwtFromRequest(request)));
                 detail.setName(model.getName());
                 detail.setMobile(model.getMobile());
                 detail.setBirthday(model.getBirthday());
-                if (model.getAvt()!=null)
+                if (model.getAvt() != null)
                     detail.setAvatar(cloudinaryService.uploadImg(model.getAvt(), cloudinary));
-                User newUser= userRepository.save(detail);
+                User newUser = userRepository.save(detail);
                 return ResponseEntity.ok(newUser);
             }
-        }catch (Exception e){
+        } catch (Exception e) {
             return ResponseEntity.badRequest().body("Vui lòng kiểm tra lại thông tin !");
         }
         return ResponseEntity.ok("Không có quyền truy cập");
     }
+
+    @PostMapping("/staff/editprofile")
+    public ResponseEntity<?> staffEditProfile(@RequestParam Map<String,String> params,@ModelAttribute UserRequest model) {
+            int id=Integer.parseInt(params.getOrDefault("id",null));
+            System.out.println(id);
+            User detail = userRepository.findAllById(id).get(0);
+            detail.setName(model.getName());
+            detail.setMobile(model.getMobile());
+            detail.setBirthday(model.getBirthday());
+            if (model.getAvt() != null)
+                detail.setAvatar(cloudinaryService.uploadImg(model.getAvt(), cloudinary));
+            User newUser = userRepository.save(detail);
+            return ResponseEntity.ok(newUser);
+    }
+
     @PostMapping("/user/pass")
-    public ResponseEntity<?> userChangePass(HttpServletRequest request, @RequestBody Map<String,String> params){
-        String pass=params.getOrDefault("pass",null);
-        String newPass=params.getOrDefault("newPass",null);
-        if (jwtAuthenticationFilter.getJwtFromRequest(request)!=null){
-            User detail=userRepository.findByEmail(tokenProvider.getUserIdFromJWT(jwtAuthenticationFilter.getJwtFromRequest(request)));
+    public ResponseEntity<?> userChangePass(HttpServletRequest request, @RequestBody Map<String, String> params) {
+        String pass = params.getOrDefault("pass", null);
+        String newPass = params.getOrDefault("newPass", null);
+        if (jwtAuthenticationFilter.getJwtFromRequest(request) != null) {
+            User detail = userRepository.findByEmail(tokenProvider.getUserIdFromJWT(jwtAuthenticationFilter.getJwtFromRequest(request)));
             Authentication authentication = authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(
                             detail.getEmail(),
                             pass
                     )
             );
-            if (authentication.isAuthenticated()){
+            if (authentication.isAuthenticated()) {
                 detail.setPassword(encoder.encode(newPass));
                 userRepository.save(detail);
                 return ResponseEntity.ok("Done");

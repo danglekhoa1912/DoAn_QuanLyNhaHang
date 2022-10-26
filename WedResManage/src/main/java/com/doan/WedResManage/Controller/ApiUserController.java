@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.Instant;
 import java.util.*;
 
 @Validated
@@ -126,6 +127,21 @@ public class ApiUserController {
         String key = params.getOrDefault("key", "");
         return ResponseEntity.ok(serviceRepository.searchServiceByNameContains(key,pageable).getContent());
     }
+    @GetMapping("feedback/getall")
+    public ResponseEntity<?> feedback(@RequestParam Map<String,String> params){
+        Pageable pageable= PageRequest.of(Integer.parseInt(params.getOrDefault("page", "0")), pageSize);
+        return ResponseEntity.ok(feedbackRepository.findAll(pageable).getContent());
+    }
+    @PostMapping("feedback/add")
+    public ResponseEntity<?> addFb(@RequestBody Map<String,String> params){
+        int id=Integer.parseInt(params.getOrDefault("id",null));
+        String content=params.getOrDefault("content",null);
+        Feedback fb=new Feedback();
+        fb.setContent(content);
+        fb.setUserId(userRepository.findAllById(id).get(0));
+        fb.setCreateDate(Date.from(Instant.now()));
+        return ResponseEntity.ok(feedbackRepository.save(fb));
+    }
     @PostMapping("/add")
     public ResponseEntity<?> add(@RequestBody OrderRequest order){
         WeddingPartyOrders wedOrder=new WeddingPartyOrders();
@@ -182,7 +198,11 @@ public class ApiUserController {
         } catch (Exception ex){
             return ResponseEntity.badRequest().body("Lỗi khi đặt bàn");
         }
-        MailRs mailRs=new MailRs(finalOrder.getUserId().getName(),finalOrder.getId(),finalOrder.getWhId().getName(), (int) finalOrder.getWhId().getPrice(),finalOrder.getListServiceId().getPrice(),finalOrder.getMenuId().getPrice(),finalOrder.getOrderDate(),finalOrder.getUserId().getMobile(),finalOrder.getPaymentStatus()==true?"Đã thanh toán":"Chưa thanh toán",finalOrder.getQuantityTable(), finalOrder.getAmount());
+        MailRs mailRs=new MailRs(finalOrder.getUserId().getName(),finalOrder.getId(),finalOrder.getWhId().getName(),
+                                (int) finalOrder.getWhId().getPrice(),finalOrder.getListServiceId().getPrice(),
+                                finalOrder.getMenuId().getPrice(),finalOrder.getOrderDate(),finalOrder.getUserId().getMobile(),
+                                finalOrder.getPaymentStatus()==true?"Đã thanh toán":"Chưa thanh toán",finalOrder.getQuantityTable(),
+                                finalOrder.getAmount());
         sendGridMailService.sendMail(
                 "customer",
                 Collections.singletonList(finalOrder.getUserId().getEmail()),

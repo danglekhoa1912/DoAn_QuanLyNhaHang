@@ -14,4 +14,6 @@ public interface UserRepository extends JpaRepository<User, Integer>, JpaSpecifi
     Boolean existsUserByEmail(String email);
     List<User> findAllById(int id);
     Boolean existsUserByMobile(String mobile);
+
+    Long deleteUsersById(int id);
 }
