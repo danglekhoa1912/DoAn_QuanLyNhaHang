@@ -11,6 +11,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -23,6 +24,8 @@ import java.util.concurrent.atomic.AtomicInteger;
 @RequestMapping("/api/admin")
 public class ApiAdminController {
     public static final int pageSize = 20;
+    @Autowired
+    PasswordEncoder encoder;
     @Autowired
     private Cloudinary cloudinary;
     @Autowired(required = true)
@@ -179,7 +182,7 @@ public class ApiAdminController {
             return ResponseEntity.badRequest().body("Tên dịch vụ đã tồn tại !");
         }
         return ResponseEntity.ok("done");    }
-    @DeleteMapping("/service/delete")
+    @PostMapping("/service/delete")
     public ResponseEntity<?> deleteService(@RequestBody Map<String, Integer> params){
         try{
             serviceRepository.deleteById(params.getOrDefault("id",null));
@@ -284,5 +287,29 @@ public class ApiAdminController {
     public ResponseEntity<?> feedback(@RequestParam Map<String,String> params){
         Pageable pageable= PageRequest.of(Integer.parseInt(params.getOrDefault("page", "0")), pageSize);
         return ResponseEntity.ok(feedbackRepository.findAll(pageable).getContent());
+    }
+    @PostMapping("/addStaff")
+    public ResponseEntity<?> addStaff(@ModelAttribute UserRequest userRequest) {
+        if (userRepository.existsUserByEmail(userRequest.getEmail())) {
+            return ResponseEntity
+                    .badRequest()
+                    .body("Error: Email is already taken!");
+        }
+
+        if (userRepository.existsUserByMobile(userRequest.getMobile())) {
+            return ResponseEntity
+                    .badRequest()
+                    .body("Error: Mobile is already in use!");
+        }
+        User user = new User();
+        user.setEmail(userRequest.getEmail());
+        user.setName(userRequest.getName());
+        user.setBirthday(userRequest.getBirthday());
+        user.setMobile(userRequest.getMobile());
+        user.setPassword(encoder.encode(userRequest.getPassword()));
+        user.setAvatar(cloudinaryService.uploadImg(userRequest.getAvt(), cloudinary));
+        user.setRole("ROLE_STAFF");
+        userRepository.save(user);
+        return ResponseEntity.ok("Đăng ký thành công");
     }
 }

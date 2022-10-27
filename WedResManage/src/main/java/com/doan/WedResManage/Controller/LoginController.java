@@ -91,31 +91,6 @@ public class LoginController {
         return ResponseEntity.ok("Đăng ký thành công");
     }
 
-    @PostMapping("/addStaff")
-    public ResponseEntity<?> addStaff(@ModelAttribute UserRequest userRequest) {
-        if (userRepository.existsUserByEmail(userRequest.getEmail())) {
-            return ResponseEntity
-                    .badRequest()
-                    .body("Error: Email is already taken!");
-        }
-
-        if (userRepository.existsUserByMobile(userRequest.getMobile())) {
-            return ResponseEntity
-                    .badRequest()
-                    .body("Error: Mobile is already in use!");
-        }
-        User user = new User();
-        user.setEmail(userRequest.getEmail());
-        user.setName(userRequest.getName());
-        user.setBirthday(userRequest.getBirthday());
-        user.setMobile(userRequest.getMobile());
-        user.setPassword(encoder.encode(userRequest.getPassword()));
-        user.setAvatar(cloudinaryService.uploadImg(userRequest.getAvt(), cloudinary));
-        user.setRole("ROLE_STAFF");
-        userRepository.save(user);
-        return ResponseEntity.ok("Đăng ký thành công");
-    }
-
     @GetMapping("/user/profile")
     public ResponseEntity<?> userDetail(HttpServletRequest request) {
         if (jwtAuthenticationFilter.getJwtFromRequest(request) != null) {
