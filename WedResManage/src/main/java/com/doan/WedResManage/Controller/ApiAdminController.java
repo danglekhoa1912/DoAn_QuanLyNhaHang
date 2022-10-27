@@ -179,10 +179,10 @@ public class ApiAdminController {
             return ResponseEntity.badRequest().body("Tên dịch vụ đã tồn tại !");
         }
         return ResponseEntity.ok("done");    }
-    @PostMapping("/service/delete")
-    public ResponseEntity<?> deleteService(@ModelAttribute int id){
+    @DeleteMapping("/service/delete")
+    public ResponseEntity<?> deleteService(@RequestBody Map<String, Integer> params){
         try{
-            serviceRepository.deleteById(id);
+            serviceRepository.deleteById(params.getOrDefault("id",null));
         }catch (Exception ex){
             return ResponseEntity.badRequest().body("Error");
         }
