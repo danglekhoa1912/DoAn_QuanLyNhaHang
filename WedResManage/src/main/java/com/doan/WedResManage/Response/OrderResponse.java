@@ -28,7 +28,7 @@ public class OrderResponse {
 
     public OrderResponse(WeddingPartyOrders whp) {
         this.id = whp.getId();
-        this.hall = whp.getWhId().getName();
+        this.hall = whp.getWhId()!=null?whp.getWhId().getName():"Sảnh không còn hoạt động";
         this.time = whp.getPwtId().getSession();
         this.date = whp.getOrderDate();
         this.dishList = whp.getMenuId().getMenuDishSet();
