@@ -31,6 +31,8 @@ public class SendGridMailServiceImpl implements SendGridMailService {
 
     @Value("${send_grid.from_name}")
     private String sendGridFromName;
+    @Value("${send_grid.email_id}")
+    private String idMail;
 
     @Override
     public void sendMail(String subject, List<String> sendToEmails, MailRs order) {
@@ -62,7 +64,7 @@ public class SendGridMailServiceImpl implements SendGridMailService {
         fromEmail.setName(sendGridFromName);
         fromEmail.setEmail(sendGridFromEmail);
 
-        mail.setTemplateId("d-46389782142d4387ba88b99f596aad8d");
+        mail.setTemplateId(idMail);
 
         mail.setFrom(fromEmail);
 
