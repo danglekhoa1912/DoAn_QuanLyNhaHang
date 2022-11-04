@@ -11,7 +11,6 @@ import {
 } from "react-native";
 import React, { useEffect, useState } from "react";
 import Header from "./Header";
-import { Intro3 } from "../../../assets/images";
 import Colors from "../../constants/Colors";
 import CusButton from "../../components/CusButton";
 import { navigate, replace } from "../../naviagtion/service";
@@ -20,26 +19,57 @@ import { useForm } from "react-hook-form";
 import CusPickDate from "../../components/CusPickDate";
 import CusDropDown from "../../components/CusDropDown";
 import { CusInput } from "../../components";
+import * as yup from "yup";
 import { useDispatch, useSelector } from "react-redux";
 import { getLobbyById } from "../../redux/slice/LobbySlice";
 import { updateBooking } from "../../redux/slice/BookingSlice";
-import { bookingSelector, lobbySelector } from "../../redux/selector";
+import {
+   bookingSelector,
+   bookingStatusSelector,
+   lobbySelector,
+   typePartySelector,
+   typeTimeSelector,
+} from "../../redux/selector";
+import { getTypeTime } from "../../redux/slice/TypeTimeSlice";
+import { yupResolver } from "@hookform/resolvers/yup";
+import { getTypeParty } from "../../redux/slice/TypePartySlice";
 
 const BookingScreen = ({ route }) => {
    const { lobbyId } = route.params;
 
    const lobby = useSelector(lobbySelector).lobby;
-   const booking = useSelector(bookingSelector);
+   const status = useSelector(bookingStatusSelector);
+   const typeTime = useSelector(typeTimeSelector);
+   const typeParty = useSelector(typePartySelector);
    const dispatch = useDispatch();
 
-   const [items, setItems] = useState([
-      { label: "Sáng", value: "1", disabled: true },
-      { label: "Trưa", value: "2" },
-      { label: "Tối", value: "3" },
-   ]);
+   const typeTimeList = typeTime.TypeTimeList.map((item) => ({
+      label: item.session,
+      value: item.id,
+   }));
+
+   const typePartyList = typeParty.TypePartyList.map((item) => ({
+      label: item.nameParty,
+      value: item.id,
+   }));
+
+   const schema = yup
+      .object({
+         time: yup.string().required("Vui lòng chọn thời gian"),
+         type_party: yup.string().required("Vui lòng chọn loại tiệc"),
+         quantity: yup
+            .number()
+            .min(1, "Vui lòng nhập số lượng bàn")
+            .max(lobby.capacity, "Số lượng bàn vượt quá số lượng của sảnh"),
+      })
+      .required();
 
    useEffect(() => {
-      dispatch(getLobbyById(lobbyId));
+      Promise.all([
+         dispatch(getLobbyById(lobbyId)),
+         dispatch(getTypeTime()),
+         dispatch(getTypeParty()),
+      ]);
    }, []);
 
    const {
@@ -52,7 +82,9 @@ const BookingScreen = ({ route }) => {
          date: new Date(),
          time: "",
          quantity: 0,
+         type_party: "",
       },
+      resolver: yupResolver(schema),
    });
 
    const onChangeLobby = () => {
@@ -61,14 +93,13 @@ const BookingScreen = ({ route }) => {
    const onSubmit = (data) => {
       dispatch(
          updateBooking({
-            ...booking,
             lobby: lobby,
             date: data.date.getTime(),
             quantityTable: data.quantity,
             time: data.time,
+            total: lobby.price * data.quantity,
          })
       );
-      navigate(stackName.dishScreenStack);
    };
 
    return (
@@ -114,20 +145,36 @@ const BookingScreen = ({ route }) => {
                            minDate={new Date()}
                            placeholder="Ngày đặt"
                            control={control}
-                           errors="lỗi"
                            label="date"
                         />
                      </View>
 
-                     <View>
-                        <Text style={styles.text}>Thời gian</Text>
-                        <CusDropDown
-                           placeholder="Thời gian"
-                           control={control}
-                           errors="lỗi"
-                           label="time"
-                           itemList={items}
-                        />
+                     <View
+                        style={{
+                           flexDirection: "row",
+                           justifyContent: "space-around",
+                        }}
+                     >
+                        <View>
+                           <Text style={styles.text}>Thời gian</Text>
+                           <CusDropDown
+                              placeholder="Thời gian"
+                              control={control}
+                              errors={errors.time}
+                              label="time"
+                              itemList={typeTimeList}
+                           />
+                        </View>
+                        <View>
+                           <Text style={styles.text}>Loại tiệc</Text>
+                           <CusDropDown
+                              placeholder="Loại tiệc"
+                              control={control}
+                              errors={errors.type_party}
+                              label="type_party"
+                              itemList={typePartyList}
+                           />
+                        </View>
                      </View>
                      <View>
                         <Text style={styles.text}>Số lượng bàn</Text>
@@ -135,8 +182,16 @@ const BookingScreen = ({ route }) => {
                            keyboardType="number-pad"
                            control={control}
                            label="quantity"
+                           errors={errors.quantity}
                         />
                      </View>
+                  </View>
+                  <View style={styles.container_err}>
+                     {status == "invalidTime" && (
+                        <Text style={styles.text_error}>
+                           Khung giờ đó đã có người đặt
+                        </Text>
+                     )}
                   </View>
                   <CusButton
                      buttonColor={Colors.Background}
@@ -187,5 +242,13 @@ const styles = StyleSheet.create({
    button: {
       paddingVertical: 12,
       alignItems: "center",
+      marginBottom: 50,
+   },
+   container_err: {
+      alignItems: "center",
+      padding: 12,
+   },
+   text_error: {
+      color: Colors.Primary,
    },
 });

@@ -14,6 +14,7 @@ const Category = createSlice({
       });
       builder.addCase(getListCategory.fulfilled, (state, { payload }) => {
          state.listCategory = payload;
+         state.status = "idle";
       });
    },
 });

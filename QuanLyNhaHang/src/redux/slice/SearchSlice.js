@@ -1,14 +1,14 @@
-import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
+import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 
 const Search = createSlice({
-   name: "Search",
-   initialState: "",
-   reducers: {
-      changeSearch: (state, action) => {
-         return action.payload;
-      },
-   },
-   extraReducers: (builder) => {},
+  name: 'Search',
+  initialState: '',
+  reducers: {
+    changeSearch: (state, action) => {
+      return action.payload;
+    },
+  },
+  extraReducers: (builder) => {},
 });
 
 const { reducer, actions } = Search;
