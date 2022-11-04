@@ -6,11 +6,11 @@ import {
 export const navigationRef = createNavigationContainerRef();
 
 export function goBack() {
-   navigationRef.current?.goBack();
+   navigationRef.current && navigationRef.current?.goBack();
 }
 
 export function replace(name) {
-   navigationRef.dispatch(StackActions.replace(name));
+   navigationRef.current && navigationRef.dispatch(StackActions.replace(name));
 }
 
 export function navigate(name, params) {

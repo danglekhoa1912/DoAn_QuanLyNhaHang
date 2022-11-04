@@ -7,18 +7,40 @@ import { bookingSelector } from "../../../../redux/selector";
 
 const TotalPrice = () => {
    const booking = useSelector(bookingSelector);
-
+   const totalLobby =
+      (booking.lobbyPriceByTime + booking.menu.total) * booking.quantityTable;
    return (
       <View>
          <Text bold>Thanh toán</Text>
          <View style={styles.total}>
             <View style={styles.price}>
                <Text>Tiền sảnh</Text>
-               <Text>2.000.000VND</Text>
+               <Text>{booking.lobbyPriceByTime} VND</Text>
+            </View>
+            <View style={styles.price}>
+               <Text></Text>
+               <Text>+</Text>
             </View>
             <View style={styles.price}>
                <Text>Tiền món ăn</Text>
                <Text>{booking.menu.total} VND</Text>
+            </View>
+            <View style={styles.price}>
+               <Text></Text>
+               <Text>x</Text>
+            </View>
+            <View style={styles.price}>
+               <Text>Số bàn</Text>
+               <Text>{booking.quantityTable} bàn</Text>
+            </View>
+            <View style={styles.price}>
+               <Text>Số bàn</Text>
+               <Text>{booking.quantityTable} bàn</Text>
+            </View>
+            <Divider />
+            <View style={styles.price}>
+               <Text></Text>
+               <Text>{totalLobby} VND</Text>
             </View>
             <View style={styles.price}>
                <Text>Tiền dịch vụ</Text>
@@ -27,7 +49,7 @@ const TotalPrice = () => {
             <Divider />
             <View style={styles.price}>
                <Text>Tổng tiền</Text>
-               <Text>{booking.total} VND</Text>
+               <Text>{totalLobby + booking.service.total} VND</Text>
             </View>
          </View>
       </View>

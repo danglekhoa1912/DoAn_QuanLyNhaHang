@@ -31,7 +31,7 @@ const DishItem = (props) => {
    return (
       <Card style={[styles.conatiner, isChoose && styles.choose]}>
          <TouchableOpacity onPress={onPressDish}>
-            <Image style={styles.image} source={{ uri: dish.image }} />
+            <Image style={styles.image} source={{ uri: dish.imgae }} />
             <View style={styles.conatiner_title}>
                <Text style={styles.title_text}>{dish.name}</Text>
                <Text>{dish.price}.000VND</Text>
@@ -46,6 +46,7 @@ export default DishItem;
 const styles = StyleSheet.create({
    conatiner: {
       width: 160,
+      //   flex: 1,
       height: 200,
       backgroundColor: Colors.Background,
       marginVertical: 12,

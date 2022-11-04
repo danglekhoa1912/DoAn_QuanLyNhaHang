@@ -7,7 +7,6 @@ import Screens from "../../screens";
 
 const Tab = createMaterialTopTabNavigator();
 const { height, width } = Dimensions.get("screen");
-console.log(height, width);
 
 const TopTabNavigation = () => {
    return (
