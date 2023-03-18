@@ -11,6 +11,7 @@ import com.doan.WedResManage.pojo.User;
 import com.doan.WedResManage.service.CloudinaryService;
 import com.doan.WedResManage.service.jwt.JwtAuthenticationFilter;
 import com.doan.WedResManage.service.jwt.JwtTokenProvider;
+import io.swagger.annotations.Api;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -26,6 +27,7 @@ import javax.validation.Valid;
 import java.util.Map;
 
 @RestController
+@Api(value = "loginController")
 @RequestMapping("api/auth/")
 public class LoginController {
     @Autowired

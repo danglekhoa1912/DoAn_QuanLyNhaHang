@@ -6,6 +6,7 @@ import com.doan.WedResManage.Repository.*;
 import com.doan.WedResManage.Response.OrderResponse;
 import com.doan.WedResManage.pojo.*;
 import com.doan.WedResManage.service.CloudinaryService;
+import io.swagger.annotations.Api;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -21,6 +22,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 @Validated
 @RestController
+@Api(value = "AdminController")
 @RequestMapping("/api/admin")
 public class ApiAdminController {
     public static final int pageSize = 20;
