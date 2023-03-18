@@ -8,6 +8,7 @@ import com.doan.WedResManage.Response.OrderResponse;
 import com.doan.WedResManage.pojo.*;
 import com.doan.WedResManage.service.CloudinaryService;
 import com.doan.WedResManage.service.SendGridMailService;
+import io.swagger.annotations.Api;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -24,6 +25,7 @@ import java.util.*;
 
 @Validated
 @RestController
+@Api(value = "userController")
 @RequestMapping("/api/order")
 public class ApiUserController {
     public static final int pageSize = 20;
