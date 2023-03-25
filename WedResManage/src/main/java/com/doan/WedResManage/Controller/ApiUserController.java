@@ -41,8 +41,8 @@ public class ApiUserController {
     public static final int pageSize = 20;
     @Autowired
     private Cloudinary cloudinary;
-    @Autowired
-    private FirebaseApp firebaseApp;
+/*    @Autowired
+    private FirebaseApp firebaseApp;*/
     @Autowired(required = true)
     private DishRepository dishRepository;
     @Autowired(required = false)
@@ -83,17 +83,17 @@ public class ApiUserController {
 
     //Dish
     @GetMapping("/dish/get-category")
-    public  ResponseEntity<?> cate() throws FirebaseMessagingException {
-        Message message = Message.builder()
-                .setNotification(Notification.builder()
-                        .setTitle("Title")
-                        .setBody("Body")
-                        .build())
-                .setToken("f7RQuSfhRCapjjFPbii3L_:APA91bHRSdv_-Jaw3gYouxr5T6c8bKcJxJutI9BYeOZ-5aa_SDBQRJmvXA_9WDKJj1hiCOW7l2YyrMhoaIkWVdtVZSWoGCWfh5r0wTHabMRQVy-hRpXGWczRsr4KR8o_lVxtFnnL2rWc")
-                .build();
-
-        String response = FirebaseMessaging.getInstance().send(message);
-        System.out.println("Successfully sent message: " + response);
+    public  ResponseEntity<?> cate() /*throws FirebaseMessagingException*/ {
+//        Message message = Message.builder()
+//                .setNotification(Notification.builder()
+//                        .setTitle("Title")
+//                        .setBody("Body")
+//                        .build())
+//                .setToken("f7RQuSfhRCapjjFPbii3L_:APA91bHRSdv_-Jaw3gYouxr5T6c8bKcJxJutI9BYeOZ-5aa_SDBQRJmvXA_9WDKJj1hiCOW7l2YyrMhoaIkWVdtVZSWoGCWfh5r0wTHabMRQVy-hRpXGWczRsr4KR8o_lVxtFnnL2rWc")
+//                .build();
+//
+//        String response = FirebaseMessaging.getInstance().send(message);
+//        System.out.println("Successfully sent message: " + response);
         return ResponseEntity.ok(categoryDishRepository.findAll());
     }
     @RequestMapping(value = "/dish/categoryId", method = RequestMethod.GET)
