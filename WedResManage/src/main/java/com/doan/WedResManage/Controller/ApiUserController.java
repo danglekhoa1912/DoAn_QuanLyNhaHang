@@ -1,16 +1,25 @@
 package com.doan.WedResManage.Controller;
 
 import com.cloudinary.Cloudinary;
-import com.doan.WedResManage.Controller.DTO.MailRs;
-import com.doan.WedResManage.Controller.DTO.OrderRequest;
+import com.doan.WedResManage.Controller.DTO.*;
 import com.doan.WedResManage.Repository.*;
 import com.doan.WedResManage.Response.OrderResponse;
 import com.doan.WedResManage.pojo.*;
+import com.doan.WedResManage.service.jwt.JwtAuthenticationFilter;
+import com.doan.WedResManage.service.jwt.JwtTokenProvider;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.doan.WedResManage.service.CloudinaryService;
 import com.doan.WedResManage.service.SendGridMailService;
+import com.google.firebase.FirebaseApp;
+import com.google.firebase.messaging.FirebaseMessaging;
+import com.google.firebase.messaging.FirebaseMessagingException;
+import com.google.firebase.messaging.Message;
+import com.google.firebase.messaging.Notification;
 import io.swagger.annotations.Api;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
@@ -18,6 +27,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.Instant;
@@ -31,6 +41,8 @@ public class ApiUserController {
     public static final int pageSize = 20;
     @Autowired
     private Cloudinary cloudinary;
+    @Autowired
+    private FirebaseApp firebaseApp;
     @Autowired(required = true)
     private DishRepository dishRepository;
     @Autowired(required = false)
@@ -63,54 +75,79 @@ public class ApiUserController {
     private UserRepository userRepository;
     @Autowired
     private TypePartyRepository typePartyRepository;
+    @Autowired
+    private JwtAuthenticationFilter jwtAuthenticationFilter;
+    @Autowired
+    private JwtTokenProvider tokenProvider;
 
 
     //Dish
-    @GetMapping("/dish/getcate")
-    public  ResponseEntity<?> cate(@RequestParam Map<String,String> params){
-        int id=Integer.parseInt(params.getOrDefault("id","0"));
-        if (id==0){
-            return ResponseEntity.ok(categoryDishRepository.findAll());
-        }
-        else return ResponseEntity.ok(categoryDishRepository.findAllById(id).get(0));
+    @GetMapping("/dish/get-category")
+    public  ResponseEntity<?> cate() throws FirebaseMessagingException {
+        Message message = Message.builder()
+                .setNotification(Notification.builder()
+                        .setTitle("Title")
+                        .setBody("Body")
+                        .build())
+                .setToken("f7RQuSfhRCapjjFPbii3L_:APA91bHRSdv_-Jaw3gYouxr5T6c8bKcJxJutI9BYeOZ-5aa_SDBQRJmvXA_9WDKJj1hiCOW7l2YyrMhoaIkWVdtVZSWoGCWfh5r0wTHabMRQVy-hRpXGWczRsr4KR8o_lVxtFnnL2rWc")
+                .build();
+
+        String response = FirebaseMessaging.getInstance().send(message);
+        System.out.println("Successfully sent message: " + response);
+        return ResponseEntity.ok(categoryDishRepository.findAll());
     }
-    @RequestMapping(value = "/dish/categoryId={i}", method = RequestMethod.GET)
-    public ResponseEntity<List<Dish>> findDishByCategoryId(@PathVariable("i") int i, @RequestParam Map<String, String> params) {
-        Pageable pageable = PageRequest.of(Integer.parseInt(params.getOrDefault("page", "0")), pageSize);
-        String key = params.getOrDefault("key", "");
+    @RequestMapping(value = "/dish/categoryId", method = RequestMethod.GET)
+    public ResponseEntity<?> findDishByCategoryId(@RequestParam int i, @ModelAttribute PageRs params) {
+        Pageable pageable = PageRequest.of(params.getPage(), pageSize);
+        String key = params.getSearchByName()==null?"":params.getSearchByName();
+        System.out.println();
         Page<Dish> result = dishRepository.searchDishByCategoryId_IdAndNameContains(i, key, pageable);
         return new ResponseEntity<>(result.getContent(), HttpStatus.OK);
     }
 
-    @RequestMapping(value = "/dish/id={i}", method = RequestMethod.GET)
-    public Dish getDishById(@PathVariable("i") int i) {
-        Dish result = dishRepository.findById(i).orElseThrow(() -> new RuntimeException("Invalid id"));
-        return result;
+//    @RequestMapping(value = "/dish/id={i}", method = RequestMethod.GET)
+//    public Dish getDishById(@PathVariable("i") int i) {
+//        Dish result = dishRepository.findById(i).orElseThrow(() -> new RuntimeException("Invalid id"));
+//        return result;
+//    }
+//    @RequestMapping(value = "/dish/getall", method = RequestMethod.GET)
+//    public ResponseEntity<List<Dish>> getAll(){
+//        List<Dish> allDish=dishRepository.findAll();
+//        return new ResponseEntity<>(allDish,HttpStatus.OK);
+//    }
+    @RequestMapping(value="/dish/get-dish",method = RequestMethod.GET)
+    public ResponseEntity<PageRq> getAllDish(@ModelAttribute PageRs params) throws JsonProcessingException {
+        Pageable pageable = PageRequest.of(params.getPage()-1, pageSize);
+        Page<Dish> total=dishRepository.searchDishByNameContains(pageable,params.getSearchByName()==null?"":params.getSearchByName());
+        PageRq record=new PageRq(total.getSize(),params.getPage(),total.getTotalPages(),total.getContent());
+        return new ResponseEntity<>(record,HttpStatus.OK);
     }
-    @RequestMapping(value = "/dish/getall", method = RequestMethod.GET)
-    public ResponseEntity<List<Dish>> getAll(){
-        List<Dish> allDish=dishRepository.findAll();
-        return new ResponseEntity<>(allDish,HttpStatus.OK);
-    }
-    @RequestMapping(value="/dish/getAllDish",method = RequestMethod.GET)
-    public ResponseEntity<List<Dish>> getAllDish(@RequestParam Map<String,String> params){
-        Pageable pageable = PageRequest.of(Integer.parseInt(params.getOrDefault("page","0")), pageSize);
-        String search=params.getOrDefault("key","");
-        return new ResponseEntity<>(dishRepository.searchDishByNameContains(search,pageable).getContent(),HttpStatus.OK);
-    }
-    @RequestMapping(value="/dish/count",method = RequestMethod.GET)
-    public ResponseEntity<Integer> getCount(@RequestParam Map<String,String> params){
-        int categoryId=Integer.parseInt(params.getOrDefault("categoryId","0"));
+    @RequestMapping(value="/dish/count-by-id",method = RequestMethod.GET)
+    public ResponseEntity<Integer> getCount(@RequestParam int categoryId){
         if (categoryId!=0){
             return new ResponseEntity<>(dishRepository.countAllByCategoryId_Id(categoryId),HttpStatus.OK);
         }
         return new ResponseEntity<>(dishRepository.findAll().size(),HttpStatus.OK);
     }
     //Wedding hall
-    @RequestMapping(value = "/weddinghall/getall", method = RequestMethod.GET)
-    public ResponseEntity<?> getAllWeddingHall(@RequestParam Map<String,String> param){
-        int id=Integer.parseInt(param.getOrDefault("id","0"));
-        return id!=0?ResponseEntity.ok(weddingHall.findAllById(id)):ResponseEntity.ok(weddingHall.findAll());
+    @RequestMapping(value = "/weddinghall/get-all-wedding-hall", method = RequestMethod.GET)
+    public ResponseEntity<?> getAllWeddingHall(@ModelAttribute PageRs params){
+        Pageable pageable = PageRequest.of(params.getPage()-1, pageSize);
+        Page<WeddingHall> total=weddingHall.searchWeddingHallByNameContains(pageable,params.getSearchByName()==null?"":params.getSearchByName());
+        PageRq record=new PageRq(total.getSize(),params.getPage(),total.getTotalPages(),total.getContent());
+        return new ResponseEntity<>(record,HttpStatus.OK);
+    }
+    @RequestMapping(value = "/weddinghall/get-detail-wdh", method = RequestMethod.GET)
+    public ResponseEntity<?> getDetailHall(@RequestParam int idHall){
+        Date now=new Date();
+        List<WeddingHallDetails> time = new ArrayList<>();
+        List<WeddingPartyOrders> result=weddingPartyOrders.findAllByWhIdAndOrderDateAfter(weddingHall.findById(idHall).get(),now);
+        result.forEach(wh->{
+            WeddingHallDetails temp=new WeddingHallDetails(wh.getOrderDate(),wh.getPwtId().getId());
+            time.add(temp);
+        });
+        WeddingHallDetailsRequest request=new WeddingHallDetailsRequest(weddingHall.findById(idHall).get(),time);
+        return new ResponseEntity<>(request,HttpStatus.OK);
     }
     @PutMapping("/checktime")
     public ResponseEntity<?> getCheckTime(@RequestBody Map<String,String> params) throws ParseException {
@@ -123,12 +160,14 @@ public class ApiUserController {
         return ResponseEntity.ok(weddingPartyOrders.findByOrderDateAndPwtIdAndWhId(date,prw,wdh)!=null?false:true);
     }
     //Service
-    @GetMapping("/service/getall")
-    public ResponseEntity<?> getService(@RequestParam Map<String,String> params){
-        Pageable pageable = PageRequest.of(Integer.parseInt(params.getOrDefault("page", "0")), pageSize);
-        String key = params.getOrDefault("key", "");
-        return ResponseEntity.ok(serviceRepository.searchServiceByNameContains(key,pageable).getContent());
+    @GetMapping("/service/get-all")
+    public ResponseEntity<?> getService(@ModelAttribute PageRs params){
+        Pageable pageable = PageRequest.of(params.getPage()-1, pageSize);
+        Page<Service> total=serviceRepository.searchServiceByNameContains(params.getSearchByName()==null?"":params.getSearchByName(),pageable);
+        PageRq record=new PageRq(total.getSize(),params.getPage(),total.getTotalPages(),total.getContent());
+        return new ResponseEntity<>(record,HttpStatus.OK);
     }
+
     @PostMapping("feedback/add")
     public ResponseEntity<?> addFb(@RequestBody Map<String,String> params){
         int id=Integer.parseInt(params.getOrDefault("id",null));
@@ -207,19 +246,30 @@ public class ApiUserController {
         );
         return ResponseEntity.ok(finalOrder);
     }
-    @GetMapping("/allorder")
-    public ResponseEntity<?> getAllOrder(@RequestParam Map<String,String> params){
-        Pageable pageable = PageRequest.of(Integer.parseInt(params.getOrDefault("page", "0")), pageSize);
+    @GetMapping("/get-all-order")
+    public ResponseEntity<?> getAllOrder(HttpServletRequest request, @ModelAttribute PageRs params){
+        Pageable pageable = PageRequest.of(params.getPage(), pageSize);
         List<OrderResponse> orderResponseList=new ArrayList<>();
-        int id=Integer.parseInt(params.getOrDefault("id","0"));
-        if (id==0) return ResponseEntity.badRequest().body("ERROR");
-        weddingPartyOrders.searchWeddingPartyOrdersByUserId(userRepository.findAllById(id).get(0),pageable).getContent().forEach(item->{
-            OrderResponse temp=new OrderResponse(item);
-            orderResponseList.add(temp);
-        });
-        return ResponseEntity.ok(orderResponseList);
+        if (jwtAuthenticationFilter.getJwtFromRequest(request) != null) {
+            User user = userRepository.findByEmail(tokenProvider.getUserIdFromJWT(jwtAuthenticationFilter.getJwtFromRequest(request)));
+            if(user.getRole()=="ROLE_STAFF"){
+                return ResponseEntity.ok(weddingPartyOrders.findAll(pageable));
+            }
+            String email = user.getEmail();
+            weddingPartyOrders.searchWeddingPartyOrdersByUserId(userRepository.findByEmail(email),pageable).getContent().forEach(item->{
+                OrderResponse temp=new OrderResponse(item);
+                orderResponseList.add(temp);
+            });
+            Page<OrderResponse> total = new PageImpl<>(orderResponseList, pageable, orderResponseList.size());
+            PageRq page=new PageRq(total.getSize(),params.getPage(),total.getTotalPages(),total.getContent());
+            return ResponseEntity.ok(page);
+        }
+        else {
+            return ResponseEntity.badRequest().body("Bạn cần đăng nhap để thực hiện chức năng này");
+        }
+
     }
-    @GetMapping("/typeparty")
+    @GetMapping("/type-party")
     public ResponseEntity<?> getTypeParty(){
         return ResponseEntity.ok(typePartyRepository.findAll());
     }
