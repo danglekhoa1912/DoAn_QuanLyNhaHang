@@ -10,6 +10,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.stereotype.Repository;
 
+import javax.validation.constraints.NotNull;
 import java.util.Date;
 import java.util.List;
 
@@ -19,6 +20,7 @@ public interface WeddingPartyOrdersRepository extends JpaRepository<WeddingParty
     Page<WeddingPartyOrders> searchWeddingPartyOrdersByUserId(User userId, Pageable pageable);
     Page<WeddingPartyOrders> findAll(Pageable pageable);
     List<WeddingPartyOrders> findByOrderDateBetween(Date start,Date end);
+    List<WeddingPartyOrders> findAllByWhIdAndOrderDateAfter(WeddingHall whId, @NotNull Date orderDate);
     long countAllByOrderDateBetween(Date start,Date end);
 
     long countAllByWhIdAndOrderDateBetween(WeddingHall whId,Date start, Date end);

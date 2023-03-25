@@ -7,6 +7,9 @@ import com.doan.WedResManage.Response.OrderResponse;
 import com.doan.WedResManage.pojo.*;
 import com.doan.WedResManage.service.CloudinaryService;
 import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiImplicitParam;
+import io.swagger.annotations.ApiImplicitParams;
+import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -24,6 +27,8 @@ import java.util.concurrent.atomic.AtomicInteger;
 @RestController
 @Api(value = "AdminController")
 @RequestMapping("/api/admin")
+
+
 public class ApiAdminController {
     public static final int pageSize = 20;
     @Autowired
@@ -51,8 +56,12 @@ public class ApiAdminController {
     @Autowired
     private WeddingPartyOrdersRepository weddingPartyOrder;
 
+    @ApiOperation(value = "Role Admin", notes = "Get my data with authentication")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "Authorization", value = "Authorization token", required = true, dataType = "string", paramType = "header")
+    })
     @PutMapping(value = "/dish/change/id={i}")
-    public String changeNameDish(@ModelAttribute DishRq params, @PathVariable("i") int id) {
+    public String changeNameDish(@ModelAttribute DishRq params, @RequestParam int id) {
         Dish dish = dishRepository.findById(id).orElseThrow(() -> new RuntimeException("Invalid id dish"));
         CategoryDish categoryDish = categoryDishRepository.findById(params.getCategoryId())
                 .orElseThrow(() -> new RuntimeException("Invalid category ID"));
@@ -89,8 +98,8 @@ public class ApiAdminController {
 
     @Transactional
     @PostMapping(value = "/dish/delete")
-    public ResponseEntity<Boolean> deleteDish(@RequestBody Map<String, String> params) {
-        int i = Integer.parseInt(params.getOrDefault("id", "0"));
+    public ResponseEntity<Boolean> deleteDish(@ModelAttribute int id) {
+        int i = id;
         if (!dishRepository.findAllById(i).isEmpty()) {
             long delete = dishRepository.deleteDishById(i);
             return new ResponseEntity<>(true, HttpStatus.OK);
@@ -133,15 +142,17 @@ public class ApiAdminController {
             return ResponseEntity.ok(false);
         }
     }
+    @Transactional
     @PostMapping("weddinghall/delete")
-    public ResponseEntity<?> deleteWDH(@RequestParam Map<String,String> params){
-        int i = Integer.parseInt(params.getOrDefault("id", "0"));
+    public ResponseEntity<?> deleteWDH(@RequestParam int id){
+        int i = id;
         if (weddingHall.findAllById(i).isEmpty()){
             return ResponseEntity.badRequest().body("Không tìm thấy id sảnh");
         }
         weddingHall.deleteById(i);
         return ResponseEntity.ok("Done");
     }
+    @ApiOperation(value = "Get my data", notes = "Get my data with authentication")
     @GetMapping(value="/user/getall")
     public ResponseEntity<?> getAllUser(){
         return ResponseEntity.ok(userRepository.findAll());

@@ -34,7 +34,7 @@ public class LoginController {
     AuthenticationManager authenticationManager;
     @Autowired
     private Cloudinary cloudinary;
-    @Autowired(required = false)
+    @Autowired
     private CloudinaryService cloudinaryService;
     @Autowired
     PasswordEncoder encoder;
