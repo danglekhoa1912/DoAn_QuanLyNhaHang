@@ -64,6 +64,9 @@ public class LoginController {
         SecurityContextHolder.getContext().setAuthentication(authentication);
         System.out.println(authentication);
         // Trả về jwt cho người dùng.
+        User user = userRepository.findByEmail(authentication.getName());
+        user.setToken(loginRequest.getToken());
+        userRepository.save(user);
         String jwt = tokenProvider.generateToken((CustomUserDetails) authentication.getPrincipal());
         return ResponseEntity.ok(new LoginResponse(jwt));
     }
