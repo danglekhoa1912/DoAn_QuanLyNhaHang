@@ -27,7 +27,7 @@ import javax.xml.bind.annotation.XmlTransient;
         @NamedQuery(name = "Dish.findAll", query = "SELECT d FROM Dish d"),
         @NamedQuery(name = "Dish.findById", query = "SELECT d FROM Dish d WHERE d.id = :id"),
         @NamedQuery(name = "Dish.findByName", query = "SELECT d FROM Dish d WHERE d.name = :name"),
-        @NamedQuery(name = "Dish.findByImgae", query = "SELECT d FROM Dish d WHERE d.imgae = :imgae")})
+        @NamedQuery(name = "Dish.findByImage", query = "SELECT d FROM Dish d WHERE d.image = :image")})
 public class Dish implements Serializable {
 
     @Basic(optional = false)
@@ -48,8 +48,8 @@ public class Dish implements Serializable {
     private String name;
     @Basic(optional = false)
     @NotNull
-    @Column(name = "imgae")
-    private String imgae;
+    @Column(name = "image")
+    private String image;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "dishId")
     @JsonIgnore
     private Set<MenuDish> menuDishSet;
@@ -66,10 +66,10 @@ public class Dish implements Serializable {
         this.id = id;
     }
 
-    public Dish(Integer id, String name, String imgae) {
+    public Dish(Integer id, String name, String image) {
         this.id = id;
         this.name = name;
-        this.imgae = imgae;
+        this.image = image;
     }
 
     public Integer getId() {
@@ -88,12 +88,12 @@ public class Dish implements Serializable {
         this.name = name;
     }
 
-    public String getImgae() {
-        return imgae;
+    public String getImage() {
+        return image;
     }
 
-    public void setImgae(String imgae) {
-        this.imgae = imgae;
+    public void setImage(String image) {
+        this.image = image;
     }
 
     @XmlTransient

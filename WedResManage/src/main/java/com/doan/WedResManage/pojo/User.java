@@ -36,7 +36,8 @@ import javax.xml.bind.annotation.XmlTransient;
         @NamedQuery(name = "User.findByBirthday", query = "SELECT u FROM User u WHERE u.birthday = :birthday"),
         @NamedQuery(name = "User.findByRole", query = "SELECT u FROM User u WHERE u.role = :role"),
         @NamedQuery(name = "User.findByAvatar", query = "SELECT u FROM User u WHERE u.avatar = :avatar"),
-        @NamedQuery(name = "User.findByMobile", query = "SELECT u FROM User u WHERE u.mobile = :mobile")})
+        @NamedQuery(name = "User.findByMobile", query = "SELECT u FROM User u WHERE u.mobile = :mobile"),
+        @NamedQuery(name = "User.findByToken", query = "SELECT u FROM User u WHERE u.token = :token")})
 public class User implements Serializable {
 
     @Basic(optional = false)
@@ -69,6 +70,12 @@ public class User implements Serializable {
     @Size(min = 1, max = 45)
     @Column(name = "mobile")
     private String mobile;
+
+    @Basic(optional = false)
+    @NotNull
+    @Size(min = 1, max = 200)
+    @Column(name = "token")
+    private String token;
 
     public static final String USER="ROLE_USER";
     public static final String STAFF="ROLE_STAFF";
@@ -111,7 +118,7 @@ public class User implements Serializable {
         this.id = id;
     }
 
-    public User(Integer id, String email, String password, String name, Date birthday, String role, String mobile) {
+    public User(Integer id, String email, String password, String name, Date birthday, String role, String mobile, String token) {
         this.id = id;
         this.email = email;
         this.password = password;
@@ -119,6 +126,7 @@ public class User implements Serializable {
         this.birthday = birthday;
         this.role = role;
         this.mobile = mobile;
+        this.token= token;
     }
 
     public Integer getId() {
@@ -232,4 +240,11 @@ public class User implements Serializable {
         this.mobile = mobile;
     }
 
+    public String getToken() {
+        return token;
+    }
+
+    public void setToken(String token) {
+        this.token = token;
+    }
 }

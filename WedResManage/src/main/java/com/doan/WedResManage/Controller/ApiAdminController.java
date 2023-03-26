@@ -46,7 +46,6 @@ public class ApiAdminController {
     private FeedbackRepository feedbackRepository;
     @Autowired
     private MenuRepository menuRepository;
-
     @Autowired
     private ServiceRepository serviceRepository;
     @Autowired
@@ -67,7 +66,7 @@ public class ApiAdminController {
                 .orElseThrow(() -> new RuntimeException("Invalid category ID"));
         dish.setName(params.getName());
         dish.setPrice(params.getPrice());
-        dish.setImgae(cloudinaryService.uploadImg(params.getImage(), cloudinary));
+        dish.setImage(cloudinaryService.uploadImg(params.getImage(), cloudinary));
         dish.setCategoryId(categoryDish);
         try {
             Dish update = dishRepository.save(dish);
@@ -86,7 +85,7 @@ public class ApiAdminController {
         Dish dish = new Dish();
         dish.setName(params.getName());
         dish.setPrice(params.getPrice());
-        dish.setImgae(cloudinaryService.uploadImg(params.getImage(), cloudinary));
+        dish.setImage(cloudinaryService.uploadImg(params.getImage(), cloudinary));
         dish.setCategoryId(categoryDish);
         try {
             Dish update = dishRepository.save(dish);

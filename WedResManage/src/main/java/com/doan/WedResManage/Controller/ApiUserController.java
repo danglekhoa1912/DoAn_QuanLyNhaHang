@@ -41,8 +41,8 @@ public class ApiUserController {
     public static final int pageSize = 20;
     @Autowired
     private Cloudinary cloudinary;
-/*    @Autowired
-    private FirebaseApp firebaseApp;*/
+//    @Autowired
+//    private FirebaseApp firebaseApp;
     @Autowired(required = true)
     private DishRepository dishRepository;
     @Autowired(required = false)
@@ -100,21 +100,11 @@ public class ApiUserController {
     public ResponseEntity<?> findDishByCategoryId(@RequestParam int i, @ModelAttribute PageRs params) {
         Pageable pageable = PageRequest.of(params.getPage(), pageSize);
         String key = params.getSearchByName()==null?"":params.getSearchByName();
-        System.out.println();
         Page<Dish> result = dishRepository.searchDishByCategoryId_IdAndNameContains(i, key, pageable);
-        return new ResponseEntity<>(result.getContent(), HttpStatus.OK);
+        PageRq record=new PageRq(result.getSize(),params.getPage(),result.getTotalPages(),result.getContent());
+        return new ResponseEntity<>(record, HttpStatus.OK);
     }
 
-//    @RequestMapping(value = "/dish/id={i}", method = RequestMethod.GET)
-//    public Dish getDishById(@PathVariable("i") int i) {
-//        Dish result = dishRepository.findById(i).orElseThrow(() -> new RuntimeException("Invalid id"));
-//        return result;
-//    }
-//    @RequestMapping(value = "/dish/getall", method = RequestMethod.GET)
-//    public ResponseEntity<List<Dish>> getAll(){
-//        List<Dish> allDish=dishRepository.findAll();
-//        return new ResponseEntity<>(allDish,HttpStatus.OK);
-//    }
     @RequestMapping(value="/dish/get-dish",method = RequestMethod.GET)
     public ResponseEntity<PageRq> getAllDish(@ModelAttribute PageRs params) throws JsonProcessingException {
         Pageable pageable = PageRequest.of(params.getPage()-1, pageSize);

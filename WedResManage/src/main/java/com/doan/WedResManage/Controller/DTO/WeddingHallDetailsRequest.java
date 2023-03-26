@@ -5,19 +5,19 @@ import com.doan.WedResManage.pojo.WeddingHall;
 import java.util.List;
 
 public class WeddingHallDetailsRequest {
-    private WeddingHall id;
+    private WeddingHall weddingHall;
     private List<WeddingHallDetails> weddingHallDetails;
 
-    public WeddingHall getId() {
-        return id;
+    public WeddingHall getWeddingHall() {
+        return weddingHall;
     }
 
-    public void setId(WeddingHall id) {
-        this.id = id;
+    public void setWeddingHall(WeddingHall weddingHall) {
+        this.weddingHall = weddingHall;
     }
 
-    public WeddingHallDetailsRequest(WeddingHall id, List<WeddingHallDetails> weddingHallDetails) {
-        this.id = id;
+    public WeddingHallDetailsRequest(WeddingHall weddingHall, List<WeddingHallDetails> weddingHallDetails) {
+        this.weddingHall = weddingHall;
         this.weddingHallDetails = weddingHallDetails;
     }
 
