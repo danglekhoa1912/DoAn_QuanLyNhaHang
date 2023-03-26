@@ -98,7 +98,7 @@ public class ApiUserController {
     }
     @RequestMapping(value = "/dish/categoryId", method = RequestMethod.GET)
     public ResponseEntity<?> findDishByCategoryId(@RequestParam int i, @ModelAttribute PageRs params) {
-        Pageable pageable = PageRequest.of(params.getPage(), pageSize);
+        Pageable pageable = PageRequest.of(params.getPage()-1, pageSize);
         String key = params.getSearchByName()==null?"":params.getSearchByName();
         Page<Dish> result = dishRepository.searchDishByCategoryId_IdAndNameContains(i, key, pageable);
         PageRq record=new PageRq(result.getSize(),params.getPage(),result.getTotalPages(),result.getContent());
