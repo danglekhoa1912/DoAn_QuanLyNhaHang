@@ -6,6 +6,7 @@ package com.doan.WedResManage.pojo;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
+import org.springframework.boot.context.properties.bind.DefaultValue;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.lang.Nullable;
 import org.springframework.web.multipart.MultipartFile;
@@ -72,7 +73,6 @@ public class User implements Serializable {
     private String mobile;
 
     @Basic(optional = false)
-    @NotNull
     @Size(min = 1, max = 200)
     @Column(name = "token")
     private String token;

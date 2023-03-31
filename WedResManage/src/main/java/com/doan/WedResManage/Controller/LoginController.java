@@ -12,6 +12,7 @@ import com.doan.WedResManage.service.CloudinaryService;
 import com.doan.WedResManage.service.jwt.JwtAuthenticationFilter;
 import com.doan.WedResManage.service.jwt.JwtTokenProvider;
 import io.swagger.annotations.Api;
+import org.springframework.beans.NullValueInNestedPathException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -59,7 +60,7 @@ public class LoginController {
             );
 
         } catch (AuthenticationException exception) {
-            return ResponseEntity.ok(new BadLoginResponse("200", "Thông tin đăng nhập không chính xác"));
+            return ResponseEntity.badRequest().body("Thông tin đăng nhập không chính xác");
         }
         SecurityContextHolder.getContext().setAuthentication(authentication);
         System.out.println(authentication);
@@ -84,16 +85,22 @@ public class LoginController {
                     .badRequest()
                     .body("Error: Mobile is already in use!");
         }
-        User user = new User();
-        user.setEmail(userRequest.getEmail());
-        user.setName(userRequest.getName());
-        user.setBirthday(userRequest.getBirthday());
-        user.setMobile(userRequest.getMobile());
-        user.setPassword(encoder.encode(userRequest.getPassword()));
-        user.setAvatar(cloudinaryService.uploadImg(userRequest.getAvt(), cloudinary));
-        user.setRole("ROLE_USER");
-        userRepository.save(user);
-        return ResponseEntity.ok("Đăng ký thành công");
+        try {
+            User user = new User();
+            user.setEmail(userRequest.getEmail());
+            user.setName(userRequest.getName());
+            user.setBirthday(userRequest.getBirthday());
+            user.setMobile(userRequest.getMobile());
+            user.setPassword(encoder.encode(userRequest.getPassword()));
+            user.setAvatar(cloudinaryService.uploadImg(userRequest.getAvt(), cloudinary));
+            user.setRole("ROLE_USER");
+            user.setToken(userRequest.getToken());
+            userRepository.save(user);
+            return ResponseEntity.ok("Đăng ký thành công");
+        }
+        catch (NullValueInNestedPathException e){
+            return ResponseEntity.badRequest().body(e);
+        }
     }
 
     @GetMapping("/user/profile")
