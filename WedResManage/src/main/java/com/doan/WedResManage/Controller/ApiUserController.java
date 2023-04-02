@@ -147,7 +147,7 @@ public class ApiUserController {
         Date date=new SimpleDateFormat("yyyy-MM-dd").parse(simpleDate);
         PriceWeddingTime prw=priceWeddingTimeRepository.findById(time).orElseThrow();
         WeddingHall wdh=weddingHall.findAllById(hall).get(0);
-        return ResponseEntity.ok(weddingPartyOrders.findByOrderDateAndPwtIdAndWhId(date,prw,wdh)!=null?false:true);
+        return ResponseEntity.ok(weddingPartyOrders.findByOrderDateAndPwtIdAndWhId(date, prw, wdh) == null);
     }
     //Service
     @GetMapping("/service/get-all")
@@ -227,7 +227,7 @@ public class ApiUserController {
         MailRs mailRs=new MailRs(finalOrder.getUserId().getName(),finalOrder.getId(),finalOrder.getWhId().getName(),
                                 (int) finalOrder.getWhId().getPrice(),finalOrder.getListServiceId().getPrice(),
                                 finalOrder.getMenuId().getPrice(),finalOrder.getOrderDate(),finalOrder.getUserId().getMobile(),
-                                finalOrder.getPaymentStatus()==true?"Đã thanh toán":"Chưa thanh toán",finalOrder.getQuantityTable(),
+                                finalOrder.getPaymentStatus() ?"Đã thanh toán":"Chưa thanh toán",finalOrder.getQuantityTable(),
                                 finalOrder.getAmount());
         sendGridMailService.sendMail(
                 "customer",
@@ -238,18 +238,22 @@ public class ApiUserController {
     }
     @GetMapping("/get-all-order")
     public ResponseEntity<?> getAllOrder(HttpServletRequest request, @ModelAttribute PageRs params){
-        Pageable pageable = PageRequest.of(params.getPage(), pageSize);
+        Pageable pageable = PageRequest.of(params.getPage()-1, pageSize);
         List<OrderResponse> orderResponseList=new ArrayList<>();
         if (jwtAuthenticationFilter.getJwtFromRequest(request) != null) {
             User user = userRepository.findByEmail(tokenProvider.getUserIdFromJWT(jwtAuthenticationFilter.getJwtFromRequest(request)));
-            if(user.getRole()=="ROLE_STAFF"){
-                return ResponseEntity.ok(weddingPartyOrders.findAll(pageable));
+            if(user.getRole().equals("ROLE_STAFF") || user.getRole().equals("ROLE_ADMIN")){
+                weddingPartyOrders.findAll(pageable).getContent().forEach(item->{
+                    OrderResponse temp=new OrderResponse(item);
+                    orderResponseList.add(temp);
+                });
             }
-            String email = user.getEmail();
-            weddingPartyOrders.searchWeddingPartyOrdersByUserId(userRepository.findByEmail(email),pageable).getContent().forEach(item->{
-                OrderResponse temp=new OrderResponse(item);
-                orderResponseList.add(temp);
-            });
+            else {
+                weddingPartyOrders.searchWeddingPartyOrdersByUserId(user, pageable).getContent().forEach(item -> {
+                    OrderResponse temp = new OrderResponse(item);
+                    orderResponseList.add(temp);
+                });
+            }
             Page<OrderResponse> total = new PageImpl<>(orderResponseList, pageable, orderResponseList.size());
             PageRq page=new PageRq((int) total.getTotalElements(),params.getPage(),total.getTotalPages(),total.getContent());
             return ResponseEntity.ok(page);
@@ -257,7 +261,14 @@ public class ApiUserController {
         else {
             return ResponseEntity.badRequest().body("Bạn cần đăng nhap để thực hiện chức năng này");
         }
-
+    }
+    @GetMapping("/get-order-by-id")
+    public ResponseEntity<?> getOrderById(@RequestParam int id) {
+        try {
+            return ResponseEntity.ok(new OrderResponse(weddingPartyOrders.findById(id).orElseThrow()));
+        } catch (NoSuchElementException e) {
+            return ResponseEntity.badRequest().body("Order not found with id " + id);
+        }
     }
     @GetMapping("/type-party")
     public ResponseEntity<?> getTypeParty(){

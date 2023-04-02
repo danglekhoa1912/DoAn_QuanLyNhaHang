@@ -12,11 +12,11 @@ public class OrderResponse {
     private int id;
     private String username;
     private String hall;
-    private String time;
+    private int time;
     private Date date;
     private int price;
 
-    private String typeParty;
+    private int typeParty;
     private Boolean paymentstt;
     private String typePay;
     private int countTable;
@@ -29,7 +29,7 @@ public class OrderResponse {
     public OrderResponse(WeddingPartyOrders whp) {
         this.id = whp.getId();
         this.hall = whp.getWhId()!=null?whp.getWhId().getName():"Sảnh không còn hoạt động";
-        this.time = whp.getPwtId().getSession();
+        this.time = whp.getPwtId().getId();
         this.date = whp.getOrderDate();
         this.dishList = whp.getMenuId().getMenuDishSet();
         this.price = whp.getAmount();
@@ -38,7 +38,7 @@ public class OrderResponse {
         this.countTable = whp.getQuantityTable();
         this.note = whp.getNote();
         this.serviceList = whp.getListServiceId().getServicesDetailSet();
-        this.typeParty = whp.getTypeParty().getNameParty();
+        this.typeParty = whp.getTypeParty().getId();
         this.username=whp.getUserId().getName();
     }
 
@@ -58,11 +58,11 @@ public class OrderResponse {
         this.hall = hall;
     }
 
-    public String getTime() {
+    public int getTime() {
         return time;
     }
 
-    public void setTime(String time) {
+    public void setTime(int time) {
         this.time = time;
     }
 
@@ -130,11 +130,11 @@ public class OrderResponse {
         this.serviceList = serviceList;
     }
 
-    public String getTypeParty() {
+    public int getTypeParty() {
         return typeParty;
     }
 
-    public void setTypeParty(String typeParty) {
+    public void setTypeParty(int typeParty) {
         this.typeParty = typeParty;
     }
     public String getUsername() {
