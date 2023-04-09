@@ -1,5 +1,6 @@
 package com.doan.WedResManage.Controller;
 
+import ch.qos.logback.classic.net.SyslogAppender;
 import com.cloudinary.Cloudinary;
 import com.doan.WedResManage.Controller.DTO.UserRequest;
 import com.doan.WedResManage.Repository.UserRepository;
@@ -94,6 +95,7 @@ public class LoginController {
             user.setMobile(userRequest.getMobile());
             user.setPassword(encoder.encode(userRequest.getPassword()));
             user.setAvatar(cloudinaryService.uploadImg(userRequest.getAvt(), cloudinary));
+            System.out.println(userRequest.getAvt());
             user.setRole("ROLE_USER");
             user.setToken(userRequest.getToken());
             userRepository.save(user);

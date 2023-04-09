@@ -31,7 +31,13 @@ import javax.servlet.http.HttpServletRequest;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.time.ZoneId;
 import java.util.*;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 @Validated
 @RestController
@@ -42,8 +48,8 @@ public class ApiUserController {
     public static final int pageSize = 20;
     @Autowired
     private Cloudinary cloudinary;
-//    @Autowired
-//    private FirebaseApp firebaseApp;
+    @Autowired
+    private FirebaseApp firebaseApp;
     @Autowired(required = true)
     private DishRepository dishRepository;
     @Autowired(required = false)
@@ -84,17 +90,7 @@ public class ApiUserController {
 
     //Dish
     @GetMapping("/dish/get-category")
-    public  ResponseEntity<?> cate() /*throws FirebaseMessagingException*/ {
-//        Message message = Message.builder()
-//                .setNotification(Notification.builder()
-//                        .setTitle("Title")
-//                        .setBody("Body")
-//                        .build())
-//                .setToken("f7RQuSfhRCapjjFPbii3L_:APA91bHRSdv_-Jaw3gYouxr5T6c8bKcJxJutI9BYeOZ-5aa_SDBQRJmvXA_9WDKJj1hiCOW7l2YyrMhoaIkWVdtVZSWoGCWfh5r0wTHabMRQVy-hRpXGWczRsr4KR8o_lVxtFnnL2rWc")
-//                .build();
-//
-//        String response = FirebaseMessaging.getInstance().send(message);
-//        System.out.println("Successfully sent message: " + response);
+    public  ResponseEntity<?> cate() {
         return ResponseEntity.ok(categoryDishRepository.findAll());
     }
     @RequestMapping(value = "/dish/categoryId", method = RequestMethod.GET)
@@ -235,6 +231,12 @@ public class ApiUserController {
                 Collections.singletonList(finalOrder.getUserId().getEmail()),
                 mailRs
         );
+        // Lấy thời gian đặt hàng của Order
+        LocalDateTime orderTime = LocalDateTime.ofInstant(finalOrder.getOrderDate().toInstant(), ZoneId.systemDefault());
+
+        // Tính toán thời gian thông báo sẽ được gửi vafo 7h
+        LocalDateTime notificationTime = LocalDateTime.of(orderTime.toLocalDate(), LocalTime.of(7, 0));
+
         return ResponseEntity.ok(finalOrder);
     }
     @GetMapping("/get-all-order")

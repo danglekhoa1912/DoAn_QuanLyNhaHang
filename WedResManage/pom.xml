@@ -98,8 +98,13 @@
 			<artifactId>firebase-admin</artifactId>
 			<version>7.0.0</version>
 		</dependency>
+        <dependency>
+            <groupId>io.grpc</groupId>
+            <artifactId>grpc-netty-shaded</artifactId>
+            <version>1.30.0</version>
+        </dependency>
 
-	</dependencies>
+    </dependencies>
 	<build>
 		<plugins>
 			<plugin>
