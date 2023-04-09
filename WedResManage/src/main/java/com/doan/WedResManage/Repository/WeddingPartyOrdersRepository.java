@@ -25,4 +25,5 @@ public interface WeddingPartyOrdersRepository extends JpaRepository<WeddingParty
 
     long countAllByWhIdAndOrderDateBetween(WeddingHall whId,Date start, Date end);
     List<WeddingPartyOrders> findByOrderDateBetweenAndWhId(Date start,Date end,WeddingHall whId);
+    List<WeddingPartyOrders> findAllByOrderDate(Date date);
 }
