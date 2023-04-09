@@ -27,7 +27,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 @RestController
 @Api(value = "AdminController")
 @RequestMapping("/api/admin")
-
+@CrossOrigin(maxAge = 3600)
 
 public class ApiAdminController {
     public static final int pageSize = 20;

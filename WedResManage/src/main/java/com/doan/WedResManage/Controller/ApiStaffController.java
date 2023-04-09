@@ -2,15 +2,13 @@ package com.doan.WedResManage.Controller;
 
 import io.swagger.annotations.Api;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
 
 @RestController
 @Api(value = "StaffController")
+@CrossOrigin(maxAge = 3600)
 @RequestMapping("api/staff")
 public class ApiStaffController extends ApiAdminController  {
     @Override

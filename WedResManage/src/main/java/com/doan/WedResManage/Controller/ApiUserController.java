@@ -36,6 +36,7 @@ import java.util.*;
 @Validated
 @RestController
 @Api(value = "userController")
+@CrossOrigin(maxAge = 3600)
 @RequestMapping("/api/order")
 public class ApiUserController {
     public static final int pageSize = 20;

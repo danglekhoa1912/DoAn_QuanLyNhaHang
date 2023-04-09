@@ -29,6 +29,7 @@ import java.util.Map;
 
 @RestController
 @Api(value = "loginController")
+@CrossOrigin(maxAge = 3600)
 @RequestMapping("api/auth/")
 public class LoginController {
     @Autowired
