@@ -38,16 +38,16 @@ public class WedResManageApplication {
 				"secure", true));
 		return cloudinary;
 	}
-//	@Bean
-//	public FirebaseApp firebaseApp() throws IOException {
-//		FileInputStream serviceAccount = new FileInputStream("E:\\DoAn_QuanLyNhaHang\\WedResManage\\src\\main\\resources\\doan-8d7a4-firebase-adminsdk-vff8c-e435141893.json");
-//
-//		FirebaseOptions options = new FirebaseOptions.Builder()
-//				.setCredentials(GoogleCredentials.fromStream(serviceAccount))
-//				.build();
-//
-//		FirebaseApp.initializeApp(options);
-//
-//		return FirebaseApp.getInstance();
-//	}
+	@Bean
+	public FirebaseApp firebaseApp() throws IOException {
+		FileInputStream serviceAccount = new FileInputStream("");
+
+		FirebaseOptions options = new FirebaseOptions.Builder()
+				.setCredentials(GoogleCredentials.fromStream(serviceAccount))
+				.build();
+
+		FirebaseApp.initializeApp(options);
+
+		return FirebaseApp.getInstance();
+	}
 }

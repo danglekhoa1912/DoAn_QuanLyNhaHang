@@ -77,9 +77,9 @@ public class ApiAdminController {
     }
 
     @PostMapping(value = "/dish/add")
-    public String addDish(@ModelAttribute DishRq params) {
+    public ResponseEntity<?> addDish(@ModelAttribute DishRq params) {
         Dish check = dishRepository.findAllByName(params.getName());
-        if (check != null) return check.getId().toString();
+        if (check != null) return ResponseEntity.badRequest().body("Đã tồn tại món ăn");
         CategoryDish categoryDish = categoryDishRepository.findById(params.getCategoryId())
                 .orElseThrow(() -> new RuntimeException("Invalid category ID"));
         Dish dish = new Dish();
@@ -89,15 +89,15 @@ public class ApiAdminController {
         dish.setCategoryId(categoryDish);
         try {
             Dish update = dishRepository.save(dish);
+            return ResponseEntity.ok(update);
         } catch (Exception ex) {
-            return "false";
+            return ResponseEntity.badRequest().body("Vui lòng kiểm tra lại thông tin");
         }
-        return "true";
     }
 
     @Transactional
     @PostMapping(value = "/dish/delete")
-    public ResponseEntity<Boolean> deleteDish(@ModelAttribute int id) {
+    public ResponseEntity<Boolean> deleteDish(@RequestBody int id) {
         int i = id;
         if (!dishRepository.findAllById(i).isEmpty()) {
             long delete = dishRepository.deleteDishById(i);
@@ -108,7 +108,7 @@ public class ApiAdminController {
     }
 
     @PostMapping(value = "/weddinghall/add")
-    public ResponseEntity<Boolean> addWeddingHall(@ModelAttribute WeddingHallRq wdh) {
+    public ResponseEntity<?> addWeddingHall(@ModelAttribute WeddingHallRq wdh) {
         WeddingHall newWdh = new WeddingHall();
         newWdh.setName(wdh.getName());
         newWdh.setCapacity(wdh.getCapacity());
@@ -118,9 +118,9 @@ public class ApiAdminController {
         newWdh.setImage(cloudinaryService.uploadImg(wdh.getImage(), cloudinary));
         try {
             WeddingHall update = weddingHall.save(newWdh);
-            return ResponseEntity.ok(true);
+            return ResponseEntity.ok(update);
         } catch (Exception ex) {
-            return ResponseEntity.ok(false);
+            return ResponseEntity.badRequest().body("Error");
         }
     }
 
@@ -149,7 +149,7 @@ public class ApiAdminController {
             return ResponseEntity.badRequest().body("Không tìm thấy id sảnh");
         }
         weddingHall.deleteById(i);
-        return ResponseEntity.ok("Done");
+        return ResponseEntity.ok("Xóa thành công");
     }
     @ApiOperation(value = "Get my data", notes = "Get my data with authentication")
     @GetMapping(value="/user/getall")
