@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "283621549036",
+    "firebase_url": "https://doan-8d7a4-default-rtdb.firebaseio.com",
+    "project_id": "doan-8d7a4",
+    "storage_bucket": "doan-8d7a4.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:283621549036:android:b6a3ace8095d0bc1ffd6c9",
+        "android_client_info": {
+          "package_name": "com.quan_ly_nha_hang"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "283621549036-b2200etqfl1f5k9ioca5n7d7j58jjk8b.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAv5WsfkCSoYaNiQtxn8np172tmvUeMVX8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "283621549036-b2200etqfl1f5k9ioca5n7d7j58jjk8b.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

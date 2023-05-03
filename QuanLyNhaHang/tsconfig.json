@@ -1,0 +1,23 @@
+// prettier-ignore
+{
+	"extends": "@tsconfig/react-native/tsconfig.json",
+	"compilerOptions": {
+	  "skipLibCheck": false,
+	  "target": "esnext",
+	  "module": "commonjs",
+	  "lib": ["DOM", "DOM.Iterable", "ESNext"],
+	  "allowJs": true,
+	  "jsx": "react-native",
+	  "noEmit": true,
+	  "isolatedModules": true,
+	  "strict": true,
+	  "moduleResolution": "node",
+	  "allowSyntheticDefaultImports": true,
+	  "esModuleInterop": true,
+	  "resolveJsonModule": true,
+	  "types": ["node"]
+	},
+	"exclude": [
+	  "node_modules", "babel.config.js", "metro.config.js"
+	]
+  }

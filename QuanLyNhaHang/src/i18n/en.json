@@ -1,0 +1,117 @@
+{
+  "screen": {
+    "lobby": {
+      "title": "Lobby",
+      "placeholder_search": "Enter the lobby you are looking for",
+      "view_detail": "View Detail",
+      "choose_lobby": "Choose Lobby",
+      "name": "Name"
+    },
+    "dish": {
+      "title": "Dish",
+      "mainDishes": "Main Dishes",
+      "dessert": "Dessert",
+      "drink": "Drink",
+      "starter": "Starter",
+      "placeholder_search": "Enter the food you are looking for"
+    },
+    "service": {
+      "title": "Service",
+      "placeholder_search": "Enter the service you are looking for"
+    },
+    "booking": {
+      "title": "Booking",
+      "change_lobby": "Change Lobby",
+      "booking_date": "Booking Date",
+      "session": "Session",
+      "placeholder_session": "",
+      "type_party": "Type Party",
+      "placeholder_type_party": "",
+      "placeholder_capacity": "Please enter the number of tables",
+      "book_now": "Book Now"
+    },
+    "booking_detail": {
+      "title": "Booking Details",
+      "info": {
+        "title": "Personal Information",
+        "name": "Customer Name",
+        "email": "Email",
+        "mobile": "Mobile"
+      },
+      "invoice": {
+        "title": "Invoice Details",
+        "name": "Lobby Name",
+        "capacity": "Capacity",
+        "date": "Booking Date"
+      },
+      "dishes": "Dish List",
+      "services": "Service List",
+      "payment_method": "Payment Methods",
+      "pay": {
+        "title": "Pay",
+        "lobby": "Lobby Fee",
+        "dish": "Dish Fee",
+        "service": "Service Fee",
+        "total": "Total Fee",
+        "capacity": "Number Of Tables",
+        "table": "Tables"
+      }
+    },
+    "home": {
+      "title": "Home"
+    },
+    "profile": {
+      "title": "Profile"
+    },
+    "order_history": {
+      "title": "Order History"
+    },
+    "language": {
+      "title": "Language"
+    }
+  },
+  "common": {
+    "next": "Next",
+    "price": "Price",
+    "capacity": "Capacity",
+    "send": "Send",
+    "select": "Select",
+    "unselect": "Unselect",
+    "see_all": "See All",
+    "tables": "Tables"
+  },
+  "form": {
+    "logout": "Log Out",
+    "logIn": "Log In",
+    "register": "Register",
+    "email": "Email",
+    "name": "Name",
+    "password": "Password",
+    "mobile": "Mobile",
+    "birthday": "Birthday",
+    "avatar": "Avatar",
+    "don't_have_account": "Don't have a Account?",
+    "user_name": "User Name"
+  },
+  "lang": {
+    "en": "English",
+    "vi": "VietNamese"
+  },
+  "validate": {
+    "session": "Please select the session",
+    "type_party": "Please select party type",
+    "capacity": {
+      "empty": "Please enter the number of tables",
+      "max": "The number of tables must be less than or equal to"
+    },
+    "user_name": {
+      "empty": "Please enter your user name"
+    },
+    "password": {
+      "empty": "Please enter your password"
+    }
+  },
+  "toast": {
+    "change_language": "Change Language Successfully"
+  }
+}

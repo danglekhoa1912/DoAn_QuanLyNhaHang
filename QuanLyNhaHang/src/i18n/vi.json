@@ -1,0 +1,117 @@
+{
+  "screen": {
+    "lobby": {
+      "title": "Sảnh",
+      "placeholder_search": "Nhập sảnh bạn cần tìm",
+      "view_detail": "Mô tả",
+      "choose_lobby": "Chọn sảnh",
+      "name": "Tên Sảnh"
+    },
+    "dish": {
+      "title": "Món Ăn",
+      "mainDishes": "Món Chính",
+      "dessert": "Tráng Miệng",
+      "drink": "Thức Uống",
+      "starter": "Khai Vị",
+      "placeholder_search": "Nhập món ăn bạn cần tìm"
+    },
+    "service": {
+      "title": "Dịch Vụ",
+      "placeholder_search": "Nhập dịnh vụ bạn cần tìm"
+    },
+    "booking": {
+      "title": "Đặt Bàn",
+      "change_lobby": "Đổi sảnh",
+      "booking_date": "Ngày Đặt",
+      "session": "Thời Gian",
+      "placeholder_session": "",
+      "type_party": "Loại Tiệc",
+      "placeholder_type_party": "",
+      "placeholder_capacity": "Vui lòng nhập số lượng bàn",
+      "book_now": "Đặt tiệc ngay"
+    },
+    "booking_detail": {
+      "title": "Chi Tiết Đơn Đặt",
+      "info": {
+        "title": "Thông Tin Khách Hàng",
+        "name": "Tên Khách Hàng",
+        "email": "Email",
+        "mobile": "Số Điện Thoại"
+      },
+      "invoice": {
+        "title": "Chi Tiết Hóa Đơn",
+        "name": "Tên Sảnh",
+        "capacity": "Số Lượng Bàn",
+        "date": "Ngày Đặt"
+      },
+      "dishes": "Danh Sách Món Ăn",
+      "services": "Danh Sách Dịch Vụ",
+      "payment_method": "Phương Thức Thanh Toán",
+      "pay": {
+        "title": "Thanh Toán",
+        "lobby": "Tiền Sảnh",
+        "dish": "Tiền Món Ăn",
+        "service": "Tiền Dịch Vụ",
+        "total": "Tổng Tiền",
+        "capacity": "Số Lượng Bàn",
+        "table": "Bàn"
+      }
+    },
+    "home": {
+      "title": "Trang Chủ"
+    },
+    "profile": {
+      "title": "Hồ Sơ"
+    },
+    "order_history": {
+      "title": "Lịch Sử Đặt Tiệc"
+    },
+    "language": {
+      "title": "Ngôn Ngữ"
+    }
+  },
+  "common": {
+    "next": "Tiếp Tục",
+    "price": "Giá",
+    "capacity": "Số Lượng",
+    "send": "Gửi",
+    "select": "Chọn",
+    "unselect": "Bỏ Chọn",
+    "see_all": "Xem Tất Cả",
+    "tables": "Bàn"
+  },
+  "form": {
+    "logout": "Đăng Xuất",
+    "logIn": "Đăng Nhập",
+    "register": "Đăng Ký",
+    "email": "Email",
+    "name": "Tên",
+    "password": "Mật Khẩu",
+    "mobile": "Số Điện Thoại",
+    "birthday": "Sinh Nhật",
+    "avatar": "Ảnh Đại Diện",
+    "don't_have_account": "Bạn không có tài khoản?",
+    "user_name": "Tên Đăng Nhập"
+  },
+  "lang": {
+    "en": "Tiếng Anh",
+    "vi": "Việt Nam"
+  },
+  "validate": {
+    "session": "Làm ơn chọn thời gian",
+    "type_party": "Làm ơn chọn loại tiệc",
+    "capacity": {
+      "empty": "Làm ơn nhập số lượng bàn",
+      "max": "Số lượng bàn phải thấp hơn hoặc bằng"
+    },
+    "user_name": {
+      "empty": "Vui lòng nhập tên đăng nhập"
+    },
+    "password": {
+      "empty": "Vui lòng nhập mật khẩu"
+    }
+  },
+  "toast": {
+    "change_language": "Đổi Ngôn Ngữ Thành Công"
+  }
+}
