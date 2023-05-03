@@ -11,6 +11,7 @@ import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
@@ -27,8 +28,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 @RestController
 @Api(value = "AdminController")
 @RequestMapping("/api/admin")
-@CrossOrigin(maxAge = 3600)
-
+@CrossOrigin(origins = "http://localhost:9000")
 public class ApiAdminController {
     public static final int pageSize = 20;
     @Autowired
@@ -59,8 +59,9 @@ public class ApiAdminController {
     @ApiImplicitParams({
             @ApiImplicitParam(name = "Authorization", value = "Authorization token", required = true, dataType = "string", paramType = "header")
     })
+    @CrossOrigin
     @PutMapping(value = "/dish/change/id={i}")
-    public String changeNameDish(@ModelAttribute DishRq params, @RequestParam int id) {
+    public ResponseEntity changeNameDish(@ModelAttribute DishRq params, @RequestParam int id) {
         Dish dish = dishRepository.findById(id).orElseThrow(() -> new RuntimeException("Invalid id dish"));
         CategoryDish categoryDish = categoryDishRepository.findById(params.getCategoryId())
                 .orElseThrow(() -> new RuntimeException("Invalid category ID"));
@@ -71,9 +72,9 @@ public class ApiAdminController {
         try {
             Dish update = dishRepository.save(dish);
         } catch (Exception ex) {
-            return "false";
+            return ResponseEntity.badRequest().body(ex.getMessage());
         }
-        return "true";
+        return new ResponseEntity<>(true, HttpStatus.OK);
     }
 
     @PostMapping(value = "/dish/add")
@@ -153,8 +154,19 @@ public class ApiAdminController {
     }
     @ApiOperation(value = "Get my data", notes = "Get my data with authentication")
     @GetMapping(value="/user/getall")
-    public ResponseEntity<?> getAllUser(){
-        return ResponseEntity.ok(userRepository.findAll());
+    public ResponseEntity<?> getAllUser(@ModelAttribute PageRs params){
+        Pageable pageable = PageRequest.of(params.getPage()-1, pageSize);
+        Page<User> total=userRepository.findAll(pageable,params.getSearchByName()==null?"":params.getSearchByName());
+        PageRq record=new PageRq((int) total.getTotalElements(),params.getPage(),total.getTotalPages(),total.getContent());
+        return new ResponseEntity<>(record,HttpStatus.OK);
+    }
+    @GetMapping(value="/user")
+    public ResponseEntity<?> getUser(@RequestParam int id){
+        try {
+            return ResponseEntity.ok(userRepository.findAllById(id).get(0));
+        } catch (NoSuchElementException e) {
+            return ResponseEntity.badRequest().body("Not found user with id " + id);
+        }
     }
     @Transactional
     @DeleteMapping("/user/delete")
@@ -175,6 +187,16 @@ public class ApiAdminController {
         });
         return ResponseEntity.ok(orderResponseList);
     }
+
+    @GetMapping("/order")
+    public ResponseEntity<?> getOrder(@RequestParam int id){
+        try {
+            return ResponseEntity.ok(weddingPartyOrder.findAllById(id).get(0));
+        } catch (NoSuchElementException e) {
+            return ResponseEntity.badRequest().body("Not found order with id " + id);
+        }
+    }
+
     @PostMapping("/service/add")
     public ResponseEntity<?> addSerivce(@ModelAttribute ServicesRequest service){
         Service newService=new Service(null,service.getPrice(),service.getName(),cloudinaryService.uploadImg(service.getImg(),cloudinary),service.getDescribe());
@@ -291,8 +313,9 @@ public class ApiAdminController {
     @PostMapping("order/updatestt")
     public ResponseEntity<?> updateStatusPayment(@RequestBody Map<String,String> params){
         int id=Integer.parseInt(params.getOrDefault("id",null));
+        boolean status=Boolean.parseBoolean(params.getOrDefault("status",null));
         WeddingPartyOrders wpo=weddingPartyOrder.findById(id).orElseThrow();
-        wpo.setPaymentStatus(true);
+        wpo.setPaymentStatus(status);
         return ResponseEntity.ok(weddingPartyOrder.save(wpo));
     }
     @GetMapping("feedback/getall")

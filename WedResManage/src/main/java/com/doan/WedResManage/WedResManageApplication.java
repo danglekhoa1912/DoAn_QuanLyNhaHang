@@ -40,7 +40,7 @@ public class WedResManageApplication {
 	}
 	@Bean
 	public FirebaseApp firebaseApp() throws IOException {
-		FileInputStream serviceAccount = new FileInputStream("");
+		FileInputStream serviceAccount = new FileInputStream("D:\\Code\\ReactNative\\DoAn_QuanLyNhaHang\\WedResManage\\src\\main\\resources\\doan-8d7a4-firebase-adminsdk-vff8c-e435141893.json");
 
 		FirebaseOptions options = new FirebaseOptions.Builder()
 				.setCredentials(GoogleCredentials.fromStream(serviceAccount))
