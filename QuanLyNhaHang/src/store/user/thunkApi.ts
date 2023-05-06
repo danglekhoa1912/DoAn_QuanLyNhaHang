@@ -39,8 +39,12 @@ export const registerUser = createAsyncThunk(
 );
 
 export const getUser = createAsyncThunk('user/getUser', async () => {
-  const result = await UserApi.getUser();
-  return result.data;
+  try {
+    const result = await UserApi.getUser();
+    return result.data;
+  } catch (err) {
+    console.log(err);
+  }
 });
 
 export const getOrderHistory = createAsyncThunk(

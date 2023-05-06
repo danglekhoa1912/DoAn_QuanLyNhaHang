@@ -31,6 +31,8 @@ import {addOrder} from '../../store/booking/thunkApi';
 import {IUser} from '../../type/user';
 import {useTranslation} from 'react-i18next';
 import {paymentZalo} from '../../apis/booking';
+import toast from '../../utils/toast';
+import {replace} from '../../utils/navigate';
 const {PayZaloBridge} = NativeModules;
 const payZaloBridgeEmitter = new NativeEventEmitter(PayZaloBridge);
 interface IBookingDetailPage {
@@ -78,38 +80,47 @@ const BookingDetailPage = ({
   const typeTime = useMemo(() => {
     return pTypeTime.find(type => type.id === order.time.id);
   }, [order]);
+
+  const total = useMemo(() => {
+    const lobby = order.lobby.price * (typeTime?.price || 0);
+    const dish = order.menu.total;
+    const service = order.service.total;
+    console.log(lobby, dish, service, order.quantityTable);
+    return (lobby + dish) * order.quantityTable + service;
+  }, [order, typeTime]);
+
   const typeParty = useMemo(() => {
     return pTypeParty.find(type => type.id === order.type_party.id);
   }, [order]);
 
   const handlePayment = () => {
-    paymentZalo(10000).then(data => {
+    paymentZalo(total).then(data => {
       const payZP = NativeModules.PayZaloBridge;
       payZP.payOrder(data.data.zp_trans_token);
     });
-    // pAddOrder({
-    //   orderDate: order.date,
-    //   amount: 0,
-    //   idUser: pUser.id || 0,
-    //   menu: order.menu.dishList.map(dish => dish.id),
-    //   note: '',
-    //   paymentStatus: false,
-    //   pwtId: order.time.value,
-    //   quantity: order.quantityTable,
-    //   service: order.service.serviceList.map(service => service.id),
-    //   type_party: order.type_party.value,
-    //   whId: order.lobby.id,
-    //   typePay: order.type_pay,
-    // });
   };
 
   useEffect(() => {
     payZaloBridgeEmitter.addListener('EventPayZalo', data => {
-      console.log(data);
       if (data.returnCode == 1) {
-        console.log('Pay success!');
+        toast.success('Pay success!');
+        pAddOrder({
+          orderDate: order.date,
+          amount: total,
+          idUser: pUser.id || 0,
+          menu: order.menu.dishList.map(dish => dish.id),
+          note: '',
+          paymentStatus: true,
+          pwtId: order.time.value,
+          quantity: order.quantityTable,
+          service: order.service.serviceList.map(service => service.id),
+          type_party: order.type_party.value,
+          whId: order.lobby.id,
+          typePay: order.type_pay,
+        });
+        replace('HomeScreen');
       } else {
-        console.log('Pay errror! ' + data.returnCode);
+        toast.error('Pay errror! ' + data.returnCode);
       }
     });
   }, []);

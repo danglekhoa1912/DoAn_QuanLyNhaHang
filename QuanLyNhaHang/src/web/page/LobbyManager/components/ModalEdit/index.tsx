@@ -146,7 +146,7 @@ const ModalEdit = ({handleClose, open, data, onReLoadData}: IModalEdit) => {
           </View>
         </View>
         <Loading
-          isLoading={isLoading || (getValues('image') && mode === 'edit')}
+          isLoading={isLoading || (!getValues('image') && mode === 'edit')}
         />
       </>
     </Modal>

@@ -40,27 +40,19 @@ const LobbyDetailPage = ({route}: LobbyDetailScreenRouteProp) => {
   useEffect(() => {
     dispatch(getLobbyById(route.params.id)).then(data => {
       const lobby = data.payload?.weddingHall;
+
       analytics()
-        .logEvent('basket', {
+        .logEvent('lobby', {
           id: 3745092,
-          item: 'mens grey t-shirt',
-          description: ['round neck', 'long sleeved'],
-          size: 'L',
+          item: lobby?.name,
         })
         .then(data => {
           console.log(data);
         });
-
-      //   analytics()
-      //     .logEvent('lobby', {
-      //       id: 3745092,
-      //       item: lobby?.name,
-      //     })
-      //     .then(data => {
-      //       console.log(data);
-      //     });
     });
   }, [route.params.id]);
+
+  console.log(pLobbyDetail?.image);
 
   return (
     <View style={styles.container}>

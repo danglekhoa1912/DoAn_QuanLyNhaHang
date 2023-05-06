@@ -6,7 +6,6 @@ export const convertImageToFile = (url: string) => {
         let match = /\.(\w+)$/.exec(filename || '');
         let type = match ? `image/${match[1]}` : `image`;
         const blob = await response.blob();
-        console.log(blob);
         return new File([blob], filename, {type: type});
       },
     );

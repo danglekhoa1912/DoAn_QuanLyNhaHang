@@ -14,6 +14,7 @@ const compileNodeModules = [
   '@react-native-async-storage/async-storage',
   'react-native-gifted-chat',
   'notistack',
+  '@react-navigation/native',
 ].map(moduleName => path.resolve(appDirectory, `node_modules/${moduleName}`));
 
 const babelLoaderConfiguration = {

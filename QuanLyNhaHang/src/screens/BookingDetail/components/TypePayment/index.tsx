@@ -1,16 +1,29 @@
-import {StyleSheet, TouchableOpacity} from 'react-native';
+import {Image, StyleSheet, TouchableOpacity} from 'react-native';
 import React from 'react';
 import {Card} from '../../../../components';
 import {useDispatch} from 'react-redux';
 import {StyleService, Text, useStyleSheet} from '@ui-kitten/components';
 import {CASH_TYPE, ITypePay} from '../../../../type/booking';
-import {MomoPay} from '../../../../assets';
+import {Cash, MomoPay, ZaloPay} from '../../../../assets';
 import {updateTypePay} from '../../../../store/booking';
 
 interface ITypePayment {
   typePayment: ITypePay;
   selected: boolean;
 }
+
+const RenderIcon = (type: CASH_TYPE) => {
+  switch (type) {
+    case CASH_TYPE.CASH:
+      return Cash;
+    case CASH_TYPE.MOMO:
+      return MomoPay;
+    case CASH_TYPE.ZALO:
+      return ZaloPay;
+    default:
+      return Cash;
+  }
+};
 
 const TypePayment = ({selected, typePayment}: ITypePayment) => {
   const dispatch = useDispatch();
@@ -20,23 +33,14 @@ const TypePayment = ({selected, typePayment}: ITypePayment) => {
     dispatch(updateTypePay(typePayment.type));
   };
 
-  const renderIcon = (type: CASH_TYPE) => {
-    switch (type) {
-      case CASH_TYPE.CASH:
-        return <MomoPay width={50} height={50} />;
-      case CASH_TYPE.MOMO:
-        return <MomoPay width={50} height={50} />;
-      case CASH_TYPE.ZALO:
-        return <MomoPay width={50} height={50} />;
-      default:
-        return <MomoPay width={50} height={50} />;
-    }
-  };
-
   return (
     <Card style={[styles.container, selected && styles.choose]}>
       <TouchableOpacity onPress={onPress} style={styles.type_payment}>
-        {renderIcon(typePayment.type)}
+        {/* {renderIcon(typePayment.type)} */}
+        <Image
+          style={{width: 50, height: 50}}
+          source={RenderIcon(typePayment.type)}
+        />
         <Text style={styles.text}>{typePayment.name}</Text>
       </TouchableOpacity>
     </Card>

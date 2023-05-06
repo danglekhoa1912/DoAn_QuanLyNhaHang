@@ -1,10 +1,8 @@
 package com.quan_ly_nha_hang;
-import android.app.Activity;
 import android.content.Context;
 import android.content.res.Configuration;
 import expo.modules.ApplicationLifecycleDispatcher;
 import expo.modules.ReactNativeHostWrapper;
-import expo.modules.adapters.react.ReactModuleRegistryProvider;
 import vn.zalopay.sdk.Environment;
 import vn.zalopay.sdk.ZaloPaySDK;
 
@@ -16,7 +14,7 @@ import com.facebook.react.ReactPackage;
 import com.facebook.react.defaults.DefaultNewArchitectureEntryPoint;
 import com.facebook.react.defaults.DefaultReactNativeHost;
 import com.facebook.soloader.SoLoader;
-import com.quan_ly_nha_hang.Helper.AppInfo;
+import com.quan_ly_nha_hang.Constant.AppInfo;
 import com.quan_ly_nha_hang.zpmodule.PayZaloBridge;
 
 

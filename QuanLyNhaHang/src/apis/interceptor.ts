@@ -6,8 +6,9 @@ import {
 } from 'axios';
 import {store} from '../store';
 import {clearSpinner, hideSpinner, showSpinner} from '../store/global';
-import {getStorage} from '../utils/storage';
+import {getStorage, removeStorage} from '../utils/storage';
 import {Platform} from 'react-native';
+import {navigate} from '../utils/navigate';
 
 interface IRequestAxios extends AxiosRequestConfig {
   skipLoading?: boolean;
@@ -46,8 +47,13 @@ const onResponseError = async (
 ): Promise<AxiosError | undefined> => {
   store.dispatch(clearSpinner());
   if (err.response?.status === 500) {
-    localStorage.removeItem('accessToken');
-    window.location.href = '/';
+    if (Platform.OS === 'web') {
+      localStorage.removeItem('accessToken');
+      window.location.href = '/';
+    } else {
+      removeStorage('accessToken');
+      navigate('LoginScreen');
+    }
     // TODO: process expiredApiQueue
     // let token: any = null
     // if (!expiredApiQueue.length) {
