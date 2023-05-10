@@ -45,8 +45,6 @@ public class ApiAdminController {
     @Autowired
     private FeedbackRepository feedbackRepository;
     @Autowired
-    private MenuRepository menuRepository;
-    @Autowired
     private ServiceRepository serviceRepository;
     @Autowired
     private UserRepository userRepository;
@@ -101,7 +99,9 @@ public class ApiAdminController {
     public ResponseEntity<Boolean> deleteDish(@RequestBody int id) {
         int i = id;
         if (!dishRepository.findAllById(i).isEmpty()) {
-            long delete = dishRepository.deleteDishById(i);
+            Dish dish = dishRepository.findById(i).orElseThrow();
+            dish.setStatus("false");
+            dishRepository.save(dish);
             return new ResponseEntity<>(true, HttpStatus.OK);
         } else {
             return new ResponseEntity<>(false, HttpStatus.OK);
@@ -117,6 +117,7 @@ public class ApiAdminController {
         newWdh.setStatus(wdh.getStatus());
         newWdh.setPrice(wdh.getPrice());
         newWdh.setImage(cloudinaryService.uploadImg(wdh.getImage(), cloudinary));
+        newWdh.setImage360(cloudinaryService.uploadImg(wdh.getImage360(), cloudinary));
         try {
             WeddingHall update = weddingHall.save(newWdh);
             return ResponseEntity.ok(update);
@@ -135,6 +136,7 @@ public class ApiAdminController {
         newWdh.setStatus(wdh.getStatus());
         newWdh.setPrice(wdh.getPrice());
         newWdh.setImage(cloudinaryService.uploadImg(wdh.getImage(), cloudinary));
+        newWdh.setImage360(cloudinaryService.uploadImg(wdh.getImage360(), cloudinary));
         try {
             WeddingHall update = weddingHall.save(newWdh);
             return ResponseEntity.ok(true);
@@ -149,7 +151,9 @@ public class ApiAdminController {
         if (weddingHall.findAllById(i).isEmpty()){
             return ResponseEntity.badRequest().body("Không tìm thấy id sảnh");
         }
-        weddingHall.deleteById(i);
+        WeddingHall wdh = weddingHall.findById(id).orElseThrow();
+        wdh.setStatus("false");
+        weddingHall.save(wdh);
         return ResponseEntity.ok("Xóa thành công");
     }
     @ApiOperation(value = "Get my data", notes = "Get my data with authentication")
@@ -217,9 +221,11 @@ public class ApiAdminController {
         }
         return ResponseEntity.ok("done");    }
     @PostMapping("/service/delete")
-    public ResponseEntity<?> deleteService(@RequestBody Map<String, Integer> params){
+    public ResponseEntity<?> deleteService(@RequestBody int id){
         try{
-            serviceRepository.deleteById(params.getOrDefault("id",null));
+            Service service = serviceRepository.findById(id).orElseThrow();
+            service.setStatus("false");
+            serviceRepository.save(service);
         }catch (Exception ex){
             return ResponseEntity.badRequest().body("Error");
         }
@@ -346,5 +352,28 @@ public class ApiAdminController {
         user.setRole("ROLE_STAFF");
         userRepository.save(user);
         return ResponseEntity.ok("Đăng ký thành công");
+    }
+    @RequestMapping(value="/dish/get-dish",method = RequestMethod.GET)
+    public ResponseEntity<PageRq> getAllDish(@ModelAttribute PageRs params) {
+        Pageable pageable = PageRequest.of(params.getPage()-1, pageSize);
+        Page<Dish> total=dishRepository.searchDishByNameContains(pageable,params.getSearchByName()==null?"":params.getSearchByName());
+        PageRq record=new PageRq((int) total.getTotalElements(),params.getPage(),total.getTotalPages(),total.getContent());
+        return new ResponseEntity<>(record,HttpStatus.OK);
+    }
+
+    @RequestMapping(value = "/weddinghall/get-all-wedding-hall", method = RequestMethod.GET)
+    public ResponseEntity<?> getAllWeddingHall(@ModelAttribute PageRs params){
+        Pageable pageable = PageRequest.of(params.getPage()-1, pageSize);
+        Page<WeddingHall> total=weddingHall.searchWeddingHallByNameContains(pageable,params.getSearchByName()==null?"":params.getSearchByName());
+        PageRq record=new PageRq((int) total.getTotalElements(),params.getPage(),total.getTotalPages(),total.getContent());
+        return new ResponseEntity<>(record,HttpStatus.OK);
+    }
+
+    @GetMapping("/service/get-all")
+    public ResponseEntity<?> getService(@ModelAttribute PageRs params){
+        Pageable pageable = PageRequest.of(params.getPage()-1, pageSize);
+        Page<Service> total=serviceRepository.searchServiceByNameContains(params.getSearchByName()==null?"":params.getSearchByName(),pageable);
+        PageRq record=new PageRq(total.getNumberOfElements(),params.getPage(),total.getTotalPages(),total.getContent());
+        return new ResponseEntity<>(record,HttpStatus.OK);
     }
 }

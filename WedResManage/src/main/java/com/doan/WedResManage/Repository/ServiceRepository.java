@@ -12,4 +12,6 @@ import java.util.List;
 public interface ServiceRepository extends JpaRepository<Service, Integer>, JpaSpecificationExecutor<Service> {
     Page<Service> searchServiceByNameContains(String s, Pageable pageable);
     List<Service> findAllById(int id);
+
+    Page<Service> searchServiceByNameContainsAndStatusEquals(String s, Pageable pageable, String status);
 }

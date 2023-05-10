@@ -97,15 +97,15 @@ public class ApiUserController {
     public ResponseEntity<?> findDishByCategoryId(@RequestParam int i, @ModelAttribute PageRs params) {
         Pageable pageable = PageRequest.of(params.getPage()-1, pageSize);
         String key = params.getSearchByName()==null?"":params.getSearchByName();
-        Page<Dish> result = dishRepository.searchDishByCategoryId_IdAndNameContains(i, key, pageable);
+        Page<Dish> result = dishRepository.searchDishByCategoryId_IdAndNameContainsAndStatusEquals(i, key, pageable, null);
         PageRq record=new PageRq((int) result.getTotalElements(), params.getPage(),result.getTotalPages(),result.getContent());
         return new ResponseEntity<>(record, HttpStatus.OK);
     }
 
     @RequestMapping(value="/dish/get-dish",method = RequestMethod.GET)
-    public ResponseEntity<PageRq> getAllDish(@ModelAttribute PageRs params) throws JsonProcessingException {
+    public ResponseEntity<PageRq> getAllDish(@ModelAttribute PageRs params) {
         Pageable pageable = PageRequest.of(params.getPage()-1, pageSize);
-        Page<Dish> total=dishRepository.searchDishByNameContains(pageable,params.getSearchByName()==null?"":params.getSearchByName());
+        Page<Dish> total=dishRepository.searchDishByNameContainsAndStatusEquals(pageable,params.getSearchByName()==null?"":params.getSearchByName(),null);
         PageRq record=new PageRq((int) total.getTotalElements(),params.getPage(),total.getTotalPages(),total.getContent());
         return new ResponseEntity<>(record,HttpStatus.OK);
     }
@@ -120,7 +120,7 @@ public class ApiUserController {
     @RequestMapping(value = "/weddinghall/get-all-wedding-hall", method = RequestMethod.GET)
     public ResponseEntity<?> getAllWeddingHall(@ModelAttribute PageRs params){
         Pageable pageable = PageRequest.of(params.getPage()-1, pageSize);
-        Page<WeddingHall> total=weddingHall.searchWeddingHallByNameContains(pageable,params.getSearchByName()==null?"":params.getSearchByName());
+        Page<WeddingHall> total=weddingHall.searchWeddingHallByNameContainsAndStatusEquals(pageable,params.getSearchByName()==null?"":params.getSearchByName(),null);
         PageRq record=new PageRq((int) total.getTotalElements(),params.getPage(),total.getTotalPages(),total.getContent());
         return new ResponseEntity<>(record,HttpStatus.OK);
     }
@@ -150,7 +150,7 @@ public class ApiUserController {
     @GetMapping("/service/get-all")
     public ResponseEntity<?> getService(@ModelAttribute PageRs params){
         Pageable pageable = PageRequest.of(params.getPage()-1, pageSize);
-        Page<Service> total=serviceRepository.searchServiceByNameContains(params.getSearchByName()==null?"":params.getSearchByName(),pageable);
+        Page<Service> total=serviceRepository.searchServiceByNameContainsAndStatusEquals(params.getSearchByName()==null?"":params.getSearchByName(),pageable,null);
         PageRq record=new PageRq(total.getNumberOfElements(),params.getPage(),total.getTotalPages(),total.getContent());
         return new ResponseEntity<>(record,HttpStatus.OK);
     }

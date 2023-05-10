@@ -24,7 +24,7 @@ public class NotificationScheduler {
     private WeddingPartyOrdersRepository weddingPartyOrdersRepository;
     @Autowired
     private FirebaseApp fcmService;
-    @Scheduled(cron = "0 7 13 * * ?") // Chạy vào 7h sáng hàng ngày
+    @Scheduled(cron = "0 0 7 * * ?") // Chạy vào 7h sáng hàng ngày
     public void sendNotificationToCustomers() {
         List<User> users = getCustomers();
 

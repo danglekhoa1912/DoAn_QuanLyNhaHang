@@ -59,6 +59,10 @@ public class WeddingHall implements Serializable {
     @Column(name = "image")
     private String image;
 
+    @Basic(optional = false)
+    @Size(max = 150)
+    @Column(name = "image360")
+    private String image360;
     @Transient
     @Nullable
     @JsonIgnore
@@ -189,4 +193,11 @@ public class WeddingHall implements Serializable {
         this.image = image;
     }
 
+    public String getImage360() {
+        return image360;
+    }
+
+    public void setImage360(String image360) {
+        this.image360 = image360;
+    }
 }

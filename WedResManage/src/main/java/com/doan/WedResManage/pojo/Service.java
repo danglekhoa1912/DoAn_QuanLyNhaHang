@@ -63,6 +63,11 @@ public class Service implements Serializable {
     @Size(min = 1, max = 150)
     @Column(name = "image")
     private String image;
+
+    @Basic(optional = false)
+    @Column(name = "status")
+    private String status;
+
     @OneToMany(mappedBy = "serviceId")
     @JsonIgnore
     private Set<ServicesDetail> servicesDetailSet;
@@ -120,6 +125,14 @@ public class Service implements Serializable {
 
     public void setImage(String image) {
         this.image = image;
+    }
+
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
     }
 
     @XmlTransient
