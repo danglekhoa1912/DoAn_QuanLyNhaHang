@@ -11,4 +11,6 @@ import java.util.List;
 public interface WeddingHallRepository extends JpaRepository<WeddingHall, Integer>, JpaSpecificationExecutor<WeddingHall> {
     List<WeddingHall> findAllById(int id);
     Page<WeddingHall> searchWeddingHallByNameContains(Pageable page, String s);
+
+    Page<WeddingHall> searchWeddingHallByNameContainsAndStatusEquals(Pageable page, String s,String status);
 }

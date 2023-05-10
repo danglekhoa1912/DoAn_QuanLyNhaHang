@@ -50,6 +50,10 @@ public class Dish implements Serializable {
     @NotNull
     @Column(name = "image")
     private String image;
+
+    @Basic(optional = false)
+    @Column(name = "status")
+    private String status;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "dishId")
     @JsonIgnore
     private Set<MenuDish> menuDishSet;
@@ -111,6 +115,14 @@ public class Dish implements Serializable {
 
     public void setCategoryId(CategoryDish categoryId) {
         this.categoryId = categoryId;
+    }
+
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
     }
 
     @Override
