@@ -22,7 +22,6 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.*;
-import java.util.concurrent.atomic.AtomicInteger;
 
 @Validated
 @RestController
@@ -100,7 +99,7 @@ public class ApiAdminController {
         int i = id;
         if (!dishRepository.findAllById(i).isEmpty()) {
             Dish dish = dishRepository.findById(i).orElseThrow();
-            dish.setStatus(false);
+            dish.setStatus(!dish.getStatus());
             dishRepository.save(dish);
             return new ResponseEntity<>(true, HttpStatus.OK);
         } else {
@@ -146,15 +145,15 @@ public class ApiAdminController {
     }
     @Transactional
     @PostMapping("weddinghall/delete")
-    public ResponseEntity<?> deleteWDH(@RequestParam int id){
+    public ResponseEntity<?> deleteWDH(@RequestBody int id){
         int i = id;
         if (weddingHall.findAllById(i).isEmpty()){
             return ResponseEntity.badRequest().body("Không tìm thấy id sảnh");
         }
         WeddingHall wdh = weddingHall.findById(id).orElseThrow();
-        wdh.setStatus(false);
+        wdh.setStatus(!wdh.getStatus());
         weddingHall.save(wdh);
-        return ResponseEntity.ok("Xóa thành công");
+        return ResponseEntity.ok("done");
     }
     @ApiOperation(value = "Get my data", notes = "Get my data with authentication")
     @GetMapping(value="/user/getall")
@@ -224,7 +223,7 @@ public class ApiAdminController {
     public ResponseEntity<?> deleteService(@RequestBody int id){
         try{
             Service service = serviceRepository.findById(id).orElseThrow();
-            service.setStatus(false);
+            service.setStatus(!service.getStatus());
             serviceRepository.save(service);
         }catch (Exception ex){
             return ResponseEntity.badRequest().body("Error");

@@ -59,7 +59,6 @@ public class WeddingHall implements Serializable {
     @Column(name = "image")
     private String image;
 
-    @Basic(optional = false)
     @Size(max = 150)
     @Column(name = "image360")
     private String image360;
