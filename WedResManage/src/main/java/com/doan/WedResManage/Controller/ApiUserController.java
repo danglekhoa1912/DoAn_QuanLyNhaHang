@@ -7,15 +7,9 @@ import com.doan.WedResManage.Response.OrderResponse;
 import com.doan.WedResManage.pojo.*;
 import com.doan.WedResManage.service.jwt.JwtAuthenticationFilter;
 import com.doan.WedResManage.service.jwt.JwtTokenProvider;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.doan.WedResManage.service.CloudinaryService;
 import com.doan.WedResManage.service.SendGridMailService;
 import com.google.firebase.FirebaseApp;
-import com.google.firebase.messaging.FirebaseMessaging;
-import com.google.firebase.messaging.FirebaseMessagingException;
-import com.google.firebase.messaging.Message;
-import com.google.firebase.messaging.Notification;
 import io.swagger.annotations.Api;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -35,10 +29,6 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.ZoneId;
 import java.util.*;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
-
 @Validated
 @RestController
 @Api(value = "userController")
@@ -97,7 +87,7 @@ public class ApiUserController {
     public ResponseEntity<?> findDishByCategoryId(@RequestParam int i, @ModelAttribute PageRs params) {
         Pageable pageable = PageRequest.of(params.getPage()-1, pageSize);
         String key = params.getSearchByName()==null?"":params.getSearchByName();
-        Page<Dish> result = dishRepository.searchDishByCategoryId_IdAndNameContainsAndStatusEquals(i, key, pageable, null);
+        Page<Dish> result = dishRepository.searchDishByCategoryId_IdAndNameContainsAndStatus(i, key, pageable, true);
         PageRq record=new PageRq((int) result.getTotalElements(), params.getPage(),result.getTotalPages(),result.getContent());
         return new ResponseEntity<>(record, HttpStatus.OK);
     }
@@ -105,7 +95,7 @@ public class ApiUserController {
     @RequestMapping(value="/dish/get-dish",method = RequestMethod.GET)
     public ResponseEntity<PageRq> getAllDish(@ModelAttribute PageRs params) {
         Pageable pageable = PageRequest.of(params.getPage()-1, pageSize);
-        Page<Dish> total=dishRepository.searchDishByNameContainsAndStatusEquals(pageable,params.getSearchByName()==null?"":params.getSearchByName(),null);
+        Page<Dish> total=dishRepository.searchDishByNameContainsAndStatus(pageable,params.getSearchByName()==null?"":params.getSearchByName(),true);
         PageRq record=new PageRq((int) total.getTotalElements(),params.getPage(),total.getTotalPages(),total.getContent());
         return new ResponseEntity<>(record,HttpStatus.OK);
     }
@@ -120,7 +110,7 @@ public class ApiUserController {
     @RequestMapping(value = "/weddinghall/get-all-wedding-hall", method = RequestMethod.GET)
     public ResponseEntity<?> getAllWeddingHall(@ModelAttribute PageRs params){
         Pageable pageable = PageRequest.of(params.getPage()-1, pageSize);
-        Page<WeddingHall> total=weddingHall.searchWeddingHallByNameContainsAndStatusEquals(pageable,params.getSearchByName()==null?"":params.getSearchByName(),null);
+        Page<WeddingHall> total=weddingHall.searchWeddingHallByNameContainsAndStatus(pageable,params.getSearchByName()==null?"":params.getSearchByName(),true);
         PageRq record=new PageRq((int) total.getTotalElements(),params.getPage(),total.getTotalPages(),total.getContent());
         return new ResponseEntity<>(record,HttpStatus.OK);
     }
@@ -150,7 +140,7 @@ public class ApiUserController {
     @GetMapping("/service/get-all")
     public ResponseEntity<?> getService(@ModelAttribute PageRs params){
         Pageable pageable = PageRequest.of(params.getPage()-1, pageSize);
-        Page<Service> total=serviceRepository.searchServiceByNameContainsAndStatusEquals(params.getSearchByName()==null?"":params.getSearchByName(),pageable,null);
+        Page<Service> total=serviceRepository.searchServiceByNameContainsAndStatus(params.getSearchByName()==null?"":params.getSearchByName(),pageable,true);
         PageRq record=new PageRq(total.getNumberOfElements(),params.getPage(),total.getTotalPages(),total.getContent());
         return new ResponseEntity<>(record,HttpStatus.OK);
     }
@@ -188,7 +178,7 @@ public class ApiUserController {
         order.getMenu().forEach(item->{
             MenuDish menuDish=new MenuDish();
             menuDish.setMenuId(menuNew);
-            menuDish.setDishId(dishRepository.findAllById(item).get(0));
+            menuDish.setDishId(dishRepository.findById(item).orElseThrow());
             menuNew.setPrice(menuNew.getPrice()+menuDish.getDishId().getPrice());
             menuRepository.save(menuNew);
             menuDishRepository.save(menuDish);

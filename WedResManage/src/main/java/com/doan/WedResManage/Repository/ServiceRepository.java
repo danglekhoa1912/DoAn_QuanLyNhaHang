@@ -13,5 +13,5 @@ public interface ServiceRepository extends JpaRepository<Service, Integer>, JpaS
     Page<Service> searchServiceByNameContains(String s, Pageable pageable);
     List<Service> findAllById(int id);
 
-    Page<Service> searchServiceByNameContainsAndStatusEquals(String s, Pageable pageable, String status);
+    Page<Service> searchServiceByNameContainsAndStatus(String s, Pageable pageable, boolean status);
 }

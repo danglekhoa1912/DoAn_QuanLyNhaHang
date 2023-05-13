@@ -66,7 +66,7 @@ public class Service implements Serializable {
 
     @Basic(optional = false)
     @Column(name = "status")
-    private String status;
+    private boolean status;
 
     @OneToMany(mappedBy = "serviceId")
     @JsonIgnore
@@ -127,11 +127,11 @@ public class Service implements Serializable {
         this.image = image;
     }
 
-    public String getStatus() {
+    public boolean getStatus() {
         return status;
     }
 
-    public void setStatus(String status) {
+    public void setStatus(boolean status) {
         this.status = status;
     }
 
