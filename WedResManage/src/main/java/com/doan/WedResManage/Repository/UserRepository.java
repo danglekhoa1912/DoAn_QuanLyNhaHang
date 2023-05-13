@@ -16,7 +16,7 @@ public interface UserRepository extends JpaRepository<User, Integer>, JpaSpecifi
     User findByEmail(String email);
     Boolean existsUserByEmail(String email);
     List<User> findAllById(int id);
-    Page<User> findAll(Pageable pageable, String s);
+    Page<User> findAllByNameContains(Pageable pageable, String s);
     Boolean existsUserByMobile(String mobile);
     Long deleteUsersById(int id);
 }

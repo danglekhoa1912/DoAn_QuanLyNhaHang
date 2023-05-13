@@ -160,7 +160,7 @@ public class ApiAdminController {
     @GetMapping(value="/user/getall")
     public ResponseEntity<?> getAllUser(@ModelAttribute PageRs params){
         Pageable pageable = PageRequest.of(params.getPage()-1, pageSize);
-        Page<User> total=userRepository.findAll(pageable,params.getSearchByName()==null?"":params.getSearchByName());
+        Page<User> total=userRepository.findAllByNameContains(pageable,params.getSearchByName()==null?"":params.getSearchByName());
         PageRq record=new PageRq((int) total.getTotalElements(),params.getPage(),total.getTotalPages(),total.getContent());
         return new ResponseEntity<>(record,HttpStatus.OK);
     }
