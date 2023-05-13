@@ -100,7 +100,7 @@ public class ApiAdminController {
         int i = id;
         if (!dishRepository.findAllById(i).isEmpty()) {
             Dish dish = dishRepository.findById(i).orElseThrow();
-            dish.setStatus("false");
+            dish.setStatus(false);
             dishRepository.save(dish);
             return new ResponseEntity<>(true, HttpStatus.OK);
         } else {
@@ -152,7 +152,7 @@ public class ApiAdminController {
             return ResponseEntity.badRequest().body("Không tìm thấy id sảnh");
         }
         WeddingHall wdh = weddingHall.findById(id).orElseThrow();
-        wdh.setStatus("false");
+        wdh.setStatus(false);
         weddingHall.save(wdh);
         return ResponseEntity.ok("Xóa thành công");
     }
@@ -160,7 +160,7 @@ public class ApiAdminController {
     @GetMapping(value="/user/getall")
     public ResponseEntity<?> getAllUser(@ModelAttribute PageRs params){
         Pageable pageable = PageRequest.of(params.getPage()-1, pageSize);
-        Page<User> total=userRepository.findAll(pageable,params.getSearchByName()==null?"":params.getSearchByName());
+        Page<User> total=userRepository.findAllByNameContains(pageable,params.getSearchByName()==null?"":params.getSearchByName());
         PageRq record=new PageRq((int) total.getTotalElements(),params.getPage(),total.getTotalPages(),total.getContent());
         return new ResponseEntity<>(record,HttpStatus.OK);
     }
@@ -224,7 +224,7 @@ public class ApiAdminController {
     public ResponseEntity<?> deleteService(@RequestBody int id){
         try{
             Service service = serviceRepository.findById(id).orElseThrow();
-            service.setStatus("false");
+            service.setStatus(false);
             serviceRepository.save(service);
         }catch (Exception ex){
             return ResponseEntity.badRequest().body("Error");
