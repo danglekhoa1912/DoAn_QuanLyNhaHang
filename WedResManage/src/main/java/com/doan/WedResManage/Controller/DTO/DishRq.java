@@ -10,12 +10,19 @@ import java.io.IOException;
 import java.util.Map;
 
 public class DishRq {
-
+    private int id;
     private String name;
     private int price;
     private MultipartFile image;
     private int categoryId;
 
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
     public String getName() {
         return name;
     }

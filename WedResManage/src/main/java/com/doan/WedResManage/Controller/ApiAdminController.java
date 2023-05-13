@@ -52,14 +52,9 @@ public class ApiAdminController {
     @Autowired
     private WeddingPartyOrdersRepository weddingPartyOrder;
 
-    @ApiOperation(value = "Role Admin", notes = "Get my data with authentication")
-    @ApiImplicitParams({
-            @ApiImplicitParam(name = "Authorization", value = "Authorization token", required = true, dataType = "string", paramType = "header")
-    })
-    @CrossOrigin
-    @PutMapping(value = "/dish/change/id={i}")
+    @PostMapping(value = "/dish/edit")
     public ResponseEntity changeNameDish(@ModelAttribute DishRq params, @RequestParam int id) {
-        Dish dish = dishRepository.findById(id).orElseThrow(() -> new RuntimeException("Invalid id dish"));
+        Dish dish = dishRepository.findById(params.getId()).orElseThrow(() -> new RuntimeException("Invalid id dish"));
         CategoryDish categoryDish = categoryDishRepository.findById(params.getCategoryId())
                 .orElseThrow(() -> new RuntimeException("Invalid category ID"));
         dish.setName(params.getName());
