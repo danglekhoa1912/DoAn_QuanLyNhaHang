@@ -12,5 +12,5 @@ public interface WeddingHallRepository extends JpaRepository<WeddingHall, Intege
     List<WeddingHall> findAllById(int id);
     Page<WeddingHall> searchWeddingHallByNameContains(Pageable page, String s);
 
-    Page<WeddingHall> searchWeddingHallByNameContainsAndStatusEquals(Pageable page, String s,String status);
+    Page<WeddingHall> searchWeddingHallByNameContainsAndStatus(Pageable page, String s,boolean status);
 }

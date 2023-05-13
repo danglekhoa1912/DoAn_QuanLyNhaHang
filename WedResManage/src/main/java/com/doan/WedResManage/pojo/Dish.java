@@ -53,7 +53,7 @@ public class Dish implements Serializable {
 
     @Basic(optional = false)
     @Column(name = "status")
-    private String status;
+    private boolean status;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "dishId")
     @JsonIgnore
     private Set<MenuDish> menuDishSet;
@@ -117,11 +117,11 @@ public class Dish implements Serializable {
         this.categoryId = categoryId;
     }
 
-    public String getStatus() {
+    public boolean getStatus() {
         return status;
     }
 
-    public void setStatus(String status) {
+    public void setStatus(boolean status) {
         this.status = status;
     }
 

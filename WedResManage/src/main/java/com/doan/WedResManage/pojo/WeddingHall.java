@@ -48,7 +48,7 @@ public class WeddingHall implements Serializable {
     private String describe;
     @Size(max = 45)
     @Column(name = "status")
-    private String status;
+    private boolean status;
     @Basic(optional = false)
     @NotNull
     @Column(name = "price")
@@ -169,11 +169,11 @@ public class WeddingHall implements Serializable {
         this.describe = describe;
     }
 
-    public String getStatus() {
+    public boolean getStatus() {
         return status;
     }
 
-    public void setStatus(String status) {
+    public void setStatus(boolean status) {
         this.status = status;
     }
 

@@ -14,5 +14,5 @@ public class WeddingHallRq {
     private int price;
     private MultipartFile image;
     private MultipartFile image360;
-    private String status;
+    private Boolean status;
 }
