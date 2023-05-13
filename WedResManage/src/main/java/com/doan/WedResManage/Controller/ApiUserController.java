@@ -24,10 +24,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.servlet.http.HttpServletRequest;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.time.Instant;
-import java.time.LocalDateTime;
-import java.time.LocalTime;
-import java.time.ZoneId;
+import java.time.*;
 import java.util.*;
 @Validated
 @RestController
@@ -116,7 +113,7 @@ public class ApiUserController {
     }
     @RequestMapping(value = "/weddinghall/get-detail-wdh", method = RequestMethod.GET)
     public ResponseEntity<?> getDetailHall(@RequestParam int idHall){
-        Date now=new Date();
+        LocalDate now = LocalDate.now().minusDays(1);
         List<WeddingHallDetails> time = new ArrayList<>();
         List<WeddingPartyOrders> result=weddingPartyOrders.findAllByWhIdAndOrderDateAfter(weddingHall.findById(idHall).get(),now);
         result.forEach(wh->{
