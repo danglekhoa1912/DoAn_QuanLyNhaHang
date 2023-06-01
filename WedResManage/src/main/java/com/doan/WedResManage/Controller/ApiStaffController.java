@@ -1,5 +1,6 @@
 package com.doan.WedResManage.Controller;
 
+import com.doan.WedResManage.Controller.DTO.OrderSearchDTO;
 import io.swagger.annotations.Api;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -12,8 +13,8 @@ import java.util.Map;
 @RequestMapping("api/staff")
 public class ApiStaffController extends ApiAdminController  {
     @Override
-    public ResponseEntity<?> getAllOrder(@RequestParam  Map<String, String> params) {
-        return super.getAllOrder(params);
+    public ResponseEntity<?> getAllOrder(@ModelAttribute OrderSearchDTO searchDTO) {
+        return super.getAllOrder(searchDTO);
     }
 
     @Override

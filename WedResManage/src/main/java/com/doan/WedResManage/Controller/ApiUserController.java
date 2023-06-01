@@ -198,7 +198,7 @@ public class ApiUserController {
         wedOrder.setListServiceId(listServiceNew);
         total+=listServiceNew.getPrice();
         wedOrder.setAmount(total);
-        wedOrder.setPaymentStatus(order.getPaymentStatus());
+        wedOrder.setStatus(order.getStatus());
         wedOrder.setTypePay(order.getTypePay());
         wedOrder.setNote(order.getNote());
         wedOrder.setTypeParty(typePartyRepository.findAllById(order.getType_party()).get(0));
@@ -211,18 +211,13 @@ public class ApiUserController {
         MailRs mailRs=new MailRs(finalOrder.getUserId().getName(),finalOrder.getId(),finalOrder.getWhId().getName(),
                                 (int) finalOrder.getWhId().getPrice(),finalOrder.getListServiceId().getPrice(),
                                 finalOrder.getMenuId().getPrice(),finalOrder.getOrderDate(),finalOrder.getUserId().getMobile(),
-                                finalOrder.getPaymentStatus() ?"Đã thanh toán":"Chưa thanh toán",finalOrder.getQuantityTable(),
+                                finalOrder.getStatus() == 1  ?"Đã thanh toán":"Chưa thanh toán",finalOrder.getQuantityTable(),
                                 finalOrder.getAmount());
         sendGridMailService.sendMail(
                 "customer",
                 Collections.singletonList(finalOrder.getUserId().getEmail()),
                 mailRs
         );
-        // Lấy thời gian đặt hàng của Order
-        LocalDateTime orderTime = LocalDateTime.ofInstant(finalOrder.getOrderDate().toInstant(), ZoneId.systemDefault());
-
-        // Tính toán thời gian thông báo sẽ được gửi vafo 7h
-        LocalDateTime notificationTime = LocalDateTime.of(orderTime.toLocalDate(), LocalTime.of(7, 0));
 
         return ResponseEntity.ok(finalOrder);
     }
