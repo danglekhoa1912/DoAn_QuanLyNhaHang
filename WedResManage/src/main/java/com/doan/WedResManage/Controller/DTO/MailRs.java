@@ -1,7 +1,11 @@
 package com.doan.WedResManage.Controller.DTO;
 
-import java.util.Date;
+import lombok.Getter;
+import lombok.Setter;
 
+import java.util.Date;
+@Getter
+@Setter
 public class MailRs {
     private String name;
     private int id;
@@ -36,85 +40,4 @@ public class MailRs {
         this.count = count;
         this.total = total;
     }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public void setId(int id) {
-        this.id = id;
-    }
-
-    public String getHall() {
-        return hall;
-    }
-
-    public void setHall(String hall) {
-        this.hall = hall;
-    }
-
-    public int getHallPrice() {
-        return hallPrice;
-    }
-
-    public void setHallPrice(int hallPrice) {
-        this.hallPrice = hallPrice;
-    }
-
-    public int getServicePrice() {
-        return servicePrice;
-    }
-
-    public void setServicePrice(int servicePrice) {
-        this.servicePrice = servicePrice;
-    }
-
-    public int getMenuPrice() {
-        return menuPrice;
-    }
-
-    public void setMenuPrice(int menuPrice) {
-        this.menuPrice = menuPrice;
-    }
-
-    public Date getTime() {
-        return time;
-    }
-
-    public void setTime(Date time) {
-        this.time = time;
-    }
-
-    public String getMobile() {
-        return mobile;
-    }
-
-    public void setMobile(String mobile) {
-        this.mobile = mobile;
-    }
-
-    public String getStatus() {
-        return status;
-    }
-
-    public void setStatus(String status) {
-        this.status = status;
-    }
-
-    public int getCount() {
-        return count;
-    }
-
-    public void setCount(int count) {
-        this.count = count;
-    }
-
 }

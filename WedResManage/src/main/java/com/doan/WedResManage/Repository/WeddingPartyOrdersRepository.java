@@ -19,12 +19,17 @@ public interface WeddingPartyOrdersRepository extends JpaRepository<WeddingParty
     WeddingPartyOrders findByOrderDateAndPwtIdAndWhId(Date orderDate, PriceWeddingTime ptwId, WeddingHall whId);
     Page<WeddingPartyOrders> searchWeddingPartyOrdersByUserId(User userId, Pageable pageable);
     Page<WeddingPartyOrders> findAll(Pageable pageable);
+
+    Page<WeddingPartyOrders> findAllByOrderDateAndStatus(Pageable pageable, Date orderDate, int status);
+    Page<WeddingPartyOrders> findAllByStatus(Pageable pageable,int status);
+    Page<WeddingPartyOrders> findAllByOrderDate(Pageable pageable, Date orderDate);
     List<WeddingPartyOrders> findAllById(int id);
-    List<WeddingPartyOrders> findByOrderDateBetween(Date start,Date end);
+    List<WeddingPartyOrders> findByOrderDateBetween( Date start,Date end);
     List<WeddingPartyOrders> findAllByWhIdAndOrderDateAfter(WeddingHall whId, LocalDate orderDate);
     long countAllByOrderDateBetween(Date start,Date end);
 
     long countAllByWhIdAndOrderDateBetween(WeddingHall whId,Date start, Date end);
     List<WeddingPartyOrders> findByOrderDateBetweenAndWhId(Date start,Date end,WeddingHall whId);
     List<WeddingPartyOrders> findAllByOrderDate(Date date);
+
 }
