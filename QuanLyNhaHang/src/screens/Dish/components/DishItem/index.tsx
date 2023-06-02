@@ -56,7 +56,7 @@ const DishItem = ({
         />
         <View style={styles.container_title}>
           <Text style={styles.title_text}>{dish.name}</Text>
-          <Text>{dish.price}.000VND</Text>
+          <Text>{dish.price} VND</Text>
         </View>
       </TouchableOpacity>
     </Card>

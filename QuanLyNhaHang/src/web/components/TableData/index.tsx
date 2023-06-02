@@ -43,6 +43,7 @@ export interface ITabelData {
   onChangePage: (event: any, newPage: number) => void;
   totalItem: number;
   renderData?: (data: any) => React.ReactNode;
+  handleSelectItem: (data: any) => void;
 }
 
 export default function TabelData({
@@ -53,6 +54,7 @@ export default function TabelData({
   onChangePage,
   totalItem,
   renderData,
+  handleSelectItem,
 }: ITabelData) {
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
   const [item, setItem] = React.useState<any>();
@@ -60,20 +62,15 @@ export default function TabelData({
   const handleClick = (event: React.MouseEvent<HTMLElement>, data: any) => {
     setAnchorEl(event.currentTarget);
     setItem(data);
+    handleSelectItem(data);
   };
   const handleClose = () => {
     setAnchorEl(null);
   };
 
-  const renderStatus = (status: STATUS) => {
-    switch (status) {
-      case STATUS.ACTIVE:
-        return <div style={{color: '#6BA80C'}}>Active</div>;
-      case STATUS.ACTIVE:
-        return <div style={{color: '#F74340'}}>Inactive</div>;
-      default:
-        return <div style={{color: '#6BA80C'}}>Active</div>;
-    }
+  const renderStatus = (status: boolean) => {
+    if (status) return <div style={{color: '#6BA80C'}}>Active</div>;
+    return <div style={{color: '#F74340'}}>Inactive</div>;
   };
 
   return (
@@ -116,9 +113,11 @@ export default function TabelData({
                       </StyledTableCell>
                     </>
                   )}
-                  <StyledTableCell align={'center'}>
-                    {renderStatus(STATUS.ACTIVE)}
-                  </StyledTableCell>
+                  {data?.status !== undefined && (
+                    <StyledTableCell align={'center'}>
+                      {renderStatus(data?.status)}
+                    </StyledTableCell>
+                  )}
                   <StyledTableCell>
                     <IconButton
                       id="demo-positioned-button"

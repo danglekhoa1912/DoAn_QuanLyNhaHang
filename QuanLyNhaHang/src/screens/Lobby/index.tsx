@@ -19,6 +19,8 @@ import {useDispatch, useSelector} from 'react-redux';
 import {AppDispatch, AppState} from '../../store';
 import {getLobbyList} from '../../store/lobby/thunkApi';
 import {ILobby} from '../../type/lobby';
+import {updateInfoBooking} from '../../store/booking';
+import {setIsBooking} from '../../store/global';
 
 const LobbyPage = () => {
   const theme = useTheme();
@@ -37,7 +39,13 @@ const LobbyPage = () => {
     });
   };
 
-  const handleChooseLobby = () => {
+  const handleChooseLobby = (item: ILobby) => {
+    dispatch(
+      updateInfoBooking({
+        lobby: item,
+      }),
+    );
+    dispatch(setIsBooking(true));
     navigate('BookingScreen');
   };
 
@@ -100,7 +108,9 @@ const LobbyPage = () => {
                         style={styles.button}
                         variant="outlined"
                         title={t('screen.lobby.choose_lobby')}
-                        onPress={handleChooseLobby}
+                        onPress={() => {
+                          handleChooseLobby(item);
+                        }}
                       />
                     </View>
                   </TouchableOpacity>

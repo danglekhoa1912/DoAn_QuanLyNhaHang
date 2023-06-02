@@ -12,6 +12,16 @@ export const getListService = (params: ISearchParam) => {
   });
 };
 
+export const getListServiceAdmin = (params: ISearchParam) => {
+  const {page = 1, searchByName = ''} = params;
+  return AxiosClient.get(`admin/service/get-all`, {
+    params: {
+      page,
+      searchByName,
+    },
+  });
+};
+
 export const addService = (service: IServiceRes) => {
   let formdata = new FormData();
   formdata.append('name', service.name);
@@ -40,5 +50,5 @@ export const updateService = (service: IServiceRes) => {
 };
 
 export const deleteService = (id: number) => {
-  return AxiosClient.post(`admin/service/delete`, {id});
+  return AxiosClient.post(`admin/service/delete`, id);
 };

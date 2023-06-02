@@ -8,6 +8,12 @@ export const getLobbyList = (params: ISearchParam) => {
   });
 };
 
+export const getLobbyListAdmin = (params: ISearchParam) => {
+  return AxiosClient.get('admin/weddinghall/get-all-wedding-hall', {
+    params: params,
+  });
+};
+
 export const getLobbyById = (id: number) => {
   return AxiosClient.get(`order/weddinghall/get-detail-wdh?idHall=${id}`);
 };
@@ -19,6 +25,7 @@ export const addLooby = (lobby: ILobbyRes) => {
   formdata.append('describe', lobby.describe);
   formdata.append('price', lobby.price.toString());
   formdata.append('image', lobby.image);
+  formdata.append('image360', lobby.image360);
   return AxiosClient.post('admin/weddinghall/add', formdata, {
     headers: {
       'Content-Type': 'multipart/form-data',
@@ -34,6 +41,7 @@ export const updateLobby = (lobby: ILobbyRes) => {
   formdata.append('describe', lobby.describe);
   formdata.append('price', lobby.price.toString());
   formdata.append('image', lobby.image);
+  formdata.append('image360', lobby.image360);
   return AxiosClient.post('admin/weddinghall/edit', formdata, {
     headers: {
       'Content-Type': 'multipart/form-data',
@@ -42,5 +50,5 @@ export const updateLobby = (lobby: ILobbyRes) => {
 };
 
 export const deleteLobby = (id: number) => {
-  return AxiosClient.post(`admin/weddinghall/delete?id=${id}`);
+  return AxiosClient.post(`admin/weddinghall/delete`, id);
 };

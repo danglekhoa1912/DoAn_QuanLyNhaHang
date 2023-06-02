@@ -12,6 +12,17 @@ export const getDishList = (params: IRequestParams) => {
   });
 };
 
+export const getDishListAdmin = (params: IRequestParams) => {
+  const {categoryId = 2, page = 1, searchByName = ''} = params;
+  return AxiosClient.get(`order/dish/categoryId`, {
+    params: {
+      page,
+      searchByName,
+      i: categoryId,
+    },
+  });
+};
+
 export const getCategories = () => {
   return AxiosClient.get('order/dish/get-category');
 };
@@ -31,12 +42,13 @@ export const addDish = (dish: IDishRes) => {
 
 export const updateDish = (dish: IDishRes) => {
   let formData = new FormData();
+  formData.append('id', dish.id);
   formData.append('name', dish.name);
   formData.append('categoryId', dish.category.toString());
   formData.append('price', dish.price.toString());
   formData.append('image', dish.image);
   console.log(formData);
-  return AxiosClient.put(`admin/dish/change/id=${dish.id}`, formData, {
+  return AxiosClient.post(`admin/dish/edit`, formData, {
     headers: {
       'Content-Type': 'multipart/form-data',
     },
@@ -44,7 +56,7 @@ export const updateDish = (dish: IDishRes) => {
 };
 
 export const deleteDish = (id: number) => {
-  return AxiosClient.post(`admin/dish/delete`, {id});
+  return AxiosClient.post(`admin/dish/delete`, id);
 };
 
 export const countDish = (cateId: number) => {

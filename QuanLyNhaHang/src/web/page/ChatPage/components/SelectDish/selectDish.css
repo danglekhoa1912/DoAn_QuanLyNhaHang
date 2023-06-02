@@ -1,0 +1,16 @@
+.wrap-dish {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+}
+.wrap-dish:hover {
+  cursor: pointer;
+  .icon-remove {
+    display: flex;
+  }
+}
+
+.icon-remove {
+  display: none;
+}

@@ -6,11 +6,20 @@ import {
 } from '@reduxjs/toolkit';
 import {DishApi} from '../../apis';
 import {ICategory, IDishRes, IRequestParams} from '../../type/dish';
+import {withParamsToastCatcher} from '../ToastCatcherWeb';
 
 export const getDishList = createAsyncThunk(
   'dish/getDishList',
   async (params: IRequestParams) => {
     const result = await DishApi.getDishList(params);
+    return result.data;
+  },
+);
+
+export const getDishListAdmin = createAsyncThunk(
+  'dish/getDishListAdmin',
+  async (params: IRequestParams) => {
+    const result = await DishApi.getDishListAdmin(params);
     return result.data;
   },
 );
@@ -25,10 +34,10 @@ export const getCategories = createAsyncThunk(
 
 export const addDish = createAsyncThunk(
   'dish/addDish',
-  async (dish: IDishRes) => {
+  withParamsToastCatcher(async (dish: IDishRes) => {
     const result = await DishApi.addDish(dish);
     return result;
-  },
+  }, 'Create dish successfully'),
 );
 
 export const deleteDish = createAsyncThunk(
@@ -41,10 +50,10 @@ export const deleteDish = createAsyncThunk(
 
 export const updateDish = createAsyncThunk(
   'dish/updateDish',
-  async (dish: IDishRes) => {
+  withParamsToastCatcher(async (dish: IDishRes) => {
     const result = await DishApi.updateDish(dish);
     return result;
-  },
+  }, 'Update dish successfully'),
 );
 
 export const countDish = createAsyncThunk(

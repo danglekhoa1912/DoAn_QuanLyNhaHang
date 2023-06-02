@@ -47,6 +47,10 @@ const BookingManager = () => {
     setPage(newPage);
   };
 
+  const handleSelectItem = (data: any) => {
+    order.current = data;
+  };
+
   const viewDetail = (data: any) => {
     setOpen(true);
     order.current = data;
@@ -138,6 +142,7 @@ const BookingManager = () => {
         </View>
       </View>
       <TabelData
+        handleSelectItem={handleSelectItem}
         renderData={data => {
           return (
             <>
@@ -186,7 +191,6 @@ const BookingManager = () => {
           {label: 'Time', minWidth: 10},
           {label: 'Type Pay', minWidth: 10},
           {label: 'Payment Status', minWidth: 10},
-          {label: 'Status', minWidth: 10},
           {label: 'Action', minWidth: 10},
         ]}
       />

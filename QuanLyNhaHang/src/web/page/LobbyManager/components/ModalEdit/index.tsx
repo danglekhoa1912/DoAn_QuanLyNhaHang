@@ -1,19 +1,13 @@
 import {StyleSheet, Text, View} from 'react-native';
 import React, {useEffect, useMemo} from 'react';
 import Modal from '../../../../components/Modal';
-import {IDish, IDishRes} from '../../../../../type/dish';
 import {useForm} from 'react-hook-form';
-import {DropDown, ImagePicker, TextField} from '../../../../components';
-import {CircularProgress, Select} from '@mui/material';
+import {ImagePicker, TextField} from '../../../../components';
 import {useDispatch, useSelector} from 'react-redux';
 import {AppDispatch, AppState} from '../../../../../store';
-import {ISelectItem} from '../../../../../type/common';
-import {sCategoryOpts} from '../../../../../store/dish/selector';
-import {updateDish} from '../../../../../store/dish/thunkApi';
 import {ILobby, ILobbyRes} from '../../../../../type/lobby';
 import {addLooby, updateLobby} from '../../../../../store/lobby/thunkApi';
 import {convertImageToFile} from '../../../../../utils/convertImageToFile';
-import {Spinner} from '../../../../../components';
 import {Loading} from '../../../../components/Loading';
 
 interface IModalEdit {
@@ -69,6 +63,7 @@ const ModalEdit = ({handleClose, open, data, onReLoadData}: IModalEdit) => {
           image: await convertImageToFile(data?.image || ''),
           capacity: data?.capacity,
           describe: data?.describe || '',
+          image360: await convertImageToFile(data?.image360 || ''),
         });
       })();
     } else reset({});
@@ -100,6 +95,13 @@ const ModalEdit = ({handleClose, open, data, onReLoadData}: IModalEdit) => {
             disabled={false}
             control={control}
             name="image"
+          />
+          <ImagePicker
+            initPreviewImg={data?.image360}
+            label="Image 360"
+            disabled={false}
+            control={control}
+            name="image360"
           />
           <View>
             <Text>Name</Text>

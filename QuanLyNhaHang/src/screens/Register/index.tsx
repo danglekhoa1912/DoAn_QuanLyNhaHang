@@ -81,71 +81,75 @@ const RegisterPage = () => {
   };
 
   return (
-    <ScrollView style={styles.root}>
-      <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-        <View style={styles.container}>
-          <View>
-            <TouchableOpacity
-              onPress={() => {
-                goBack();
-              }}>
-              <Icon size={30} name="back" color={COLORS.tertiary} />
-            </TouchableOpacity>
-            <Text style={styles.title} category="h1">
-              Create Account.
-            </Text>
-          </View>
-          <View style={styles.container_input}>
+    <>
+      <ScrollView style={styles.root}>
+        <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+          <View style={styles.container}>
             <View>
-              <ImgPicker control={control} name="avatar" />
-              {errors?.avatar?.message && <Text>{errors.avatar.message}</Text>}
+              <TouchableOpacity
+                onPress={() => {
+                  goBack();
+                }}>
+                <Icon size={30} name="back" color={COLORS.tertiary} />
+              </TouchableOpacity>
+              <Text style={styles.title} category="h1">
+                Create Account.
+              </Text>
             </View>
-            <TextField
-              colorError="white"
-              styleContainer={styles.text_field}
-              keyboardType="email-address"
-              control={control}
-              name="email"
-              placeholder="Email"
-            />
-            <TextField
-              colorError="white"
-              styleContainer={styles.text_field}
-              control={control}
-              name="name"
-              placeholder="Name"
-            />
-            <TextField
-              colorError="white"
-              styleContainer={styles.text_field}
-              keyboardType="numeric"
-              control={control}
-              name="mobile"
-              placeholder="Mobile"
-            />
-            <DatePicker
-              styleContainer={styles.text_field}
-              max={new Date()}
-              min={new Date(0)}
-              control={control}
-              name="birthday"
-            />
-            <TextField
-              colorError="white"
-              styleContainer={styles.text_field}
-              secureTextEntry
-              control={control}
-              name="password"
-              placeholder="Password"
-            />
+            <View style={styles.container_input}>
+              <View>
+                <ImgPicker control={control} name="avatar" />
+                {errors?.avatar?.message && (
+                  <Text>{errors.avatar.message}</Text>
+                )}
+              </View>
+              <TextField
+                colorError="white"
+                styleContainer={styles.text_field}
+                keyboardType="email-address"
+                control={control}
+                name="email"
+                placeholder="Email"
+              />
+              <TextField
+                colorError="white"
+                styleContainer={styles.text_field}
+                control={control}
+                name="name"
+                placeholder="Name"
+              />
+              <TextField
+                colorError="white"
+                styleContainer={styles.text_field}
+                keyboardType="numeric"
+                control={control}
+                name="mobile"
+                placeholder="Mobile"
+              />
+              <DatePicker
+                styleContainer={styles.text_field}
+                max={new Date()}
+                min={new Date(0)}
+                control={control}
+                name="birthday"
+              />
+              <TextField
+                colorError="white"
+                styleContainer={styles.text_field}
+                secureTextEntry
+                control={control}
+                name="password"
+                placeholder="Password"
+              />
+            </View>
+            <View>
+              <Button onPress={handleSubmit(onSubmit)} title="Register" />
+            </View>
           </View>
-          <View>
-            <Button onPress={handleSubmit(onSubmit)} title="Register" />
-          </View>
-          <Spinner isLoading={!!pIsLoading} />
-        </View>
-      </TouchableWithoutFeedback>
-    </ScrollView>
+        </TouchableWithoutFeedback>
+      </ScrollView>
+      <Spinner isLoading={!!pIsLoading} />
+    </>
   );
 };
 

@@ -156,7 +156,12 @@ dependencies {
     implementation("androidx.swiperefreshlayout:swiperefreshlayout:1.0.0")
     implementation('com.squareup.okhttp3:okhttp:4.6.0')
     implementation("com.google.firebase:firebase-analytics")
+    implementation 'com.google.protobuf.nano:protobuf-javanano:3.2.0rc2'
     implementation files('libs/zpdk-release-v3.1.aar')
+    implementation files('libs/sdk-panowidget-1.170.0.aar')
+    implementation files('libs/sdk-base-1.160.0.aar')
+    implementation files('libs/sdk-commonwidget-1.170.0.aar')
+    implementation files('libs/sdk-common-1.170.0.aar')
     debugImplementation("com.facebook.flipper:flipper:${FLIPPER_VERSION}")
     debugImplementation("com.facebook.flipper:flipper-network-plugin:${FLIPPER_VERSION}") {
         exclude group:'com.squareup.okhttp3', module:'okhttp'

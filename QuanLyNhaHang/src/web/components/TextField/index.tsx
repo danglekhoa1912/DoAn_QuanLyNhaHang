@@ -22,8 +22,10 @@ function TextField<T extends FieldValues>({
           onChange={onChange}
           style={{
             borderRadius: 6,
-            backgroundColor: '#eee',
+            backgroundColor: '#ffffff',
             padding: 14,
+            borderColor: '#e7e7e7',
+            borderWidth: 1,
             // outline: 'none',
           }}
           placeholderTextColor="#cbc"

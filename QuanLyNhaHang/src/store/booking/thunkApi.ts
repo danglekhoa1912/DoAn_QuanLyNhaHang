@@ -1,4 +1,4 @@
-import {IBookingStore} from './index';
+import {IBookingStore, orderDefault} from './index';
 import {
   ActionReducerMapBuilder,
   createAsyncThunk,
@@ -59,4 +59,10 @@ export const extraReducers = (
         state.typeParty = action.payload;
       },
     );
+  builders.addCase(
+    addOrder.fulfilled,
+    (state: IBookingStore, action: PayloadAction<any>) => {
+      state.order = orderDefault;
+    },
+  );
 };

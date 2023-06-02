@@ -17,6 +17,7 @@ const initialState = {
     name: '',
     price: 0,
     status: '',
+    image360: '',
   },
   weddingHallDetails: [],
 } as ILobbyStore;

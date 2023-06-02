@@ -5,33 +5,46 @@ import {IDish} from '../../../type/dish';
 import {useDispatch} from 'react-redux';
 import {AppDispatch} from '../../../store';
 import {IService} from '../../../type/service';
-import {getLobbyList} from '../../../store/lobby/thunkApi';
+import {
+  deleteLobby,
+  getLobbyList,
+  getLobbyListAdmin,
+} from '../../../store/lobby/thunkApi';
 import {ILobby} from '../../../type/lobby';
 import ModalEdit from './components/ModalEdit';
 
 const LobbyManager = () => {
-  const [lobbyList, setLobbyList] = useState<IService[]>([]);
+  const [lobbyList, setLobbyList] = useState<ILobby[]>([]);
   const [page, setPage] = useState(0);
   const [search, setSearch] = useState('');
   const totalItem = useRef<number>(0);
   const dispatch = useDispatch<AppDispatch>();
   const [open, setOpen] = React.useState(false);
-  const lobby = useRef<ILobby>();
+  const [lobby, setLobby] = useState<ILobby>();
 
   const handleChangePage = (event: any, newPage: number) => {
     setPage(newPage);
   };
 
+  const handleSelectItem = (data: any) => {
+    setLobby(data);
+  };
+
   const handleEdit = (data: any) => {
     setOpen(true);
-    lobby.current = data;
+  };
+
+  const handleRemove = (data: any) => {
+    dispatch(deleteLobby(data.id)).then(() => {
+      handleLoadData();
+    });
   };
 
   const handleClose = () => setOpen(false);
 
   const handleLoadData = () => {
     dispatch(
-      getLobbyList({
+      getLobbyListAdmin({
         page: page + 1,
         searchByName: search,
       }),
@@ -86,13 +99,17 @@ const LobbyManager = () => {
         />
       </View>
       <TabelData
+        handleSelectItem={handleSelectItem}
         currentPage={page}
         onChangePage={handleChangePage}
         totalItem={totalItem.current}
         data={lobbyList}
         menu={[
           {label: 'Edit', action: handleEdit},
-          {label: 'Remove', action: () => {}},
+          {
+            label: `${lobby?.status ? 'Inactive' : 'Active'}`,
+            action: handleRemove,
+          },
         ]}
         rowTitle={[
           {label: '#', minWidth: 10},
@@ -105,7 +122,7 @@ const LobbyManager = () => {
       />
       <ModalEdit
         onReLoadData={handleLoadData}
-        data={lobby.current}
+        data={lobby}
         open={open}
         handleClose={handleClose}
       />

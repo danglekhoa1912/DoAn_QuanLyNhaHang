@@ -113,7 +113,7 @@ public class ApiUserController {
     }
     @RequestMapping(value = "/weddinghall/get-detail-wdh", method = RequestMethod.GET)
     public ResponseEntity<?> getDetailHall(@RequestParam int idHall){
-        LocalDate now = LocalDate.now().minusDays(1);
+        Date now = new Date();
         List<WeddingHallDetails> time = new ArrayList<>();
         List<WeddingPartyOrders> result=weddingPartyOrders.findAllByWhIdAndOrderDateAfter(weddingHall.findById(idHall).get(),now);
         result.forEach(wh->{

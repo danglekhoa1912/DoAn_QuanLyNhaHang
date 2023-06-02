@@ -11,7 +11,7 @@ import Icon from 'react-native-vector-icons/AntDesign';
 import {Button, Spinner, Text, TextField} from '../../components';
 import {useForm} from 'react-hook-form';
 import {IFormLogin} from '../../type/form';
-import {goBack, navigate} from '../../utils/navigate';
+import {goBack, navigate, replace} from '../../utils/navigate';
 import {AppDispatch, AppState} from '../../store';
 import {ILoginRes} from '../../type/user';
 import {connect, useSelector} from 'react-redux';
@@ -63,7 +63,7 @@ const LoginPage = ({pLoginUser, pGetUser}: ILoginPage) => {
           if (!data?.error) {
             reset();
             pGetUser();
-            navigate('DrawerScreen');
+            replace('DrawerScreen');
           }
         });
       });

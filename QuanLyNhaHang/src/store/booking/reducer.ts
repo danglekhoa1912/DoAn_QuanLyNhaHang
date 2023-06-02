@@ -1,6 +1,6 @@
 import {IDish} from './../../type/dish';
 import {PayloadAction} from '@reduxjs/toolkit';
-import {IBookingStore} from '.';
+import {IBookingStore, orderDefault} from '.';
 import {IFormBooking} from '../../type/booking';
 import {IService} from '../../type/service';
 
@@ -36,5 +36,8 @@ export const reducer = {
   },
   updateTypePay: (state: IBookingStore, action: PayloadAction<any>) => {
     state.order.type_pay = action.payload;
+  },
+  resetBooking: (state: IBookingStore) => {
+    state.order = orderDefault;
   },
 };

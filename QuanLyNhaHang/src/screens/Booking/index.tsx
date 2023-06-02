@@ -25,13 +25,14 @@ import {useTranslation} from 'react-i18next';
 import {navigate, replace} from '../../utils/navigate';
 import {connect} from 'react-redux';
 import {AppDispatch, AppState} from '../../store';
-import {updateInfoBooking} from '../../store/booking';
+import {resetBooking, updateInfoBooking} from '../../store/booking';
 import {getTypeParty, getTypeTime} from '../../store/booking/thunkApi';
 import {IILoobyBooked, ILobby, ITypeParty} from '../../type/lobby';
 import {sTypePartyOpts, sTypeTimeOpts} from '../../store/booking/selector';
 import {ISelectItem} from '../../type/common';
 import * as _ from 'lodash';
 import {setIsBooking} from '../../store/global';
+import moment from 'moment';
 
 interface IBookingPage {
   pTypePartyOpts: ISelectItem[];
@@ -40,9 +41,11 @@ interface IBookingPage {
   pTimeLobbyBooked: IILoobyBooked[];
   pIsLoading: number;
   pGetTypeParty: () => Promise<unknown>;
+  pResetBooking: () => void;
   pGetTypeTime: () => Promise<unknown>;
   pUpdateInfoBooking: (data: any) => void;
   pSetIsBooking: (data: boolean) => void;
+  pIsBooking: boolean;
 }
 
 const BookingPage = ({
@@ -55,6 +58,8 @@ const BookingPage = ({
   pIsLoading,
   pUpdateInfoBooking,
   pSetIsBooking,
+  pResetBooking,
+  pIsBooking,
 }: IBookingPage) => {
   const {t} = useTranslation();
   const schema = yup
@@ -88,9 +93,10 @@ const BookingPage = ({
     handleSubmit,
     formState: {errors},
     watch,
+    reset,
   } = useForm<IFormBooking>({
     defaultValues: {
-      date: new Date(),
+      date: moment(new Date()).add(1, 'd').toDate(),
       quantityTable: 0,
       time: {},
       type_party: {},
@@ -99,19 +105,20 @@ const BookingPage = ({
   });
 
   const typeTimeOpts = useMemo(() => {
-    const dateSelected = pTimeLobbyBooked.find(
+    const dateSelected = pTimeLobbyBooked.filter(
       item =>
-        new Date(`${item.date} 00:00:00`).getTime() === watch('date').getTime(),
+        new Date(`${item.date}`).setHours(0, 0, 0, 0) ===
+        watch('date')?.getTime(),
     );
     return pTypeTimeOpts.map(item => ({
       ...item,
-      disabled: item.id === dateSelected?.session,
+      disabled: dateSelected.some(date => date.session === item.id),
     }));
   }, [pTypeTimeOpts, watch('date')]);
 
   const handleChangeLobby = () => {
-    pSetIsBooking(false);
-    replace('LobbyScreen');
+    // pSetIsBooking(false);
+    navigate('LobbyScreen');
   };
 
   const onSubmit = (data: IFormBooking) => {
@@ -149,107 +156,118 @@ const BookingPage = ({
     pGetTypeTime();
   }, []);
 
+  useEffect(() => {
+    if (!pIsBooking) {
+      reset();
+    }
+  }, [pIsBooking]);
+
   return (
-    <ScrollView>
-      <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-        <View style={styles.root}>
-          <Header
-            onGoBack={() => {
-              pSetIsBooking(false);
-            }}
-            filter={false}
-            title={t('screen.booking.title')}
-          />
-          <View style={styles.content}>
-            <View style={styles.content_lobby}>
-              <Image
-                source={{
-                  uri: pLobbyInOrder?.image,
-                }}
-                style={styles.content_image as StyleProp<ImageStyle>}
-              />
-              <View style={styles.content_right}>
-                <View>
-                  <Text style={styles.text}>
-                    {t('screen.lobby.name')}: {pLobbyInOrder?.name}
-                  </Text>
-                  <Text style={styles.text}>
-                    {t('common.capacity')}: {pLobbyInOrder?.capacity} bàn
-                  </Text>
-                  <Text style={styles.text}>
-                    {t('common.price')}: {pLobbyInOrder?.price} VND
-                  </Text>
-                </View>
-                <Button
-                  backgroundColor={theme['color-primary-default']}
-                  title={t('screen.booking.change_lobby')}
-                  style={styles.button}
-                  onPress={handleChangeLobby}
-                />
-              </View>
-            </View>
-            <View style={styles.containerForm}>
-              <Field label={t('screen.booking.booking_date')}>
-                <DatePicker
-                  min={new Date()}
-                  filter={filterDateBooked}
-                  colorIcon="black"
-                  controlStyle={styles.dataPicker}
-                  control={control}
-                  name="date"
-                />
-              </Field>
-              <View
-                style={{
-                  flexDirection: 'row',
-                  justifyContent: 'space-between',
-                  alignItems: 'flex-start',
-                  width: '100%',
-                }}>
-                <Field
-                  style={styles.selectField}
-                  label={t('screen.booking.session')}>
-                  <Select
-                    placeholder={t('screen.booking.placeholder_session') || ''}
-                    options={typeTimeOpts}
-                    control={control}
-                    name="time"
-                  />
-                </Field>
-                <Field
-                  style={styles.selectField}
-                  label={t('screen.booking.type_party')}>
-                  <Select
-                    placeholder={
-                      t('screen.booking.placeholder_type_party') || ''
-                    }
-                    options={pTypePartyOpts}
-                    control={control}
-                    name="type_party"
-                  />
-                </Field>
-              </View>
-              <Field label={t('common.capacity')}>
-                <TextField
-                  placeholderTextColor={theme['color-gray']}
-                  placeholder={t('screen.booking.placeholder_capacity') || ''}
-                  style={styles.dataPicker}
-                  control={control}
-                  name="quantityTable"
-                  keyboardType="numeric"
-                />
-              </Field>
-            </View>
-            <Button
-              backgroundColor={theme['color-primary-default']}
-              title={t('common.next')}
-              onPress={handleSubmit(onSubmit)}
+    <>
+      <ScrollView>
+        <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+          <View style={styles.root}>
+            <Header
+              onGoBack={() => {
+                pSetIsBooking(false);
+                pResetBooking();
+              }}
+              filter={false}
+              title={t('screen.booking.title')}
             />
+            <View style={styles.content}>
+              <View style={styles.content_lobby}>
+                <Image
+                  source={{
+                    uri: pLobbyInOrder?.image,
+                  }}
+                  style={styles.content_image as StyleProp<ImageStyle>}
+                />
+                <View style={styles.content_right}>
+                  <View>
+                    <Text style={styles.text}>
+                      {t('screen.lobby.name')}: {pLobbyInOrder?.name}
+                    </Text>
+                    <Text style={styles.text}>
+                      {t('common.capacity')}: {pLobbyInOrder?.capacity} bàn
+                    </Text>
+                    <Text style={styles.text}>
+                      {t('common.price')}: {pLobbyInOrder?.price} VND
+                    </Text>
+                  </View>
+                  <Button
+                    backgroundColor={theme['color-primary-default']}
+                    title={t('screen.booking.change_lobby')}
+                    style={styles.button}
+                    onPress={handleChangeLobby}
+                  />
+                </View>
+              </View>
+              <View style={styles.containerForm}>
+                <Field label={t('screen.booking.booking_date')}>
+                  <DatePicker
+                    min={moment(new Date()).add(1, 'd').toDate()}
+                    filter={filterDateBooked}
+                    colorIcon="black"
+                    controlStyle={styles.dataPicker}
+                    control={control}
+                    name="date"
+                  />
+                </Field>
+                <View
+                  style={{
+                    flexDirection: 'row',
+                    justifyContent: 'space-between',
+                    alignItems: 'flex-start',
+                    width: '100%',
+                  }}>
+                  <Field
+                    style={styles.selectField}
+                    label={t('screen.booking.session')}>
+                    <Select
+                      placeholder={
+                        t('screen.booking.placeholder_session') || ''
+                      }
+                      options={typeTimeOpts}
+                      control={control}
+                      name="time"
+                    />
+                  </Field>
+                  <Field
+                    style={styles.selectField}
+                    label={t('screen.booking.type_party')}>
+                    <Select
+                      placeholder={
+                        t('screen.booking.placeholder_type_party') || ''
+                      }
+                      options={pTypePartyOpts}
+                      control={control}
+                      name="type_party"
+                    />
+                  </Field>
+                </View>
+                <Field label={t('common.capacity')}>
+                  <TextField
+                    placeholderTextColor={theme['color-gray']}
+                    placeholder={t('screen.booking.placeholder_capacity') || ''}
+                    style={styles.dataPicker}
+                    control={control}
+                    name="quantityTable"
+                    keyboardType="numeric"
+                  />
+                </Field>
+              </View>
+              <Button
+                backgroundColor={theme['color-primary-default']}
+                title={t('common.next')}
+                onPress={handleSubmit(onSubmit)}
+              />
+            </View>
           </View>
-        </View>
-      </TouchableWithoutFeedback>
+        </TouchableWithoutFeedback>
+      </ScrollView>
       <Spinner isLoading={!!pIsLoading} />
-    </ScrollView>
+    </>
   );
 };
 
@@ -259,6 +277,7 @@ const mapStateToProps = (state: AppState) => ({
   pTypePartyOpts: sTypePartyOpts(state),
   pTimeLobbyBooked: state.lobby.weddingHallDetails,
   pIsLoading: state.global.isLoading,
+  pIsBooking: state.global.isBooking,
 });
 
 const mapDispatchToProps = (dispatch: AppDispatch) => ({
@@ -266,6 +285,7 @@ const mapDispatchToProps = (dispatch: AppDispatch) => ({
   pGetTypeTime: () => dispatch(getTypeTime()),
   pGetTypeParty: () => dispatch(getTypeParty()),
   pSetIsBooking: (data: boolean) => dispatch(setIsBooking(data)),
+  pResetBooking: () => dispatch(resetBooking()),
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(BookingPage);

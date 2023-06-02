@@ -88,9 +88,9 @@ const RoomChat = () => {
   const [messages, setMessages] = useState<any[]>([]);
 
   const onSend = useCallback((messages: any[] = []) => {
-    setMessages(previousMessage =>
-      GiftedChat.append(previousMessage, messages),
-    );
+    // setMessages(previousMessage =>
+    //   GiftedChat.append(previousMessage, messages),
+    // );
 
     const {_id, text, user, createdAt} = messages[0];
 
@@ -131,35 +131,36 @@ const RoomChat = () => {
   }, []);
 
   useLayoutEffect(() => {
-    setMessages([]);
+    let result: any[] = [];
     firestore()
       .collection('usersChat')
       .where('__name__', '>=', profile?.id?.toString())
       .onSnapshot(snap => {
-        setMessages([]);
         (snap.docs[0]?.get('messages') as Array<string>)?.map(mess => {
           firestore()
             .collection('chats')
             .doc(mess)
             .onSnapshot(data => {
-              setMessages(mess =>
-                _.uniqBy(
-                  [
-                    {
-                      _id: data.id,
-                      createdAt: data.data()?.createdAt,
-                      text: data.data()?.text,
-                      user: data.data()?.user,
-                    },
-                    ...mess,
-                  ],
-                  '_id',
-                ),
-              );
+              if (result.findIndex(item => item?._id === data.id) === -1) {
+                result.unshift({
+                  _id: data.id,
+                  createdAt: data.data()?.createdAt,
+                  text: data.data()?.text,
+                  user: data.data()?.user,
+                });
+              }
+              if (
+                result.length ===
+                (snap.docs[0]?.get('messages') as Array<string>).length
+              )
+                console.log('result', result);
+              setMessages(result);
             });
         });
       });
   }, []);
+
+  console.log('mess', messages);
 
   return (
     <>

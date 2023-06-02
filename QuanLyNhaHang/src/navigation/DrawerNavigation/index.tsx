@@ -13,6 +13,7 @@ import SettingLanguage from '../../screens/Settinglanguage';
 import OrderHistoryPage from '../../screens/OrderHistory';
 import {useTranslation} from 'react-i18next';
 import {getUser} from '../../store/user/thunkApi';
+import analytics from '@react-native-firebase/analytics';
 
 const Drawer = createDrawerNavigator();
 
@@ -25,7 +26,9 @@ function DrawerScreen() {
     getStorage('accessToken').then(data => {
       if (!data) navigate('LoginScreen');
       else {
-        dispatch(getUser());
+        dispatch(getUser()).then(data => {
+          analytics().setUserId(data.payload?.id.toString());
+        });
       }
     });
   }, []);

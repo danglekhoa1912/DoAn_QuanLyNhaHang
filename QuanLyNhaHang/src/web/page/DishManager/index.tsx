@@ -4,7 +4,12 @@ import {Button, TabelData} from '../../components';
 import {IDish} from '../../../type/dish';
 import {useDispatch, useSelector} from 'react-redux';
 import {AppDispatch, AppState} from '../../../store';
-import {getCategories, getDishList} from '../../../store/dish/thunkApi';
+import {
+  deleteDish,
+  getCategories,
+  getDishList,
+  getDishListAdmin,
+} from '../../../store/dish/thunkApi';
 import {
   FormControl,
   InputLabel,
@@ -25,7 +30,7 @@ const DishManager = () => {
   const [category, setCategory] = useState(1);
   const dispatch = useDispatch<AppDispatch>();
   const [open, setOpen] = React.useState(false);
-  const dish = useRef<IDish>();
+  const [dish, setDish] = useState<IDish>();
 
   const pCategoryOpts = useSelector<AppState, ISelectItem[]>(state =>
     sCategoryOpts(state),
@@ -41,14 +46,23 @@ const DishManager = () => {
 
   const handleEdit = (data: any) => {
     setOpen(true);
-    dish.current = data;
+  };
+
+  const handleSelectItem = (data: any) => {
+    setDish(data);
+  };
+
+  const handleRemoveDish = (data: any) => {
+    dispatch(deleteDish(data?.id)).then(() => {
+      handleLoadData();
+    });
   };
 
   const handleClose = () => setOpen(false);
 
-  useEffect(() => {
+  const handleLoadData = () => {
     dispatch(
-      getDishList({
+      getDishListAdmin({
         categoryId: category,
         page: page + 1,
         searchByName: search,
@@ -57,6 +71,10 @@ const DishManager = () => {
       setDishList(data.payload.record);
       totalItem.current = data.payload.totalRecord;
     });
+  };
+
+  useEffect(() => {
+    handleLoadData();
   }, [page, search, category]);
 
   useEffect(() => {
@@ -127,13 +145,17 @@ const DishManager = () => {
         />
       </View>
       <TabelData
+        handleSelectItem={handleSelectItem}
         currentPage={page}
         onChangePage={handleChangePage}
         totalItem={totalItem.current}
         data={dishList}
         menu={[
           {label: 'Edit', action: handleEdit},
-          {label: 'Remove', action: () => {}},
+          {
+            label: `${dish?.status ? 'Inactive' : 'Active'}`,
+            action: handleRemoveDish,
+          },
         ]}
         rowTitle={[
           {label: '#', minWidth: 10},
@@ -144,7 +166,12 @@ const DishManager = () => {
           {label: 'Action', minWidth: 10},
         ]}
       />
-      <ModalEdit data={dish.current} open={open} handleClose={handleClose} />
+      <ModalEdit
+        onReLoadData={handleLoadData}
+        data={dish}
+        open={open}
+        handleClose={handleClose}
+      />
     </View>
   );
 };

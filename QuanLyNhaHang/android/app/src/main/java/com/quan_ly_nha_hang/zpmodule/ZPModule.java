@@ -34,6 +34,7 @@ public class ZPModule extends ReactContextBaseJavaModule {
             params.putString("transToken", transToken);
             params.putString("appTransID", appTransID);
             params.putString("returnCode", PAYMENTSUCCESS);
+            params.putString("message", "Thanh toán thành công");
             Toast.makeText(getCurrentActivity(), "Thanh toán thành công", Toast.LENGTH_SHORT).show();
             Log.d("Test123","success");
             sendEvent(mReactContext, "EventPayZalo", params);
@@ -46,7 +47,8 @@ public class ZPModule extends ReactContextBaseJavaModule {
             params.putString("returnCode",  PAYMENTCANCELED);
             params.putString("zpTranstoken", transToken);
             params.putString("appTransID", appTransID);
-            Toast.makeText(getCurrentActivity(), "Thanh toán bị hủy", Toast.LENGTH_SHORT).show();
+            params.putString("message", "Thanh toán bị hủy");
+//            Toast.makeText(getCurrentActivity(), "Thanh toán bị hủy", Toast.LENGTH_SHORT).show();
             sendEvent(mReactContext, "EventPayZalo", params);
         }
 
@@ -57,9 +59,8 @@ public class ZPModule extends ReactContextBaseJavaModule {
             params.putString("returnCode",  PAYMENTFAILED);
             params.putString("zpTranstoken", transToken);
             params.putString("appTransID", appTransID);
-            Log.d("Test123", String.valueOf(zaloPayError));
-            Toast.makeText(getCurrentActivity(), zaloPayError.name(), Toast.LENGTH_SHORT).show();
-            Log.d("MyAppZalo", String.valueOf(zaloPayError));
+            params.putString("message", zaloPayError.name());
+//            Toast.makeText(getCurrentActivity(), zaloPayError.name(), Toast.LENGTH_SHORT).show();
             sendEvent(mReactContext, "EventPayZalo", params);
         }
     };

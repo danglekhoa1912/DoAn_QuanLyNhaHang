@@ -14,6 +14,7 @@ import {updateInfoBooking} from '../../store/booking';
 import {setIsBooking} from '../../store/global';
 import {useTranslation} from 'react-i18next';
 import analytics from '@react-native-firebase/analytics';
+import {View360} from '../../assets';
 
 const LobbyDetailPage = ({route}: LobbyDetailScreenRouteProp) => {
   const {t} = useTranslation();
@@ -37,22 +38,24 @@ const LobbyDetailPage = ({route}: LobbyDetailScreenRouteProp) => {
     navigate('BookingScreen');
   };
 
+  const handlePanoramaView = () => {
+    navigate('PanoramaScreen', {
+      url: pLobbyDetail.image360,
+    });
+  };
+
   useEffect(() => {
     dispatch(getLobbyById(route.params.id)).then(data => {
       const lobby = data.payload?.weddingHall;
-
-      analytics()
-        .logEvent('lobby', {
-          id: 3745092,
-          item: lobby?.name,
-        })
-        .then(data => {
-          console.log(data);
+      console.log(lobby);
+      if (lobby) {
+        analytics().logEvent('lobby_view', {
+          id: lobby.id,
+          item: lobby.name,
         });
+      }
     });
   }, [route.params.id]);
-
-  console.log(pLobbyDetail?.image);
 
   return (
     <View style={styles.container}>
@@ -73,6 +76,17 @@ const LobbyDetailPage = ({route}: LobbyDetailScreenRouteProp) => {
                 color={theme['color-primary-default']}
                 name="left"
                 size={30}
+              />
+            </TouchableOpacity>
+            <TouchableOpacity
+              onPress={handlePanoramaView}
+              style={styles.button_panorama}>
+              <Image
+                source={View360}
+                style={{
+                  width: 40,
+                  height: 40,
+                }}
               />
             </TouchableOpacity>
           </ImageBackground>
@@ -120,6 +134,11 @@ const themedStyles = StyleService.create({
   button_back: {
     top: 20,
     left: 20,
+  },
+  button_panorama: {
+    position: 'absolute',
+    bottom: 10,
+    right: 10,
   },
   container_content: {
     paddingHorizontal: 20,

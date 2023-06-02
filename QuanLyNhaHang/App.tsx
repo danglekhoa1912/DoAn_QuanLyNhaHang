@@ -26,6 +26,11 @@ import analytics from '@react-native-firebase/analytics';
 LogBox.ignoreLogs([
   'Require cycle:',
   'source.uri should not be an empty string',
+  `ReactImageView: Image source "" doesn't exist`,
+  'new NativeEventEmitter()` was called with a non-null argument without the required `addListener` method',
+  'new NativeEventEmitter()` was called with a non-null argument without the required `removeListeners` method.',
+  'Failed prop type: Invalid props.style key `tintColor` supplied to `Text`.',
+  'Key "cancelled" in the image picker result is deprecated and will be removed in SDK 48, use "canceled" instead',
 ]);
 
 type SectionProps = PropsWithChildren<{
@@ -34,7 +39,6 @@ type SectionProps = PropsWithChildren<{
 
 function App(): JSX.Element {
   const {i18n} = useTranslation();
-  console.log(process.env.REACT_APP_BASE_URL);
 
   useEffect(() => {
     PermissionsAndroid.request(

@@ -9,6 +9,7 @@ export interface IDish {
   name: string;
   image: string;
   categoryId: ICategory;
+  status?: boolean;
 }
 
 export interface IRequestParams {

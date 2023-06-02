@@ -113,5 +113,6 @@
   },
   "toast": {
     "change_language": "Change Language Successfully"
-  }
+  },
+  "dont_have_order_history": "Oops! Looks like you've never booked a party"
 }

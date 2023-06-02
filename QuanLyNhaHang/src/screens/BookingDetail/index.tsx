@@ -24,7 +24,7 @@ import {Button, Spinner} from '../../components';
 import {AppDispatch, AppState} from '../../store';
 import {connect} from 'react-redux';
 import {ICategory} from '../../type/dish';
-import {IBookingStore} from '../../store/booking';
+import {IBookingStore, resetBooking} from '../../store/booking';
 import {CASH_TYPE, IBookingReq, ISession, ITypePay} from '../../type/booking';
 import {ITypeParty} from '../../type/lobby';
 import {addOrder} from '../../store/booking/thunkApi';
@@ -33,6 +33,7 @@ import {useTranslation} from 'react-i18next';
 import {paymentZalo} from '../../apis/booking';
 import toast from '../../utils/toast';
 import {replace} from '../../utils/navigate';
+import analytics from '@react-native-firebase/analytics';
 const {PayZaloBridge} = NativeModules;
 const payZaloBridgeEmitter = new NativeEventEmitter(PayZaloBridge);
 interface IBookingDetailPage {
@@ -43,6 +44,7 @@ interface IBookingDetailPage {
   pUser: IUser;
   pIsLoading: number;
   pAddOrder: (data: IBookingReq) => Promise<any>;
+  pResetBooking: () => void;
 }
 
 const TYPE_PAY: ITypePay[] = [
@@ -71,6 +73,7 @@ const BookingDetailPage = ({
   pTypeTime,
   pAddOrder,
   pIsLoading,
+  pResetBooking,
 }: IBookingDetailPage) => {
   const styles = useStyleSheet(themedStyles);
   const theme = useTheme();
@@ -85,7 +88,7 @@ const BookingDetailPage = ({
     const lobby = order.lobby.price * (typeTime?.price || 0);
     const dish = order.menu.total;
     const service = order.service.total;
-    console.log(lobby, dish, service, order.quantityTable);
+
     return (lobby + dish) * order.quantityTable + service;
   }, [order, typeTime]);
 
@@ -93,87 +96,115 @@ const BookingDetailPage = ({
     return pTypeParty.find(type => type.id === order.type_party.id);
   }, [order]);
 
-  const handlePayment = () => {
-    paymentZalo(total).then(data => {
-      const payZP = NativeModules.PayZaloBridge;
-      payZP.payOrder(data.data.zp_trans_token);
+  const createOrder = (paymentStatus: boolean) => {
+    pAddOrder({
+      orderDate: order.date,
+      amount: total,
+      idUser: pUser.id || 0,
+      menu: order.menu.dishList.map(dish => dish.id),
+      note: '',
+      paymentStatus: paymentStatus,
+      pwtId: order.time.value,
+      quantity: order.quantityTable,
+      service: order.service.serviceList.map(service => service.id),
+      type_party: order.type_party.value,
+      whId: order.lobby.id,
+      typePay: order.type_pay,
+    }).then(() => {
+      toast.success('successful party booking');
+      pResetBooking();
+      analytics().logAddPaymentInfo({
+        currency: 'VND',
+        value: total,
+      });
+      replace('DrawerScreen');
     });
+  };
+
+  const handlePayment = () => {
+    switch (order.type_pay) {
+      case CASH_TYPE.CASH:
+        createOrder(false);
+        break;
+      case CASH_TYPE.MOMO:
+        paymentZalo(total).then(data => {
+          const payZP = NativeModules.PayZaloBridge;
+          payZP.payOrder(data.data.zp_trans_token);
+        });
+        break;
+      case CASH_TYPE.ZALO:
+        paymentZalo(total).then(data => {
+          const payZP = NativeModules.PayZaloBridge;
+          payZP.payOrder(data.data.zp_trans_token);
+        });
+        break;
+      default:
+        createOrder(false);
+    }
   };
 
   useEffect(() => {
     payZaloBridgeEmitter.addListener('EventPayZalo', data => {
       if (data.returnCode == 1) {
         toast.success('Pay success!');
-        pAddOrder({
-          orderDate: order.date,
-          amount: total,
-          idUser: pUser.id || 0,
-          menu: order.menu.dishList.map(dish => dish.id),
-          note: '',
-          paymentStatus: true,
-          pwtId: order.time.value,
-          quantity: order.quantityTable,
-          service: order.service.serviceList.map(service => service.id),
-          type_party: order.type_party.value,
-          whId: order.lobby.id,
-          typePay: order.type_pay,
-        });
-        replace('HomeScreen');
+        createOrder(true);
       } else {
-        toast.error('Pay errror! ' + data.returnCode);
+        toast.error('Pay errror! ' + data.message);
       }
     });
   }, []);
 
   return (
-    <ScrollView contentContainerStyle={styles.container}>
-      <Header />
-      <CardInfor />
-      <CardInforLobby />
-      <View style={styles.dish_list}>
-        <Text category="h5">{t('screen.booking_detail.dishes') || ''}</Text>
-        {pCategories.map(item => (
-          <DishListByCategory key={item.id} category={item} />
-        ))}
-      </View>
-      <View style={styles.service_list}>
-        <Text category="h5">{t('screen.booking_detail.services') || ''}</Text>
-        {order.service.serviceList.map((service, index) => (
-          <Text
-            key={service.id}
-            style={{fontSize: 18, paddingLeft: 12}}
-            category="p1">
-            {index + 1} - {service.name}
+    <>
+      <ScrollView contentContainerStyle={styles.container}>
+        <Header />
+        <CardInfor />
+        <CardInforLobby />
+        <View style={styles.dish_list}>
+          <Text category="h5">{t('screen.booking_detail.dishes') || ''}</Text>
+          {pCategories.map(item => (
+            <DishListByCategory key={item.id} category={item} />
+          ))}
+        </View>
+        <View style={styles.service_list}>
+          <Text category="h5">{t('screen.booking_detail.services') || ''}</Text>
+          {order.service.serviceList.map((service, index) => (
+            <Text
+              key={service.id}
+              style={{fontSize: 18, paddingLeft: 12}}
+              category="p1">
+              {index + 1} - {service.name}
+            </Text>
+          ))}
+        </View>
+        <TotalPrice
+          dishPrice={order.menu.total}
+          lobbyPrice={order.lobby.price * (typeTime?.price || 0)}
+          servicePrice={order.service.total}
+          tableQuantity={order.quantityTable}
+        />
+        <View>
+          <Text category="h5">
+            {t('screen.booking_detail.payment_method') || ''}
           </Text>
-        ))}
-      </View>
-      <TotalPrice
-        dishPrice={order.menu.total}
-        lobbyPrice={order.lobby.price * (typeTime?.price || 0)}
-        servicePrice={order.service.total}
-        tableQuantity={order.quantityTable}
-      />
-      <View>
-        <Text category="h5">
-          {t('screen.booking_detail.payment_method') || ''}
-        </Text>
-        {TYPE_PAY.map(type => (
-          <TypePayment
-            selected={order.type_pay === type.type}
-            key={type.id}
-            typePayment={type}
-          />
-        ))}
-      </View>
-      <Button
-        title={t('screen.booking_detail.pay.title') || ''}
-        backgroundColor={theme['color-primary-default']}
-        style={styles.button}
-        styleText={styles.button_text}
-        onPress={handlePayment}
-      />
+          {TYPE_PAY.map(type => (
+            <TypePayment
+              selected={order.type_pay === type.type}
+              key={type.id}
+              typePayment={type}
+            />
+          ))}
+        </View>
+        <Button
+          title={t('screen.booking_detail.pay.title') || ''}
+          backgroundColor={theme['color-primary-default']}
+          style={styles.button}
+          styleText={styles.button_text}
+          onPress={handlePayment}
+        />
+      </ScrollView>
       <Spinner isLoading={!!pIsLoading} />
-    </ScrollView>
+    </>
   );
 };
 
@@ -188,6 +219,7 @@ const mapStateToProps = (state: AppState) => ({
 
 const mapDispatchToProps = (dispatch: AppDispatch) => ({
   pAddOrder: (data: IBookingReq) => dispatch(addOrder(data)),
+  pResetBooking: () => dispatch(resetBooking()),
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(BookingDetailPage);

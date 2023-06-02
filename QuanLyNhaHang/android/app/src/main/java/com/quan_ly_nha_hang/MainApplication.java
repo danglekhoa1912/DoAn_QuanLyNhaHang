@@ -15,6 +15,7 @@ import com.facebook.react.defaults.DefaultNewArchitectureEntryPoint;
 import com.facebook.react.defaults.DefaultReactNativeHost;
 import com.facebook.soloader.SoLoader;
 import com.quan_ly_nha_hang.Constant.AppInfo;
+import com.quan_ly_nha_hang.panoramamodule.PanoramaViewPackage;
 import com.quan_ly_nha_hang.zpmodule.PayZaloBridge;
 
 
@@ -38,7 +39,9 @@ public class MainApplication extends Application implements ReactApplication {
           // Packages that cannot be autolinked yet can be added manually here, for example:
           // packages.add(new MyReactNativePackage());
             packages.add(new PayZaloBridge());
-          return packages;
+            packages.add(new PanoramaViewPackage());
+
+            return packages;
         }
 
         @Override

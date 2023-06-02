@@ -27,10 +27,12 @@ import {
 } from 'firebase/firestore';
 import {db} from '../../firebase';
 import {Send as SendIcon} from '@mui/icons-material';
-import {Chat, User} from './components';
+import {Chat, ModalCreateOrder, User} from './components';
 import {useNavigate, useParams} from 'react-router-dom';
 import {getUserById} from '../../../store/profile/thunkApi';
 import _ from 'lodash';
+import AddIcon from '@mui/icons-material/Add';
+import {COLORS} from '../../../utils/color';
 
 interface IMessage {
   _id: number;
@@ -46,6 +48,7 @@ const ChatPage = () => {
       lastMessage: string;
     }[]
   >([]);
+  const [open, setOpen] = React.useState(false);
   const [messages, setMessages] = useState<any[]>([]);
   const [message, setMessage] = useState('');
 
@@ -58,6 +61,8 @@ const ChatPage = () => {
   const currentCustomer = useMemo(() => {
     return userList.find(user => user.user?.id === +(userId || 0));
   }, [userId, userList]);
+
+  const handleClose = () => setOpen(false);
 
   const onSend = async () => {
     const newMessage = {
@@ -119,7 +124,6 @@ const ChatPage = () => {
         onSnapshot(docRef, (snapshot: any) => {
           if (+data.id.split('-')[0]) {
             dispatch(getUserById(+data.id.split('-')[0])).then(data => {
-              console.log(data);
               setUserList([
                 ...userList,
                 {
@@ -163,7 +167,7 @@ const ChatPage = () => {
       });
     });
   }, [userId]);
-  console.log(userList);
+
   return (
     <View
       style={{
@@ -171,7 +175,7 @@ const ChatPage = () => {
         display: 'flex',
         flexDirection: 'row',
       }}>
-      <View style={{flex: 1}}>
+      <View style={{flex: 1, borderRightColor: '#bfbfbf', borderRightWidth: 1}}>
         <FlatList
           data={userList}
           renderItem={({item}) => (
@@ -192,84 +196,119 @@ const ChatPage = () => {
           flex: 3,
           backgroundColor: 'white',
           display: 'flex',
-          borderLeftColor: '#bfbfbf',
-          borderLeftWidth: 1,
         }}>
-        <View
-          style={{
-            width: '100%',
-            height: 74,
-            alignItems: 'center',
-            flexDirection: 'row',
-            padding: 20,
-            borderBottomColor: '#bfbfbf',
-            borderBottomWidth: 1,
-          }}>
-          <Image
-            source={{
-              uri: currentCustomer?.user.avatar || '',
-            }}
-            style={{
-              width: 50,
-              height: 50,
-              borderRadius: 25,
-              marginRight: 20,
-            }}
-          />
-          <Text
-            style={{
-              fontWeight: 'bold',
-            }}>
-            {currentCustomer?.user.name}
-          </Text>
-        </View>
-        <FlatList
-          style={{
-            flex: 8,
-          }}
-          data={messages}
-          renderItem={({item}) => {
-            return (
-              <Chat
-                avatar={item.user.avatar}
-                message={item.text}
-                isSender={profile?.id === item?.user?._id}
-                key={item?._id}
-              />
-            );
-          }}
-        />
-        <View
-          style={{
-            width: '100%',
-            flexDirection: 'row',
-            alignItems: 'center',
-            justifyContent: 'space-evenly',
-            flex: 1,
-          }}>
-          <TextInput
-            value={message}
-            onChangeText={setMessage}
-            placeholder="Type here..."
-            style={{
-              backgroundColor: '#f5f7fb',
-              height: 40,
-              width: '80%',
-              borderRadius: 18,
-              paddingLeft: 12,
-            }}
-          />
-          <TouchableOpacity onPress={onSend}>
-            <SendIcon
-              color="primary"
+        {!!userId && (
+          <>
+            <View
               style={{
-                width: 30,
-                height: 30,
+                width: '100%',
+                height: 74,
+                alignItems: 'center',
+                flexDirection: 'row',
+                justifyContent: 'space-between',
+                padding: 20,
+                borderBottomColor: '#bfbfbf',
+                borderBottomWidth: 1,
+              }}>
+              <View
+                style={{
+                  flexDirection: 'row',
+                  alignItems: 'center',
+                }}>
+                <Image
+                  source={{
+                    uri: currentCustomer?.user.avatar || '',
+                  }}
+                  style={{
+                    width: 50,
+                    height: 50,
+                    borderRadius: 25,
+                    marginRight: 20,
+                  }}
+                />
+                <Text
+                  style={{
+                    fontWeight: 'bold',
+                  }}>
+                  {currentCustomer?.user.name}
+                </Text>
+              </View>
+              <TouchableOpacity
+                onPress={() => {
+                  setOpen(true);
+                }}
+                style={{
+                  flexDirection: 'row',
+                  alignItems: 'center',
+                  backgroundColor: COLORS.primary,
+                  padding: 12,
+                  borderRadius: 8,
+                }}>
+                <AddIcon
+                  style={{
+                    color: 'white',
+                  }}
+                />
+                <Text
+                  style={{
+                    color: 'white',
+                    fontSize: 18,
+                    marginLeft: 8,
+                  }}>
+                  Create Order
+                </Text>
+              </TouchableOpacity>
+            </View>
+            <FlatList
+              style={{
+                flex: 8,
+              }}
+              data={messages}
+              renderItem={({item}) => {
+                return (
+                  <Chat
+                    avatar={item.user.avatar}
+                    message={item.text}
+                    isSender={profile?.id === item?.user?._id}
+                    key={item?._id}
+                  />
+                );
               }}
             />
-          </TouchableOpacity>
-        </View>
+            <View
+              style={{
+                width: '100%',
+                flexDirection: 'row',
+                alignItems: 'center',
+                justifyContent: 'space-evenly',
+                flex: 1,
+              }}>
+              <TextInput
+                value={message}
+                onChangeText={setMessage}
+                placeholder="Type here..."
+                style={{
+                  backgroundColor: '#f5f7fb',
+                  height: 40,
+                  width: '80%',
+                  borderRadius: 18,
+                  paddingLeft: 12,
+                }}
+              />
+              <TouchableOpacity onPress={onSend}>
+                <SendIcon
+                  color="primary"
+                  style={{
+                    width: 30,
+                    height: 30,
+                  }}
+                />
+              </TouchableOpacity>
+            </View>
+          </>
+        )}
       </View>
+      <ModalCreateOrder open={open} handleClose={handleClose} />
     </View>
   );
 };

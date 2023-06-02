@@ -30,41 +30,44 @@ export interface IBookingStore {
   typeParty: ITypeParty[];
 }
 
-const initialState = {
-  order: {
-    menu: {
-      dishList: [],
-      total: 0,
-    },
-    service: {
-      serviceList: [],
-      total: 0,
-    },
-    date: new Date(),
-    time: {
-      id: 0,
-      label: '',
-      value: 0,
-    },
-    quantityTable: 0,
-    type_pay: CASH_TYPE.CASH,
-    lobbyPriceByTime: 0,
-    note: '',
-    lobby: {
-      capacity: 0,
-      describe: '',
-      id: 0,
-      image: '',
-      name: '',
-      price: 0,
-      status: '',
-    },
-    type_party: {
-      id: 0,
-      label: '',
-      value: 0,
-    },
+export const orderDefault = {
+  menu: {
+    dishList: [],
+    total: 0,
   },
+  service: {
+    serviceList: [],
+    total: 0,
+  },
+  date: new Date(),
+  time: {
+    id: 0,
+    label: '',
+    value: 0,
+  },
+  quantityTable: 0,
+  type_pay: CASH_TYPE.CASH,
+  lobbyPriceByTime: 0,
+  note: '',
+  lobby: {
+    capacity: 0,
+    describe: '',
+    id: 0,
+    image: '',
+    name: '',
+    price: 0,
+    status: '',
+    image360: '',
+  },
+  type_party: {
+    id: 0,
+    label: '',
+    value: 0,
+  },
+};
+
+const initialState = {
+  order: orderDefault,
   typeParty: [],
   typeTime: [],
 } as IBookingStore;
@@ -83,6 +86,7 @@ export const {
   removeServiceToBooking,
   updateInfoBooking,
   updateTypePay,
+  resetBooking,
 } = bookingSlice.actions;
 
 export default bookingSlice.reducer;

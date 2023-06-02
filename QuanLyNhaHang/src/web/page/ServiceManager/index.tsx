@@ -5,7 +5,11 @@ import {IDish} from '../../../type/dish';
 import {useDispatch, useSelector} from 'react-redux';
 import {AppDispatch, AppState} from '../../../store';
 import {IService} from '../../../type/service';
-import {getListService} from '../../../store/service/thunkApi';
+import {
+  deleteService,
+  getListService,
+  getListServiceAdmin,
+} from '../../../store/service/thunkApi';
 import ModalEdit from './components/ModalEdit';
 import {Loading} from '../../components/Loading';
 
@@ -16,11 +20,15 @@ const ServiceManager = () => {
   const totalItem = useRef<number>(0);
   const dispatch = useDispatch<AppDispatch>();
   const [open, setOpen] = React.useState(false);
-  const service = useRef<IService>();
+  const [service, setService] = useState<IService>();
 
   const pIsLoading = useSelector<AppState, number>(
     state => state.global.isLoading,
   );
+
+  const handleSelectItem = (data: any) => {
+    setService(data);
+  };
 
   const handleChangePage = (event: any, newPage: number) => {
     setPage(newPage);
@@ -28,14 +36,19 @@ const ServiceManager = () => {
 
   const handleEdit = (data: any) => {
     setOpen(true);
-    service.current = data;
+  };
+
+  const handleRemove = (data: any) => {
+    dispatch(deleteService(data?.id)).then(() => {
+      handleLoadData();
+    });
   };
 
   const handleClose = () => setOpen(false);
 
   const handleLoadData = () => {
     dispatch(
-      getListService({
+      getListServiceAdmin({
         page: page + 1,
         searchByName: search,
       }),
@@ -90,13 +103,17 @@ const ServiceManager = () => {
         />
       </View>
       <TabelData
+        handleSelectItem={handleSelectItem}
         currentPage={page}
         onChangePage={handleChangePage}
         totalItem={totalItem.current}
         data={serviceList}
         menu={[
           {label: 'Edit', action: handleEdit},
-          {label: 'Remove', action: () => {}},
+          {
+            label: `${service?.status ? 'Inactive' : 'Active'}`,
+            action: handleRemove,
+          },
         ]}
         rowTitle={[
           {label: '#', minWidth: 10},
@@ -109,7 +126,7 @@ const ServiceManager = () => {
       />
       <ModalEdit
         onReloadData={handleLoadData}
-        data={service.current}
+        data={service}
         open={open}
         handleClose={handleClose}
       />

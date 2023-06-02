@@ -6,6 +6,7 @@ export interface ILobby {
   price: number;
   image: string;
   id: number;
+  image360: string;
 }
 
 export interface IILoobyBooked {
@@ -26,4 +27,5 @@ export interface ILobbyRes {
   describe: string;
   price: number;
   image: File;
+  image360: File;
 }

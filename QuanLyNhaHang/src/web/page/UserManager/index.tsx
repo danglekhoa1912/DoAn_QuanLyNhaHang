@@ -43,6 +43,10 @@ const UserManager = () => {
     setPage(newPage);
   };
 
+  const handleSelectItem = (data: any) => {
+    user.current = data;
+  };
+
   const handleChange = (event: SelectChangeEvent) => {
     setSelectedRole(+event.target.value);
     setPage(0);
@@ -136,6 +140,7 @@ const UserManager = () => {
         />
       </View>
       <TabelData
+        handleSelectItem={handleSelectItem}
         renderData={data => {
           return (
             <>
@@ -168,7 +173,6 @@ const UserManager = () => {
           {label: 'Email', minWidth: 60},
           {label: 'Mobile', minWidth: 10},
           {label: 'Role', minWidth: 10},
-          {label: 'Status', minWidth: 10},
           {label: 'Action', minWidth: 10},
         ]}
       />

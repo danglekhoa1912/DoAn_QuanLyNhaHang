@@ -8,6 +8,14 @@ export interface IFormBooking {
   time: ISelectItem;
   type_party: ISelectItem;
   quantityTable: number;
+  lobby?: ILobby;
+}
+
+export interface IFormBookingStaff {
+  date: moment.Moment;
+  time: ISelectItem;
+  type_party: ISelectItem;
+  quantityTable: number;
 }
 
 export interface IBookingReq {

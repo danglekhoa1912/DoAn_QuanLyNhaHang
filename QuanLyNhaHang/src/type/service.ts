@@ -6,6 +6,7 @@ export interface IService {
   price: number;
   serviceDescribe: string;
   image: string;
+  status?: boolean;
 }
 
 export interface IServiceRes {

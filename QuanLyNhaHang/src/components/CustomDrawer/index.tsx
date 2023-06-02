@@ -15,7 +15,7 @@ import {
 import Icon from 'react-native-vector-icons/Ionicons';
 
 import {MenuBg} from '../../assets/index';
-import {navigate} from '../../utils/navigate';
+import {navigate, replace} from '../../utils/navigate';
 import {useDispatch, useSelector} from 'react-redux';
 import {AppDispatch, AppState} from '../../store';
 import {logout} from '../../store/user';
@@ -29,7 +29,7 @@ const CustomDrawer = (props: DrawerContentComponentProps) => {
   const handleLogout = () => {
     dispatch(logout());
     props.navigation.closeDrawer();
-    navigate('LoginScreen');
+    replace('LoginScreen');
   };
 
   return (

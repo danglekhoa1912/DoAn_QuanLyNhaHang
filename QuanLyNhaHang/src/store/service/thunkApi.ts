@@ -18,6 +18,14 @@ export const getListService = createAsyncThunk(
   },
 );
 
+export const getListServiceAdmin = createAsyncThunk(
+  'service/getListService',
+  async (params: ISearchParam) => {
+    const result = await ServiceApi.getListServiceAdmin(params);
+    return result.data;
+  },
+);
+
 export const addService = createAsyncThunk(
   'service/addService',
   withParamsToastCatcher(async (service: IServiceRes) => {

@@ -18,6 +18,7 @@ import UKFlag from './united-kingdom.png';
 import Wedding from './wedding.svg';
 import ZaloPay from './ZaloPay.png';
 import Cash from './Cash.png';
+import View360 from './360.png';
 
 export {
   Logo,
@@ -40,4 +41,5 @@ export {
   Wedding,
   ZaloPay,
   Cash,
+  View360,
 };

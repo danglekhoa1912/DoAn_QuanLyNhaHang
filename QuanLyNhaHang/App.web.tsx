@@ -17,6 +17,8 @@ import ChatPage from './src/web/page/ChatPage';
 import {SnackbarProvider} from 'notistack';
 import {SnackbarUtilsConfigurator} from './src/utils/toastWeb';
 import {makeStyles} from '@mui/styles';
+import {LocalizationProvider} from '@mui/x-date-pickers';
+import {AdapterMoment} from '@mui/x-date-pickers/AdapterMoment';
 
 const App = () => {
   const useStyles = makeStyles(theme => ({
@@ -28,33 +30,35 @@ const App = () => {
   const classes = useStyles();
 
   return (
-    <Provider store={store}>
-      <BrowserRouter>
-        <ThemeProvider theme={theme}>
-          <SnackbarProvider
-            classes={{containerRoot: classes.snackbar}}
-            maxSnack={300}
-            autoHideDuration={3000}
-            preventDuplicate
-            anchorOrigin={{horizontal: 'right', vertical: 'top'}}>
-            <SnackbarUtilsConfigurator />
-            <Routes>
-              <Route path={'/'} element={<LoginPage />} />
-              <Route element={<MainLayout />}>
-                <Route path="admin" element={<AdminLayout />}>
-                  {ADMIN_ROUTES.map(route => (
-                    <Route path={route.path} element={route.element} />
-                  ))}
+    <LocalizationProvider dateAdapter={AdapterMoment}>
+      <Provider store={store}>
+        <BrowserRouter>
+          <ThemeProvider theme={theme}>
+            <SnackbarProvider
+              classes={{containerRoot: classes.snackbar}}
+              maxSnack={300}
+              autoHideDuration={3000}
+              preventDuplicate
+              anchorOrigin={{horizontal: 'right', vertical: 'top'}}>
+              <SnackbarUtilsConfigurator />
+              <Routes>
+                <Route path={'/'} element={<LoginPage />} />
+                <Route element={<MainLayout />}>
+                  <Route path="admin" element={<AdminLayout />}>
+                    {ADMIN_ROUTES.map(route => (
+                      <Route path={route.path} element={route.element} />
+                    ))}
+                  </Route>
+                  <Route path="chat/:userId" element={<ChatPage />} />
+                  <Route path="chat" element={<ChatPage />} />
                 </Route>
-                <Route path="chat/:userId" element={<ChatPage />} />
-                <Route path="chat" element={<ChatPage />} />
-              </Route>
-              <Route path={'*'} element={<NotFoundPage />} />
-            </Routes>
-          </SnackbarProvider>
-        </ThemeProvider>
-      </BrowserRouter>
-    </Provider>
+                <Route path={'*'} element={<NotFoundPage />} />
+              </Routes>
+            </SnackbarProvider>
+          </ThemeProvider>
+        </BrowserRouter>
+      </Provider>
+    </LocalizationProvider>
   );
 };
 

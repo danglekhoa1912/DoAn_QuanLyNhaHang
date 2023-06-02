@@ -17,9 +17,10 @@ interface IModalEdit {
   handleClose: () => void;
   open: boolean;
   data?: IDish;
+  onReLoadData: () => void;
 }
 
-const ModalEdit = ({handleClose, open, data}: IModalEdit) => {
+const ModalEdit = ({handleClose, open, data, onReLoadData}: IModalEdit) => {
   const {control, reset, handleSubmit, getValues} = useForm<IDishRes>({
     defaultValues: {
       category: 0,
@@ -43,13 +44,16 @@ const ModalEdit = ({handleClose, open, data}: IModalEdit) => {
   );
 
   const onSubmit = (data: IDishRes) => {
-    if (mode === 'edit')
-      dispatch(
-        updateDish({
-          ...data,
-        }),
-      );
-    else dispatch(addDish({...data}));
+    dispatch(
+      mode === 'edit'
+        ? updateDish({
+            ...data,
+          })
+        : addDish({...data}),
+    ).then(() => {
+      handleClose();
+      onReLoadData();
+    });
   };
 
   useEffect(() => {

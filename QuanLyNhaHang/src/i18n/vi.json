@@ -113,5 +113,6 @@
   },
   "toast": {
     "change_language": "Đổi Ngôn Ngữ Thành Công"
-  }
+  },
+  "dont_have_order_history": "Oops! Có vẻ bạn chưa từng đặt tiệc thì phải"
 }
