@@ -21,6 +21,9 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 @Validated
@@ -175,15 +178,41 @@ public class ApiAdminController {
         }
         return ResponseEntity.badRequest().body("Không thành công !");
     }
-    @GetMapping("/order/all")
-    public ResponseEntity<?> getAllOrder(@RequestParam Map<String,String> params){
-        Pageable pageable = PageRequest.of(Integer.parseInt(params.getOrDefault("page", "0")), pageSize);
-        List<OrderResponse> orderResponseList=new ArrayList<>();
-        weddingPartyOrder.findAll(pageable).getContent().forEach(item->{
-            OrderResponse temp=new OrderResponse(item);
-            orderResponseList.add(temp);
-        });
-        return ResponseEntity.ok(orderResponseList);
+    @PostMapping ("/order/all")
+    public ResponseEntity<?> getAllOrder(@ModelAttribute OrderSearchDTO searchDTO){
+        Pageable pageable = PageRequest.of(searchDTO.getPage()-1, pageSize);
+        String pattern = "dd-MM-yyyy";
+        DateFormat dateFormat = new SimpleDateFormat(pattern);
+        Date searchDate = null;
+//        try {
+//            searchDate = dateFormat.parse("12-12-2023");
+//        } catch (ParseException ignored){
+//        }
+        Page<WeddingPartyOrders> result;
+        if (searchDTO.getStatus() !=null ){
+            if (searchDTO.getDate() != null) {
+                try {
+                    result = weddingPartyOrder.findAllByOrderDateAndStatus(pageable, dateFormat.parse(searchDTO.getDate()), searchDTO.getStatus());
+                } catch (ParseException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+            else
+                result = weddingPartyOrder.findAllByStatus(pageable,searchDTO.getStatus());
+        }
+        else {
+            if (searchDTO.getDate() != null){
+                try {
+                    result = weddingPartyOrder.findAllByOrderDate(pageable,dateFormat.parse(searchDTO.getDate()));
+                } catch (ParseException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+            else
+                result = weddingPartyOrder.findAll(pageable);
+        }
+        PageRq record=new PageRq((int) result.getTotalElements(), searchDTO.getPage(),result.getTotalPages(),result.getContent());
+        return ResponseEntity.ok(record);
     }
 
     @GetMapping("/order")
@@ -194,6 +223,7 @@ public class ApiAdminController {
             return ResponseEntity.badRequest().body("Not found order with id " + id);
         }
     }
+
 
     @PostMapping("/service/add")
     public ResponseEntity<?> addSerivce(@ModelAttribute ServicesRequest service){
@@ -313,9 +343,17 @@ public class ApiAdminController {
     @PostMapping("order/updatestt")
     public ResponseEntity<?> updateStatusPayment(@RequestBody Map<String,String> params){
         int id=Integer.parseInt(params.getOrDefault("id",null));
-        boolean status=Boolean.parseBoolean(params.getOrDefault("status",null));
+        int status=Integer.parseInt(params.getOrDefault("status",null));
         WeddingPartyOrders wpo=weddingPartyOrder.findById(id).orElseThrow();
-        wpo.setPaymentStatus(status);
+        wpo.setStatus(status);
+        return ResponseEntity.ok(weddingPartyOrder.save(wpo));
+    }
+    @PostMapping("order/update-payment-stt")
+    public ResponseEntity<?> updatePayment(@RequestBody Map<String,String> params){
+        int id=Integer.parseInt(params.getOrDefault("id",null));
+        String status=params.getOrDefault("status",null);
+        WeddingPartyOrders wpo=weddingPartyOrder.findById(id).orElseThrow();
+        wpo.setTypePay(status);
         return ResponseEntity.ok(weddingPartyOrder.save(wpo));
     }
     @GetMapping("feedback/getall")
