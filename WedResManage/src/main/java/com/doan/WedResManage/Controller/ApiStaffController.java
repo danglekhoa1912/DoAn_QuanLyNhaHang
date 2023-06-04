@@ -1,6 +1,7 @@
 package com.doan.WedResManage.Controller;
 
 import com.doan.WedResManage.Controller.DTO.OrderSearchDTO;
+import com.doan.WedResManage.Controller.DTO.TimeDTO;
 import io.swagger.annotations.Api;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -25,5 +26,10 @@ public class ApiStaffController extends ApiAdminController  {
     @Override
     public ResponseEntity<?> feedback(@RequestParam  Map<String, String> params) {
         return super.feedback(params);
+    }
+
+    @Override
+    public ResponseEntity<?> getReadyHall(TimeDTO time) {
+        return super.getReadyHall(time);
     }
 }
