@@ -185,11 +185,6 @@ public class ApiAdminController {
         Pageable pageable = PageRequest.of(searchDTO.getPage()-1, pageSize);
         String pattern = "dd-MM-yyyy";
         DateFormat dateFormat = new SimpleDateFormat(pattern);
-        Date searchDate = null;
-//        try {
-//            searchDate = dateFormat.parse("12-12-2023");
-//        } catch (ParseException ignored){
-//        }
         Page<WeddingPartyOrders> result;
         if (searchDTO.getStatus() !=null ){
             if (searchDTO.getDate() != null) {
