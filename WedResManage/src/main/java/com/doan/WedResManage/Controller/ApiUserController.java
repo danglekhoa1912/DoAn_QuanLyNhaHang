@@ -248,6 +248,7 @@ public class ApiUserController {
             menuDishRepository.save(menuDish);
         });
         wedOrder.setMenuId(menuNew);
+        wedOrder.setUserId(userRepository.findAllById(order.getIdUser()).get(0));
         wedOrder.setQuantityTable(order.getQuantity());
         total=(total+ menuNew.getPrice())*order.getQuantity();
         //add service
@@ -269,14 +270,7 @@ public class ApiUserController {
         wedOrder.setTypePay(order.getTypePay());
         wedOrder.setNote(order.getNote());
         wedOrder.setTypeParty(typePartyRepository.findAllById(order.getType_party()).get(0));
-        WeddingPartyOrders finalOrder;
-        try{
-            finalOrder=weddingPartyOrders.save(wedOrder);
-        } catch (Exception ex){
-            return ResponseEntity.badRequest().body("Lỗi khi thay doi thong tin");
-        }
-
-        return ResponseEntity.ok(finalOrder);
+        return ResponseEntity.ok(weddingPartyOrders.save(wedOrder));
     }
     @GetMapping("/get-all-order")
     public ResponseEntity<?> getAllOrder(HttpServletRequest request, @ModelAttribute PageRs params){

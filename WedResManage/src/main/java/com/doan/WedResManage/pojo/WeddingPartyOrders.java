@@ -88,7 +88,6 @@ public class WeddingPartyOrders implements Serializable {
     //@JsonIgnore
     private Menu menuId;
     @JoinColumn(name = "pwt_id", referencedColumnName = "id")
-    @JsonIgnore
     @ManyToOne
     private PriceWeddingTime pwtId;
     @JoinColumn(name = "type_party", referencedColumnName = "id")
