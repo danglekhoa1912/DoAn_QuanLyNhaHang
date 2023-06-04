@@ -54,6 +54,8 @@ public class ApiAdminController {
     private WeddingHallRepository weddingHall;
     @Autowired
     private WeddingPartyOrdersRepository weddingPartyOrder;
+    @Autowired
+    private PriceWeddingTimeRepository priceWeddingTimeRepository;
 
     @PostMapping(value = "/dish/edit")
     public ResponseEntity changeNameDish(@ModelAttribute DishRq params, @RequestParam int id) {
@@ -344,7 +346,7 @@ public class ApiAdminController {
     public ResponseEntity<?> updateStatusPayment(@RequestBody Map<String,String> params){
         int id=Integer.parseInt(params.getOrDefault("id",null));
         int status=Integer.parseInt(params.getOrDefault("status",null));
-        WeddingPartyOrders wpo=weddingPartyOrder.findById(id).orElseThrow();
+        WeddingPartyOrders wpo=weddingPartyOrder.findById(id);
         wpo.setStatus(status);
         return ResponseEntity.ok(weddingPartyOrder.save(wpo));
     }
@@ -352,7 +354,7 @@ public class ApiAdminController {
     public ResponseEntity<?> updatePayment(@RequestBody Map<String,String> params){
         int id=Integer.parseInt(params.getOrDefault("id",null));
         String status=params.getOrDefault("status",null);
-        WeddingPartyOrders wpo=weddingPartyOrder.findById(id).orElseThrow();
+        WeddingPartyOrders wpo=weddingPartyOrder.findById(id);
         wpo.setTypePay(status);
         return ResponseEntity.ok(weddingPartyOrder.save(wpo));
     }
@@ -407,5 +409,17 @@ public class ApiAdminController {
         Page<Service> total=serviceRepository.searchServiceByNameContains(params.getSearchByName()==null?"":params.getSearchByName(),pageable);
         PageRq record=new PageRq(total.getNumberOfElements(),params.getPage(),total.getTotalPages(),total.getContent());
         return new ResponseEntity<>(record,HttpStatus.OK);
+    }
+
+    @PostMapping("/weddinghall/ready")
+    public ResponseEntity<?> getReadyHall(@ModelAttribute TimeDTO time){
+        List<WeddingHall> result = new ArrayList<>();
+        PriceWeddingTime prw=priceWeddingTimeRepository.findById(time.getTime()).orElseThrow();
+        weddingHall.findAll().forEach( t-> {
+            if (weddingPartyOrder.findByOrderDateAndPwtIdAndWhId(time.getDate(),prw, t) == null){
+                result.add(t);
+            }
+        });
+        return ResponseEntity.ok(result);
     }
 }
