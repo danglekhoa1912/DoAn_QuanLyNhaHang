@@ -221,6 +221,63 @@ public class ApiUserController {
 
         return ResponseEntity.ok(finalOrder);
     }
+    @PostMapping("/edit")
+    public ResponseEntity<?> edit(@RequestBody OrderRequest order,@RequestParam int id){
+        WeddingPartyOrders wedOrder=new WeddingPartyOrders();
+        wedOrder.setId(id);
+        int total=0;
+        //Add wedding hall
+        WeddingHall wdh=weddingHall.findAllById(order.getWhId()).get(0);
+        wedOrder.setWhId(wdh);
+        //add time
+        PriceWeddingTime time=priceWeddingTimeRepository.findAllById(order.getPwtId()).get(0);
+        total= (int) (wdh.getPrice()*time.getPrice());
+        wedOrder.setPwtId(time);
+        //add order_date
+        wedOrder.setOrderDate(order.getOrderDate());
+        //add menu
+        Menu menu=new Menu();
+        menu.setPrice(0);
+        Menu menuNew =menuRepository.save(menu);
+        order.getMenu().forEach(item->{
+            MenuDish menuDish=new MenuDish();
+            menuDish.setMenuId(menuNew);
+            menuDish.setDishId(dishRepository.findById(item).orElseThrow());
+            menuNew.setPrice(menuNew.getPrice()+menuDish.getDishId().getPrice());
+            menuRepository.save(menuNew);
+            menuDishRepository.save(menuDish);
+        });
+        wedOrder.setMenuId(menuNew);
+        wedOrder.setQuantityTable(order.getQuantity());
+        total=(total+ menuNew.getPrice())*order.getQuantity();
+        //add service
+        ListService listservice=new ListService();
+        listservice.setPrice(0);
+        ListService listServiceNew=listService.save(listservice);
+        order.getService().forEach(item->{
+            ServicesDetail servicesDetail=new ServicesDetail();
+            servicesDetail.setListServiceId(listServiceNew);
+            servicesDetail.setServiceId(serviceRepository.findAllById(item).get(0));
+            listServiceNew.setPrice(listServiceNew.getPrice()+servicesDetail.getServiceId().getPrice());
+            servicesDetailRepository.save(servicesDetail);
+            listService.save(listServiceNew);
+        });
+        wedOrder.setListServiceId(listServiceNew);
+        total+=listServiceNew.getPrice();
+        wedOrder.setAmount(total);
+        wedOrder.setStatus(order.getStatus());
+        wedOrder.setTypePay(order.getTypePay());
+        wedOrder.setNote(order.getNote());
+        wedOrder.setTypeParty(typePartyRepository.findAllById(order.getType_party()).get(0));
+        WeddingPartyOrders finalOrder;
+        try{
+            finalOrder=weddingPartyOrders.save(wedOrder);
+        } catch (Exception ex){
+            return ResponseEntity.badRequest().body("Lỗi khi thay doi thong tin");
+        }
+
+        return ResponseEntity.ok(finalOrder);
+    }
     @GetMapping("/get-all-order")
     public ResponseEntity<?> getAllOrder(HttpServletRequest request, @ModelAttribute PageRs params){
         Pageable pageable = PageRequest.of(params.getPage()-1, pageSize);
@@ -235,8 +292,10 @@ public class ApiUserController {
             }
             else {
                 weddingPartyOrders.searchWeddingPartyOrdersByUserId(user, pageable).getContent().forEach(item -> {
-                    OrderResponse temp = new OrderResponse(item);
-                    orderResponseList.add(temp);
+                    if (item.getStatus()!=3){
+                        OrderResponse temp = new OrderResponse(item);
+                        orderResponseList.add(temp);
+                    }
                 });
             }
             Page<OrderResponse> total = new PageImpl<>(orderResponseList, pageable, orderResponseList.size());
@@ -250,7 +309,7 @@ public class ApiUserController {
     @GetMapping("/get-order-by-id")
     public ResponseEntity<?> getOrderById(@RequestParam int id) {
         try {
-            return ResponseEntity.ok(new OrderResponse(weddingPartyOrders.findById(id).orElseThrow()));
+            return ResponseEntity.ok(new OrderResponse(weddingPartyOrders.findById(id)));
         } catch (NoSuchElementException e) {
             return ResponseEntity.badRequest().body("Order not found with id " + id);
         }
