@@ -24,6 +24,7 @@ import org.springframework.web.bind.annotation.*;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.ZoneId;
 import java.util.*;
 
 @Validated
@@ -180,7 +181,7 @@ public class ApiAdminController {
         }
         return ResponseEntity.badRequest().body("Không thành công !");
     }
-    @PostMapping ("/order/all")
+    @GetMapping ("/order/all")
     public ResponseEntity<?> getAllOrder(@ModelAttribute OrderSearchDTO searchDTO){
         Pageable pageable = PageRequest.of(searchDTO.getPage()-1, pageSize);
         String pattern = "dd-MM-yyyy";
@@ -406,12 +407,13 @@ public class ApiAdminController {
         return new ResponseEntity<>(record,HttpStatus.OK);
     }
 
-    @PostMapping("/weddinghall/ready")
+    @GetMapping("/weddinghall/ready")
     public ResponseEntity<?> getReadyHall(@ModelAttribute TimeDTO time){
         List<WeddingHall> result = new ArrayList<>();
         PriceWeddingTime prw=priceWeddingTimeRepository.findById(time.getTime()).orElseThrow();
+        ZoneId zoneId = ZoneId.systemDefault();
         weddingHall.findAll().forEach( t-> {
-            if (weddingPartyOrder.findByOrderDateAndPwtIdAndWhId(time.getDate(),prw, t) == null){
+            if (weddingPartyOrder.findByOrderDateAndPwtIdAndWhId( Date.from(time.getDate()),prw, t) == null){
                 result.add(t);
             }
         });
