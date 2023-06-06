@@ -17,6 +17,7 @@ public interface DishRepository extends JpaRepository<Dish, Integer>, JpaSpecifi
     Page<Dish> findAll(Pageable pageable);
     Page<Dish> searchDishByNameContainsAndStatus(Pageable pageable,String s,boolean status);
     Page<Dish> searchDishByCategoryId_IdAndNameContainsAndStatus(int id,String s,Pageable pageable, boolean status);
+    Page<Dish> searchDishByCategoryId_IdAndNameContains(int id,String s,Pageable pageable);
     List<Dish> findAllById(int i);
 
     Page<Dish> searchDishByNameContains(Pageable pageable,String s);

@@ -390,6 +390,14 @@ public class ApiAdminController {
         PageRq record=new PageRq((int) total.getTotalElements(),params.getPage(),total.getTotalPages(),total.getContent());
         return new ResponseEntity<>(record,HttpStatus.OK);
     }
+    @RequestMapping(value = "/dish/categoryId", method = RequestMethod.GET)
+    public ResponseEntity<?> findDishByCategoryId(@RequestParam int i, @ModelAttribute PageRs params) {
+        Pageable pageable = PageRequest.of(params.getPage()-1, pageSize);
+        String key = params.getSearchByName()==null?"":params.getSearchByName();
+        Page<Dish> result = dishRepository.searchDishByCategoryId_IdAndNameContains(i, key, pageable);
+        PageRq record=new PageRq((int) result.getTotalElements(), params.getPage(),result.getTotalPages(),result.getContent());
+        return new ResponseEntity<>(record, HttpStatus.OK);
+    }
 
     @RequestMapping(value = "/weddinghall/get-all-wedding-hall", method = RequestMethod.GET)
     public ResponseEntity<?> getAllWeddingHall(@ModelAttribute PageRs params){
