@@ -24,6 +24,8 @@ import org.springframework.web.bind.annotation.*;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.Instant;
+import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.*;
 
@@ -416,11 +418,13 @@ public class ApiAdminController {
     }
 
     @GetMapping("/weddinghall/ready")
-    public ResponseEntity<?> getReadyHall(@ModelAttribute TimeDTO time){
+    public ResponseEntity<?> getReadyHall(@ModelAttribute TimeDTO time) throws ParseException {
         List<WeddingHall> result = new ArrayList<>();
-        PriceWeddingTime prw=time.getTime() == null ? null:priceWeddingTimeRepository.findById(time.getTime()).orElseThrow();
+        PriceWeddingTime prw=time.getTime() == null ? null:priceWeddingTimeRepository.findById(time.getTime().intValue()).orElseThrow();
+        LocalDate orderDate = time.getDate() == null ? null : time.getDate().atZone(ZoneId.systemDefault()).toLocalDate();
+        Date date=orderDate == null ? null : (new SimpleDateFormat("yyyy-MM-dd").parse(orderDate.toString()));
         weddingHall.findAll().forEach( t-> {
-            if (weddingPartyOrder.findByOrderDateAndPwtIdAndWhId(time.getDate()==null?null: Date.from(time.getDate()),prw, t) == null){
+            if (weddingPartyOrder.findByOrderDateAndPwtIdAndWhId(date,prw, t) == null){
                 result.add(t);
             }
         });
