@@ -24,6 +24,7 @@ import org.springframework.web.bind.annotation.*;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.ZoneId;
 import java.util.*;
 
 @Validated
@@ -180,7 +181,7 @@ public class ApiAdminController {
         }
         return ResponseEntity.badRequest().body("Không thành công !");
     }
-    @PostMapping ("/order/all")
+    @GetMapping ("/order/all")
     public ResponseEntity<?> getAllOrder(@ModelAttribute OrderSearchDTO searchDTO){
         Pageable pageable = PageRequest.of(searchDTO.getPage()-1, pageSize);
         String pattern = "dd-MM-yyyy";
@@ -389,6 +390,14 @@ public class ApiAdminController {
         PageRq record=new PageRq((int) total.getTotalElements(),params.getPage(),total.getTotalPages(),total.getContent());
         return new ResponseEntity<>(record,HttpStatus.OK);
     }
+    @RequestMapping(value = "/dish/categoryId", method = RequestMethod.GET)
+    public ResponseEntity<?> findDishByCategoryId(@RequestParam int i, @ModelAttribute PageRs params) {
+        Pageable pageable = PageRequest.of(params.getPage()-1, pageSize);
+        String key = params.getSearchByName()==null?"":params.getSearchByName();
+        Page<Dish> result = dishRepository.searchDishByCategoryId_IdAndNameContains(i, key, pageable);
+        PageRq record=new PageRq((int) result.getTotalElements(), params.getPage(),result.getTotalPages(),result.getContent());
+        return new ResponseEntity<>(record, HttpStatus.OK);
+    }
 
     @RequestMapping(value = "/weddinghall/get-all-wedding-hall", method = RequestMethod.GET)
     public ResponseEntity<?> getAllWeddingHall(@ModelAttribute PageRs params){
@@ -406,12 +415,13 @@ public class ApiAdminController {
         return new ResponseEntity<>(record,HttpStatus.OK);
     }
 
-    @PostMapping("/weddinghall/ready")
+    @GetMapping("/weddinghall/ready")
     public ResponseEntity<?> getReadyHall(@ModelAttribute TimeDTO time){
         List<WeddingHall> result = new ArrayList<>();
         PriceWeddingTime prw=priceWeddingTimeRepository.findById(time.getTime()).orElseThrow();
+        ZoneId zoneId = ZoneId.systemDefault();
         weddingHall.findAll().forEach( t-> {
-            if (weddingPartyOrder.findByOrderDateAndPwtIdAndWhId(time.getDate(),prw, t) == null){
+            if (weddingPartyOrder.findByOrderDateAndPwtIdAndWhId( Date.from(time.getDate()),prw, t) == null){
                 result.add(t);
             }
         });
