@@ -6,6 +6,7 @@ import io.swagger.annotations.Api;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.text.ParseException;
 import java.util.Map;
 
 @RestController
@@ -29,7 +30,7 @@ public class ApiStaffController extends ApiAdminController  {
     }
 
     @Override
-    public ResponseEntity<?> getReadyHall(TimeDTO time) {
+    public ResponseEntity<?> getReadyHall(TimeDTO time) throws ParseException {
         return super.getReadyHall(time);
     }
 }
