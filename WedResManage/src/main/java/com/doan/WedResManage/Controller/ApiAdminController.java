@@ -418,10 +418,9 @@ public class ApiAdminController {
     @GetMapping("/weddinghall/ready")
     public ResponseEntity<?> getReadyHall(@ModelAttribute TimeDTO time){
         List<WeddingHall> result = new ArrayList<>();
-        PriceWeddingTime prw=priceWeddingTimeRepository.findById(time.getTime()).orElseThrow();
-        ZoneId zoneId = ZoneId.systemDefault();
+        PriceWeddingTime prw=time.getTime() == null ? null:priceWeddingTimeRepository.findById(time.getTime()).orElseThrow();
         weddingHall.findAll().forEach( t-> {
-            if (weddingPartyOrder.findByOrderDateAndPwtIdAndWhId( Date.from(time.getDate()),prw, t) == null){
+            if (weddingPartyOrder.findByOrderDateAndPwtIdAndWhId(time.getDate()==null?null: Date.from(time.getDate()),prw, t) == null){
                 result.add(t);
             }
         });
