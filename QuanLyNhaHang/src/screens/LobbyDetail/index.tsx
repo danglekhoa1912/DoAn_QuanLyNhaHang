@@ -47,7 +47,6 @@ const LobbyDetailPage = ({route}: LobbyDetailScreenRouteProp) => {
   useEffect(() => {
     dispatch(getLobbyById(route.params.id)).then(data => {
       const lobby = data.payload?.weddingHall;
-      console.log(lobby);
       if (lobby) {
         analytics().logEvent('lobby_view', {
           id: lobby.id,

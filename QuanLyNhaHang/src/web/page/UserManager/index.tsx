@@ -67,7 +67,6 @@ const UserManager = () => {
       }),
     ).then(data => {
       const role = selectedRole === 1 ? 'ROLE_USER' : 'ROLE_STAFF';
-      console.log(data.payload.record);
       setUserList(
         data.payload.record?.filter((user: any) => user.role === role),
       );

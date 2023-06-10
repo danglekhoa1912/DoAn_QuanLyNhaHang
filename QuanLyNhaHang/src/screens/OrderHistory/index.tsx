@@ -32,23 +32,24 @@ const OrderHistoryPage = () => {
 
   return (
     <>
-      {orderList?.length ? (
-        <ScrollView contentContainerStyle={styles.container}>
-          {orderList?.map(order => (
-            <Item
-              handlePress={() => {
-                navigate('OrderHistoryDetailScreen', {id: order.id});
-              }}
-              key={order.id}
-              order={order}
-            />
-          ))}
-        </ScrollView>
-      ) : (
-        <View style={styles.container_text}>
-          <Text style={styles.text}>{t('dont_have_order_history')}</Text>
-        </View>
-      )}
+      {!pIsLoading &&
+        (orderList?.length ? (
+          <ScrollView contentContainerStyle={styles.container}>
+            {orderList?.map(order => (
+              <Item
+                handlePress={() => {
+                  navigate('OrderHistoryDetailScreen', {id: order.id});
+                }}
+                key={order.id}
+                order={order}
+              />
+            ))}
+          </ScrollView>
+        ) : (
+          <View style={styles.container_text}>
+            <Text style={styles.text}>{t('dont_have_order_history')}</Text>
+          </View>
+        ))}
       <Spinner isLoading={!!pIsLoading} />
     </>
   );

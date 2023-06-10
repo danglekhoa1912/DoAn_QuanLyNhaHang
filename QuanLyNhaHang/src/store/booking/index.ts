@@ -9,6 +9,7 @@ import {extraReducers} from './thunkApi';
 
 export interface IBookingStore {
   order: {
+    id?: number;
     menu: {
       dishList: IDish[];
       total: number;

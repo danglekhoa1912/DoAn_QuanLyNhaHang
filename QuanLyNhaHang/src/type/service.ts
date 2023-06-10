@@ -15,4 +15,5 @@ export interface IServiceRes {
   serviceDescribe: string;
   image: File;
   price: number;
+  status?: boolean;
 }

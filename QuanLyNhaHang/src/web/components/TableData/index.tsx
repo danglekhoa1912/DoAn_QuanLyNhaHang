@@ -28,11 +28,13 @@ const StyledTableCell = styled(TableCell)(({theme}) => ({
 export interface IMenu {
   label: string;
   action: (data: any) => void;
+  hidden?: boolean;
 }
 
 export interface IRowTitle {
   label: string;
   minWidth: number;
+  hidden?: boolean;
 }
 
 export interface ITabelData {
@@ -44,6 +46,8 @@ export interface ITabelData {
   totalItem: number;
   renderData?: (data: any) => React.ReactNode;
   handleSelectItem: (data: any) => void;
+  showStatus?: boolean;
+  showAction?: boolean;
 }
 
 export default function TabelData({
@@ -55,6 +59,8 @@ export default function TabelData({
   totalItem,
   renderData,
   handleSelectItem,
+  showStatus = true,
+  showAction = true,
 }: ITabelData) {
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
   const [item, setItem] = React.useState<any>();
@@ -79,13 +85,15 @@ export default function TabelData({
         <Table stickyHeader aria-label="sticky table">
           <TableHead>
             <TableRow>
-              {rowTitle?.map(data => (
-                <StyledTableCell
-                  align={'center'}
-                  style={{color: 'gray', minWidth: data.minWidth}}>
-                  {data.label}
-                </StyledTableCell>
-              ))}
+              {rowTitle
+                ?.filter(data => !data.hidden)
+                ?.map(data => (
+                  <StyledTableCell
+                    align={'center'}
+                    style={{color: 'gray', minWidth: data.minWidth}}>
+                    {data.label}
+                  </StyledTableCell>
+                ))}
             </TableRow>
           </TableHead>
           <TableBody>
@@ -113,23 +121,27 @@ export default function TabelData({
                       </StyledTableCell>
                     </>
                   )}
-                  {data?.status !== undefined && (
+                  {data?.status !== undefined && showStatus && (
                     <StyledTableCell align={'center'}>
                       {renderStatus(data?.status)}
                     </StyledTableCell>
                   )}
-                  <StyledTableCell>
-                    <IconButton
-                      id="demo-positioned-button"
-                      aria-controls={open ? 'demo-positioned-menu' : undefined}
-                      aria-haspopup="true"
-                      aria-expanded={open ? 'true' : undefined}
-                      onClick={e => {
-                        handleClick(e, data);
-                      }}>
-                      <MoreVertIcon />
-                    </IconButton>
-                  </StyledTableCell>
+                  {showAction && (
+                    <StyledTableCell>
+                      <IconButton
+                        id="demo-positioned-button"
+                        aria-controls={
+                          open ? 'demo-positioned-menu' : undefined
+                        }
+                        aria-haspopup="true"
+                        aria-expanded={open ? 'true' : undefined}
+                        onClick={e => {
+                          handleClick(e, data);
+                        }}>
+                        <MoreVertIcon />
+                      </IconButton>
+                    </StyledTableCell>
+                  )}
                 </TableRow>
               );
             })}
@@ -158,15 +170,17 @@ export default function TabelData({
           vertical: 'top',
           horizontal: 'left',
         }}>
-        {menu?.map(data => (
-          <MenuItem
-            onClick={() => {
-              data.action(item);
-              handleClose();
-            }}>
-            {data.label}
-          </MenuItem>
-        ))}
+        {menu
+          ?.filter(data => !data.hidden)
+          ?.map(data => (
+            <MenuItem
+              onClick={() => {
+                data.action(item);
+                handleClose();
+              }}>
+              {data.label}
+            </MenuItem>
+          ))}
       </Menu>
     </Paper>
   );

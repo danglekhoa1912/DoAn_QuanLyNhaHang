@@ -25,15 +25,22 @@ import {AppDispatch, AppState} from '../../store';
 import {connect} from 'react-redux';
 import {ICategory} from '../../type/dish';
 import {IBookingStore, resetBooking} from '../../store/booking';
-import {CASH_TYPE, IBookingReq, ISession, ITypePay} from '../../type/booking';
+import {
+  CASH_TYPE,
+  IBookingReq,
+  ISession,
+  ITypePay,
+  ORDER_STATUS,
+} from '../../type/booking';
 import {ITypeParty} from '../../type/lobby';
-import {addOrder} from '../../store/booking/thunkApi';
+import {addOrder, updateOrder} from '../../store/booking/thunkApi';
 import {IUser} from '../../type/user';
 import {useTranslation} from 'react-i18next';
 import {paymentZalo} from '../../apis/booking';
 import toast from '../../utils/toast';
 import {replace} from '../../utils/navigate';
 import analytics from '@react-native-firebase/analytics';
+import {convertPaymentType} from '../../utils/convertEnum';
 const {PayZaloBridge} = NativeModules;
 const payZaloBridgeEmitter = new NativeEventEmitter(PayZaloBridge);
 interface IBookingDetailPage {
@@ -44,6 +51,7 @@ interface IBookingDetailPage {
   pUser: IUser;
   pIsLoading: number;
   pAddOrder: (data: IBookingReq) => Promise<any>;
+  pEditOrder: (data: {id: number; order: IBookingReq}) => Promise<any>;
   pResetBooking: () => void;
 }
 
@@ -74,6 +82,7 @@ const BookingDetailPage = ({
   pAddOrder,
   pIsLoading,
   pResetBooking,
+  pEditOrder,
 }: IBookingDetailPage) => {
   const styles = useStyleSheet(themedStyles);
   const theme = useTheme();
@@ -97,28 +106,56 @@ const BookingDetailPage = ({
   }, [order]);
 
   const createOrder = (paymentStatus: boolean) => {
-    pAddOrder({
-      orderDate: order.date,
-      amount: total,
-      idUser: pUser.id || 0,
-      menu: order.menu.dishList.map(dish => dish.id),
-      note: '',
-      paymentStatus: paymentStatus,
-      pwtId: order.time.value,
-      quantity: order.quantityTable,
-      service: order.service.serviceList.map(service => service.id),
-      type_party: order.type_party.value,
-      whId: order.lobby.id,
-      typePay: order.type_pay,
-    }).then(() => {
-      toast.success('successful party booking');
-      pResetBooking();
-      analytics().logAddPaymentInfo({
-        currency: 'VND',
-        value: total,
+    if (order.id) {
+      pEditOrder({
+        id: order.id,
+        order: {
+          orderDate: order.date,
+          amount: total,
+          idUser: pUser.id || 0,
+          menu: order.menu.dishList.map(dish => dish.id),
+          note: '',
+          status: paymentStatus
+            ? ORDER_STATUS.SUCCESS
+            : ORDER_STATUS.WAIT_PAYMENT,
+          pwtId: order.time.value,
+          quantity: order.quantityTable,
+          service: order.service.serviceList.map(service => service.id),
+          type_party: order.type_party.value,
+          whId: order.lobby.id,
+          typePay: convertPaymentType(order.type_pay),
+        },
+      }).then(() => {
+        pResetBooking();
+        analytics().logAddPaymentInfo({
+          currency: 'VND',
+          value: total,
+        });
+        replace('DrawerScreen');
       });
-      replace('DrawerScreen');
-    });
+    } else {
+      pAddOrder({
+        orderDate: order.date,
+        amount: total,
+        idUser: pUser.id || 0,
+        menu: order.menu.dishList.map(dish => dish.id),
+        note: '',
+        status: ORDER_STATUS.WAIT_CONFIRM,
+        pwtId: order.time.value,
+        quantity: order.quantityTable,
+        service: order.service.serviceList.map(service => service.id),
+        type_party: order.type_party.value,
+        whId: order.lobby.id,
+        typePay: convertPaymentType(order.type_pay),
+      }).then(() => {
+        pResetBooking();
+        analytics().logAddPaymentInfo({
+          currency: 'VND',
+          value: total,
+        });
+        replace('DrawerScreen');
+      });
+    }
   };
 
   const handlePayment = () => {
@@ -219,6 +256,8 @@ const mapStateToProps = (state: AppState) => ({
 
 const mapDispatchToProps = (dispatch: AppDispatch) => ({
   pAddOrder: (data: IBookingReq) => dispatch(addOrder(data)),
+  pEditOrder: (data: {id: number; order: IBookingReq}) =>
+    dispatch(updateOrder(data)),
   pResetBooking: () => dispatch(resetBooking()),
 });
 

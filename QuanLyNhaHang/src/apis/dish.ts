@@ -1,5 +1,9 @@
+import {Platform} from 'react-native';
 import AxiosClient from '.';
 import {IDishRes, IRequestParams} from '../type/dish';
+
+const isAdmin =
+  Platform.OS === 'web' && localStorage.getItem('role') === 'ROLE_ADMIN';
 
 export const getDishList = (params: IRequestParams) => {
   const {categoryId = 2, page = 1, searchByName = ''} = params;
@@ -14,7 +18,7 @@ export const getDishList = (params: IRequestParams) => {
 
 export const getDishListAdmin = (params: IRequestParams) => {
   const {categoryId = 2, page = 1, searchByName = ''} = params;
-  return AxiosClient.get(`order/dish/categoryId`, {
+  return AxiosClient.get(`${isAdmin ? 'admin' : 'staff'}/dish/categoryId`, {
     params: {
       page,
       searchByName,
@@ -33,6 +37,7 @@ export const addDish = (dish: IDishRes) => {
   formData.append('categoryId', dish.category.toString());
   formData.append('price', dish.price.toString());
   formData.append('image', dish.image);
+  formData.append('status', dish.status);
   return AxiosClient.post('admin/dish/add', formData, {
     headers: {
       'Content-Type': 'multipart/form-data',
@@ -47,7 +52,7 @@ export const updateDish = (dish: IDishRes) => {
   formData.append('categoryId', dish.category.toString());
   formData.append('price', dish.price.toString());
   formData.append('image', dish.image);
-  console.log(formData);
+  formData.append('status', dish.status);
   return AxiosClient.post(`admin/dish/edit`, formData, {
     headers: {
       'Content-Type': 'multipart/form-data',

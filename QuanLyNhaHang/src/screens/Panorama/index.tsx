@@ -14,7 +14,6 @@ import {useTheme} from '@ui-kitten/components';
 
 const PanoramaPage = ({route}: PanoramaScreenRouteProp) => {
   const theme = useTheme();
-  console.log(route.params.url);
   return (
     <View style={styles.container}>
       <PanoramaView

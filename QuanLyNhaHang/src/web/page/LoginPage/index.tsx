@@ -56,7 +56,7 @@ const LoginPage = () => {
     ).then((data: any) => {
       if (!data?.error) {
         reset();
-        localStorage.setItem('accessToken', data.payload?.data?.accessToken);
+        localStorage.setItem('accessToken', data.payload?.accessToken);
         navigate('admin');
       }
     });

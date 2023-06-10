@@ -26,7 +26,6 @@ export function withParamsToastCatcher<ThunkArg, Returned>(
       toastWeb.success(message);
       return res;
     } catch (err: any) {
-      console.log(err);
       toastWeb.error(`${err?.message || err}`);
       throw err;
     }

@@ -101,15 +101,12 @@ const SelectDish = () => {
     state => state.booking.order.menu.dishList,
   );
 
-  console.log(pDishListInMenu);
-
   const handleChange = (event: SelectChangeEvent) => {
     setCategory(+event.target.value);
     setPage(0);
   };
 
   const fetchMoreDish = () => {
-    console.log('call');
     if (totalPage.current > page) {
       setPage(page + 1);
     }
@@ -141,7 +138,7 @@ const SelectDish = () => {
       <View
         style={{
           flex: 1,
-          overflow: 'scroll',
+          overflow: 'auto',
           borderRightWidth: 1,
           borderRightColor: COLORS.secondary,
         }}>

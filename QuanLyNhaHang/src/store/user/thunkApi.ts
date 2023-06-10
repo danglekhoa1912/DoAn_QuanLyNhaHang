@@ -14,9 +14,7 @@ import {ISearchParam} from '../../type/common';
 export const loginUser = createAsyncThunk(
   'user/login',
   withParamsToastCatcher(async (data: ILoginRes) => {
-    console.log(data);
     const result = await UserApi.login(data);
-    console.log(result);
     return result;
     // return result.data;
   }, 'Login successfully'),
@@ -24,10 +22,10 @@ export const loginUser = createAsyncThunk(
 
 export const loginUserWeb = createAsyncThunk(
   'user/loginWeb',
-  async (data: ILoginRes) => {
-    return await UserApi.login(data);
-    // return result.data;
-  },
+  withParamsToastCatcherWeb(async (data: ILoginRes) => {
+    const result = await UserApi.login(data);
+    return result;
+  }, 'Login successfully'),
 );
 
 export const registerUser = createAsyncThunk(

@@ -1,6 +1,10 @@
 import {ILobbyRes} from './../type/lobby';
 import AxiosClient from '.';
 import {ISearchParam} from '../type/common';
+import {Platform} from 'react-native';
+
+const isAdmin =
+  Platform.OS === 'web' && localStorage.getItem('role') === 'ROLE_ADMIN';
 
 export const getLobbyList = (params: ISearchParam) => {
   return AxiosClient.get('order/weddinghall/get-all-wedding-hall', {
@@ -8,10 +12,19 @@ export const getLobbyList = (params: ISearchParam) => {
   });
 };
 
-export const getLobbyListAdmin = (params: ISearchParam) => {
-  return AxiosClient.get('admin/weddinghall/get-all-wedding-hall', {
+export const getLobbyListReady = (params: {date?: Date; time?: number}) => {
+  return AxiosClient.get(`${isAdmin ? 'admin' : 'staff'}/weddinghall/ready`, {
     params: params,
   });
+};
+
+export const getLobbyListAdmin = (params: ISearchParam) => {
+  return AxiosClient.get(
+    `${isAdmin ? 'admin' : 'staff'}/weddinghall/get-all-wedding-hall`,
+    {
+      params: params,
+    },
+  );
 };
 
 export const getLobbyById = (id: number) => {
@@ -26,6 +39,7 @@ export const addLooby = (lobby: ILobbyRes) => {
   formdata.append('price', lobby.price.toString());
   formdata.append('image', lobby.image);
   formdata.append('image360', lobby.image360);
+  formdata.append('status', lobby.status);
   return AxiosClient.post('admin/weddinghall/add', formdata, {
     headers: {
       'Content-Type': 'multipart/form-data',
@@ -42,6 +56,7 @@ export const updateLobby = (lobby: ILobbyRes) => {
   formdata.append('price', lobby.price.toString());
   formdata.append('image', lobby.image);
   formdata.append('image360', lobby.image360);
+  formdata.append('status', lobby.status);
   return AxiosClient.post('admin/weddinghall/edit', formdata, {
     headers: {
       'Content-Type': 'multipart/form-data',

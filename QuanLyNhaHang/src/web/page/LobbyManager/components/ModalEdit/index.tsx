@@ -24,6 +24,7 @@ const ModalEdit = ({handleClose, open, data, onReLoadData}: IModalEdit) => {
       describe: '',
       price: 0,
       name: '',
+      status: true,
     },
   });
 
@@ -64,6 +65,7 @@ const ModalEdit = ({handleClose, open, data, onReLoadData}: IModalEdit) => {
           capacity: data?.capacity,
           describe: data?.describe || '',
           image360: await convertImageToFile(data?.image360 || ''),
+          status: data?.status,
         });
       })();
     } else reset({});

@@ -3,13 +3,24 @@ import AxiosClient from '.';
 import {IBookingReq, IUpdateBookingStatus} from '../type/booking';
 import CryptoJS from 'crypto-js';
 import moment from 'moment';
+import {Platform} from 'react-native';
+
+const isAdmin =
+  Platform.OS === 'web' && localStorage.getItem('role') === 'ROLE_ADMIN';
 
 export const addOrderService = (order: IBookingReq) => {
   return AxiosClient.post('order/add', order);
 };
 
+export const updateOrder = ({id, order}: {id: number; order: IBookingReq}) => {
+  return AxiosClient.post(`order/edit/?id=${id}`, order);
+};
+
 export const updateOrderStatus = (data: IUpdateBookingStatus) => {
-  return AxiosClient.post('admin/order/updatestt', data);
+  return AxiosClient.post(
+    `${isAdmin ? 'admin' : 'staff'}/order/updatestt`,
+    data,
+  );
 };
 
 export const getOrderById = (id: number) => {

@@ -33,6 +33,14 @@ export const getLobbyList = createAsyncThunk(
   },
 );
 
+export const getLobbyListReady = createAsyncThunk(
+  'lobby/getLobbyListReady',
+  async (params: {date?: Date; time?: number}) => {
+    const result = await LobbyApi.getLobbyListReady(params);
+    return result.data;
+  },
+);
+
 export const getLobbyListAdmin = createAsyncThunk(
   'lobby/getLobbyListAdmin',
   async (params: ISearchParam) => {

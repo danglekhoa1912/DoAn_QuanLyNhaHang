@@ -24,6 +24,7 @@ const ModalEdit = ({handleClose, open, data, onReloadData}: IModalEdit) => {
       name: '',
       price: 0,
       serviceDescribe: '',
+      status: true,
     },
   });
 
@@ -62,6 +63,7 @@ const ModalEdit = ({handleClose, open, data, onReloadData}: IModalEdit) => {
           price: data?.price,
           image: await convertImageToFile(data?.image || ''),
           serviceDescribe: data?.serviceDescribe,
+          status: data?.status,
         });
       })();
     }
@@ -116,7 +118,6 @@ const ModalEdit = ({handleClose, open, data, onReloadData}: IModalEdit) => {
             <TextField
               multiline
               numberOfLines={6}
-              maxLength={40}
               control={control}
               name="serviceDescribe"
             />

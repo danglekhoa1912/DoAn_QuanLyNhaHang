@@ -11,13 +11,25 @@ import SelectLobby from '../SelectLobby';
 import * as yup from 'yup';
 import _ from 'lodash';
 import {useForm} from 'react-hook-form';
-import {IFormBooking} from '../../../../../type/booking';
+import {IFormBooking, ORDER_STATUS} from '../../../../../type/booking';
 import moment from 'moment';
 import {yupResolver} from '@hookform/resolvers/yup';
 import {updateInfoBooking} from '../../../../../store/booking';
-import {useDispatch} from 'react-redux';
-import {AppDispatch} from '../../../../../store';
+import {useDispatch, useSelector} from 'react-redux';
+import {AppDispatch, AppState} from '../../../../../store';
 import SelectDish from '../SelectDish';
+import SelectService from '../SelectService';
+import Confirm from '../Confirm';
+import {COLORS} from '../../../../../utils/color';
+import {
+  addOrder,
+  getTypeParty,
+  getTypeTime,
+} from '../../../../../store/booking/thunkApi';
+import {IDish} from '../../../../../type/dish';
+import {IService} from '../../../../../type/service';
+import {useParams} from 'react-router-dom';
+import {send} from 'process';
 
 const steps = ['Select Lobby', 'Select Dish', 'Select Service', 'Confirm'];
 
@@ -43,16 +55,22 @@ const schema = yup
 interface IModalCreateOrder {
   handleClose: () => void;
   open: boolean;
+  onSend: (id?: number) => Promise<void>;
 }
 
 export default function ModalCreateOrder({
   handleClose,
   open,
+  onSend,
 }: IModalCreateOrder) {
-  const [activeStep, setActiveStep] = React.useState(1);
+  const [activeStep, setActiveStep] = React.useState(0);
   const [skipped, setSkipped] = React.useState(new Set<number>());
   const dispatch = useDispatch<AppDispatch>();
+  const pDetailBooking = useSelector<AppState, any>(
+    state => state.booking.order,
+  );
 
+  let {userId} = useParams();
   const {
     control,
     handleSubmit,
@@ -69,8 +87,6 @@ export default function ModalCreateOrder({
     },
     resolver: yupResolver(schema),
   });
-
-  console.log('errors', errors);
 
   const isStepOptional = (step: number) => {
     return step === 2;
@@ -89,6 +105,30 @@ export default function ModalCreateOrder({
 
     setActiveStep(prevActiveStep => prevActiveStep + 1);
     setSkipped(newSkipped);
+    if (activeStep === steps.length - 1) {
+      dispatch(
+        addOrder({
+          orderDate: pDetailBooking.date,
+          amount: 1000,
+          idUser: +(userId || 0),
+          menu: pDetailBooking.menu.dishList.map((dish: IDish) => dish.id),
+          note: '',
+          status: ORDER_STATUS.DRAW,
+          pwtId: pDetailBooking.time.value,
+          quantity: pDetailBooking.quantityTable,
+          service: pDetailBooking.service.serviceList.map(
+            (service: IService) => service.id,
+          ),
+          type_party: pDetailBooking.type_party.value,
+          whId: pDetailBooking.lobby.id,
+          typePay: pDetailBooking.type_pay,
+        }),
+      ).then((data: any) => {
+        onSend(data?.payload?.data?.id);
+      });
+
+      handleClose();
+    }
   };
 
   const handleBack = () => {
@@ -120,18 +160,28 @@ export default function ModalCreateOrder({
         return <SelectLobby control={control} />;
       case 1:
         return <SelectDish />;
+      case 2:
+        return <SelectService />;
+      case 3:
+        return <Confirm />;
       default:
         return <SelectLobby control={control} />;
     }
   };
 
   const onSubmitSelectLooby = (data: IFormBooking) => {
-    console.log(data);
     dispatch(updateInfoBooking(data));
     handleNext();
   };
 
-  console.log(activeStep);
+  React.useEffect(() => {
+    dispatch(getTypeParty());
+    dispatch(getTypeTime());
+  }, []);
+
+  React.useEffect(() => {
+    if (!open) setActiveStep(0);
+  }, [open]);
 
   return (
     <Modal
@@ -177,9 +227,15 @@ export default function ModalCreateOrder({
             }}>
             {renderContent(activeStep)}
           </View>
-          <Box sx={{display: 'flex', flexDirection: 'row', pt: 2}}>
+          <Box sx={{display: 'flex', flexDirection: 'row', paddingY: 1}}>
             <Button
-              color="inherit"
+              style={{
+                backgroundColor: 'white',
+                borderColor: 'black',
+                borderWidth: 1,
+                borderStyle: 'solid',
+                color: 'black',
+              }}
               disabled={activeStep === 0}
               onClick={handleBack}
               sx={{mr: 1}}>
@@ -187,15 +243,28 @@ export default function ModalCreateOrder({
             </Button>
             <Box sx={{flex: '1 1 auto'}} />
             {isStepOptional(activeStep) && (
-              <Button color="inherit" onClick={handleSkip} sx={{mr: 1}}>
+              <Button
+                style={{
+                  backgroundColor: 'white',
+                  borderColor: COLORS.secondary,
+                  borderWidth: 1,
+                  borderStyle: 'solid',
+                  color: COLORS.secondary,
+                }}
+                onClick={handleSkip}
+                sx={{mr: 1}}>
                 Skip
               </Button>
             )}
             <Button
+              style={{
+                backgroundColor: COLORS.primary,
+                color: 'white',
+              }}
               onClick={
                 activeStep ? handleNext : handleSubmit(onSubmitSelectLooby)
               }>
-              {activeStep === steps.length - 1 ? 'Finish' : 'Next'}
+              {activeStep === steps.length - 1 ? 'Send' : 'Next'}
             </Button>
           </Box>
         </React.Fragment>

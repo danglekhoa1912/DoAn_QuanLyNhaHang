@@ -54,7 +54,7 @@ function App(): JSX.Element {
     analytics().setAnalyticsCollectionEnabled(true);
     analytics()
       .getAppInstanceId()
-      .then(data => console.log(data));
+      .then(data => {});
   }, []);
 
   return (

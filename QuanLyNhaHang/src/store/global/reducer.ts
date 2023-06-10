@@ -14,4 +14,10 @@ export const globalReducer = {
   setIsBooking: (state: IGlobalStore, action: PayloadAction<boolean>) => {
     state.isBooking = action.payload;
   },
+  setResolveBookingId: (state: IGlobalStore, action: PayloadAction<number>) => {
+    state.resolveBookingId = action.payload;
+  },
+  clearResolveBookingId: (state: IGlobalStore) => {
+    state.resolveBookingId = undefined;
+  },
 };

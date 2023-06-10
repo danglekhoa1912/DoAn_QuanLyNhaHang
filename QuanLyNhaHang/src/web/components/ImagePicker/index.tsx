@@ -89,7 +89,6 @@ export function ImagePicker<T extends FieldValues>({
   required = false,
 }: IPictureFieldProps<T>) {
   const [previewImg, setPreviewImg] = useState<string | null>(initPreviewImg);
-  console.log(initPreviewImg);
   useEffect(() => {
     if (initPreviewImg) {
       setPreviewImg(initPreviewImg);
@@ -123,7 +122,6 @@ export function ImagePicker<T extends FieldValues>({
             accept="image/jpg, image/png, image/jpeg"
             onChange={e => {
               const file = e.target.files?.[0];
-              console.log(file);
               onChange(file);
               if (file) {
                 setPreviewImg(handleCreateImg(file));

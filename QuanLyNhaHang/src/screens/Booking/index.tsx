@@ -23,7 +23,7 @@ import Select from '../../components/Select';
 import {ScrollView} from 'react-native';
 import {useTranslation} from 'react-i18next';
 import {navigate, replace} from '../../utils/navigate';
-import {connect} from 'react-redux';
+import {connect, useSelector} from 'react-redux';
 import {AppDispatch, AppState} from '../../store';
 import {resetBooking, updateInfoBooking} from '../../store/booking';
 import {getTypeParty, getTypeTime} from '../../store/booking/thunkApi';
@@ -87,19 +87,20 @@ const BookingPage = ({
 
   const theme = useTheme();
   const styles = useStyleSheet(themedStyles);
-
+  const pBookingInfo = useSelector<AppState, any>(state => state.booking.order);
   const {
     control,
     handleSubmit,
     formState: {errors},
     watch,
     reset,
+    getValues,
   } = useForm<IFormBooking>({
     defaultValues: {
-      date: moment(new Date()).add(1, 'd').toDate(),
-      quantityTable: 0,
-      time: {},
-      type_party: {},
+      date: pBookingInfo?.date || moment(new Date()).add(1, 'd').toDate(),
+      quantityTable: pBookingInfo?.quantityTable || 0,
+      time: pBookingInfo?.time || {},
+      type_party: pBookingInfo?.type_party || {},
     },
     resolver: yupResolver(schema),
   });
@@ -150,6 +151,14 @@ const BookingPage = ({
       item => new Date(`${item} 00:00:00`).getTime() === time,
     );
   };
+  useEffect(() => {
+    reset({
+      date: pBookingInfo?.date || moment(new Date()).add(1, 'd').toDate(),
+      quantityTable: pBookingInfo?.quantityTable || 0,
+      time: pBookingInfo?.time || {},
+      type_party: pBookingInfo?.type_party || {},
+    });
+  }, [pBookingInfo]);
 
   useEffect(() => {
     pGetTypeParty();

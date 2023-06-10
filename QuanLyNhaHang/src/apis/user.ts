@@ -1,7 +1,11 @@
+import {Platform} from 'react-native';
 import AxiosClient from '.';
 import {ISearchParam} from '../type/common';
 import {IUserRes} from '../type/user';
 import {ILoginRes, IUser} from '../type/user';
+
+const isAdmin =
+  Platform.OS === 'web' && localStorage.getItem('role') === 'ROLE_ADMIN';
 
 export const register = (user: IUser) => {
   let filename = user.avatar.split('/').pop();
@@ -39,7 +43,7 @@ export const getUser = () => {
 };
 
 export const getUserById = (id: number) => {
-  return AxiosClient.get('admin/user', {
+  return AxiosClient.get(`${isAdmin ? 'admin' : 'staff'}/user`, {
     params: {
       id,
     },
@@ -52,6 +56,22 @@ export const getOrderHistory = (param: ISearchParam) => {
     params: {
       page,
       searchByName,
+    },
+  });
+};
+
+export const getAllOrder = (param: {
+  date?: Date;
+  page?: number;
+  status?: number;
+}) => {
+  const {page = 1, date, status} = param;
+
+  return AxiosClient.get(`${isAdmin ? 'admin' : 'staff'}/order/all`, {
+    params: {
+      page,
+      date,
+      status,
     },
   });
 };
@@ -95,7 +115,7 @@ export const getAllUser = (params: ISearchParam) => {
 };
 
 export const getAllBooking = () => {
-  return AxiosClient.get('admin/order/all');
+  return AxiosClient.get(`${isAdmin ? 'admin' : 'staff'}/order/all`);
 };
 
 export const confirmBookingService = (id: number) => {
@@ -111,6 +131,7 @@ export const addStaff = (staff: IUserRes) => {
   formdata.append('mobile', staff.mobile);
   formdata.append('password', '123456');
   formdata.append('avt', staff.avatar);
+  formdata.append('token', '');
   return AxiosClient.post('admin/addStaff', formdata, {
     headers: {
       'Content-Type': 'multipart/form-data',

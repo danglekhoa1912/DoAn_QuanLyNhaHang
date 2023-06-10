@@ -22,7 +22,9 @@ const MainLayout = () => {
   if (!token) return <Navigate to={'/'} />;
 
   useEffect(() => {
-    dispatch(getUser());
+    dispatch(getUser()).then(data => {
+      localStorage.setItem('role', data.payload?.role);
+    });
   }, []);
 
   return (

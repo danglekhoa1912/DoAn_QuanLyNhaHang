@@ -17,6 +17,10 @@ import {connect} from 'react-redux';
 import {sCountDishInMenu} from '../../store/booking/selector';
 import {navigate} from '../../utils/navigate';
 import {getCategories, getDishList} from '../../store/dish/thunkApi';
+import Modal from '../../components/Modal';
+import {sCategoryOpts} from '../../store/dish/selector';
+import {ISelectItem} from '../../type/common';
+import {removeDishToMenu} from '../../store/booking';
 
 interface IDishPage {
   pCountDishInMenu: number;
@@ -25,6 +29,9 @@ interface IDishPage {
   pCategories: ICategory[];
   pIsBooking: boolean;
   pIsLoading: number;
+  pCategoryOpts: ISelectItem[];
+  pDishListInMenu: IDish[];
+  pRemoveDishToMenu: (dish: IDish) => void;
 }
 
 const DishPage = ({
@@ -34,6 +41,9 @@ const DishPage = ({
   pCategories,
   pIsBooking,
   pIsLoading,
+  pCategoryOpts,
+  pDishListInMenu,
+  pRemoveDishToMenu,
 }: IDishPage) => {
   const {t} = useTranslation();
   const styles = useStyleSheet(themedStyles);
@@ -43,11 +53,16 @@ const DishPage = ({
   const [dishList, setDishList] = useState<IDish[]>([]);
   const [page, setPage] = useState(0);
   const isLatestsPage = useRef(false);
+  const [open, setOpen] = useState(false);
 
   const fetchMoreDish = () => {
     if (!isLatestsPage.current) {
       setPage(page + 1);
     }
+  };
+
+  const handleClose = () => {
+    setOpen(false);
   };
 
   useEffect(() => {
@@ -113,11 +128,15 @@ const DishPage = ({
       </View>
       {pIsBooking && (
         <>
-          <TouchableOpacity style={styles.icon_menu}>
+          <TouchableOpacity
+            onPress={() => {
+              setOpen(true);
+            }}
+            style={styles.icon_menu}>
             <Text style={styles.count}>{pCountDishInMenu}</Text>
             <Icon
               name="list-alt"
-              size={24}
+              size={28}
               color={theme['color-primary-default']}
             />
           </TouchableOpacity>
@@ -132,6 +151,61 @@ const DishPage = ({
         </>
       )}
       <Spinner isLoading={!!pIsLoading} />
+      <Modal
+        style={{
+          width: 300,
+          height: 400,
+        }}
+        title="Dish List"
+        onClose={handleClose}
+        visible={open}>
+        <ScrollView>
+          {pCategoryOpts?.map(category => (
+            <View
+              style={{
+                marginBottom: 12,
+              }}
+              key={category.id}>
+              <Text
+                style={{
+                  fontWeight: 'bold',
+                  fontSize: 20,
+                  textAlign: 'center',
+                }}>
+                * {category.label}
+              </Text>
+              {pDishListInMenu
+                ?.filter(dish => dish.categoryId.id === category.id)
+                ?.map(dish => (
+                  <View
+                    key={dish.id}
+                    style={{
+                      display: 'flex',
+                      flexDirection: 'row',
+                      justifyContent: 'space-between',
+                      alignItems: 'center',
+                    }}>
+                    <Text
+                      style={{
+                        fontWeight: '300',
+                        fontSize: 16,
+                        paddingLeft: 8,
+                        paddingVertical: 4,
+                      }}>
+                      - {dish.name}
+                    </Text>
+                    <TouchableOpacity
+                      onPress={() => {
+                        pRemoveDishToMenu(dish);
+                      }}>
+                      <Icon name="close" color="red" size={20} />
+                    </TouchableOpacity>
+                  </View>
+                ))}
+            </View>
+          ))}
+        </ScrollView>
+      </Modal>
     </View>
   );
 };
@@ -141,11 +215,14 @@ const mapStateToProps = (state: AppState) => ({
   pCategories: state.dish.categories,
   pIsBooking: state.global.isBooking,
   pIsLoading: state.global.isLoading,
+  pCategoryOpts: sCategoryOpts(state),
+  pDishListInMenu: state.booking.order.menu.dishList,
 });
 
 const mapDispatchToProps = (dispatch: AppDispatch) => ({
   pGetDishList: (params: IRequestParams) => dispatch(getDishList(params)),
   pGetCategories: () => dispatch(getCategories()),
+  pRemoveDishToMenu: (dish: IDish) => dispatch(removeDishToMenu(dish)),
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(DishPage);
@@ -173,19 +250,24 @@ const themedStyles = StyleService.create({
     position: 'absolute',
     bottom: 12,
     left: 12,
-    backgroundColor: '#ffff',
-    padding: 18,
+    backgroundColor: '#fff',
     borderRadius: 50,
+    width: 70,
+    height: 70,
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   count: {
     position: 'absolute',
     right: 0,
     top: -5,
     borderRadius: 50,
-    paddingVertical: 2,
-    paddingHorizontal: 8,
+    width: 26,
+    height: 26,
     backgroundColor: 'color-primary-default',
     color: '#ffff',
+    textAlign: 'center',
   },
   button_next: {
     position: 'absolute',

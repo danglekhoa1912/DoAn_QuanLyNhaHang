@@ -3,7 +3,11 @@ import React, {useEffect, useState} from 'react';
 import {useParams} from 'react-router-dom';
 import {useDispatch, useSelector} from 'react-redux';
 import moment from 'moment';
-import {IOrderHistory, ISession} from '../../../../../type/booking';
+import {
+  IOrderHistory,
+  IOrderHistoryAdmin,
+  ISession,
+} from '../../../../../type/booking';
 import {AppDispatch, AppState} from '../../../../../store';
 import {getOrderHistoryById} from '../../../../../store/user/thunkApi';
 import Modal from '../../../../components/Modal';
@@ -34,12 +38,11 @@ const renderItem = ({image, name, price, id}: IItem) => {
 interface IModalEdit {
   handleClose: () => void;
   open: boolean;
-  data?: IOrderHistory;
+  data?: IOrderHistoryAdmin;
   onReLoadData: () => void;
 }
 
 const ModalEdit = ({handleClose, open, data, onReLoadData}: IModalEdit) => {
-  console.log(data);
   const pTypeParty = useSelector<AppState, ITypeParty[]>(
     state => state.booking.typeParty,
   );
@@ -63,17 +66,17 @@ const ModalEdit = ({handleClose, open, data, onReLoadData}: IModalEdit) => {
   };
 
   const handleUpdateStatus = () => {
-    if (data) {
-      dispatch(
-        updateOrderStatus({
-          id: data?.id,
-          status: !data?.paymentstt,
-        }),
-      ).then(() => {
-        handleClose();
-        onReLoadData();
-      });
-    }
+    // if (data) {
+    //   dispatch(
+    //     updateOrderStatus({
+    //       id: data?.id,
+    //       status: !data?.paymentstt,
+    //     }),
+    //   ).then(() => {
+    //     handleClose();
+    //     onReLoadData();
+    //   });
+    // }
   };
 
   return (
@@ -87,16 +90,13 @@ const ModalEdit = ({handleClose, open, data, onReLoadData}: IModalEdit) => {
       header={{title: `Order Id: ${data?.id}`}}>
       <View style={styles.content}>
         <View>
-          <Text>Customer: {data?.username}</Text>
+          <Text>Customer: {data?.userId?.name}</Text>
           <Text>
-            Order date: {moment(data?.date).format('DD/MM/YYYY')} -{' '}
-            {pTypeSession.find(session => session.id === data?.time)?.session}
+            Order date: {moment(data?.orderDate).format('DD/MM/YYYY')} -{' '}
+            {/* {pTypeSession.find(session => session.id === data?.time)?.session} */}
           </Text>
-          <Text>
-            Type Party:{' '}
-            {pTypeParty.find(party => party.id === data?.typeParty)?.nameParty}
-          </Text>
-          <Text>Status Payment: {renderStatusPay(!!data?.paymentstt)}</Text>
+          <Text>Type Party: {data?.typeParty.nameParty}</Text>
+          {/* <Text>Status Payment: {renderStatusPay(!!data?.paymentstt)}</Text> */}
         </View>
         {/* <View>
         <Text>Lobby information</Text>
@@ -110,7 +110,7 @@ const ModalEdit = ({handleClose, open, data, onReLoadData}: IModalEdit) => {
         <View>
           <Text style={styles.title}>List of dishes</Text>
           <View style={styles.containerList}>
-            {data?.dishList.map(dish =>
+            {data?.menuId.menuDishSet.map(dish =>
               renderItem({
                 image: dish.dishId.image,
                 name: dish.dishId.name,
@@ -124,14 +124,14 @@ const ModalEdit = ({handleClose, open, data, onReLoadData}: IModalEdit) => {
         <View>
           <Text style={styles.title}>List of service</Text>
           <View style={styles.containerList}>
-            {data?.serviceList.map(
-              dish =>
-                dish.serviceId &&
+            {data?.listServiceId.servicesDetailSet.map(
+              service =>
+                service.serviceId &&
                 renderItem({
-                  image: dish.serviceId?.image,
-                  name: dish.serviceId?.name,
-                  price: dish.serviceId?.price,
-                  id: dish.serviceId?.id,
+                  image: service.serviceId?.image,
+                  name: service.serviceId?.name,
+                  price: service.serviceId?.price,
+                  id: service.serviceId?.id,
                 }),
             )}
           </View>
@@ -144,7 +144,7 @@ const ModalEdit = ({handleClose, open, data, onReLoadData}: IModalEdit) => {
           </View>
           <View>
             <Text style={styles.title}>Total</Text>
-            <Text>{data?.price} VND</Text>
+            <Text>{data?.amount} VND</Text>
           </View>
         </View>
         <Divider />

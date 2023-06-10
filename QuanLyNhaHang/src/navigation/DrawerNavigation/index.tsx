@@ -4,7 +4,7 @@ import CustomDrawer from '../../components/CustomDrawer';
 import {useTheme} from '@ui-kitten/components';
 import HomePage from '../../screens/Home';
 import {getStorage} from '../../utils/storage';
-import {navigate} from '../../utils/navigate';
+import {navigate, replace} from '../../utils/navigate';
 import {useDispatch} from 'react-redux';
 import {AppDispatch} from '../../store';
 import {useEffect} from 'react';
@@ -26,9 +26,13 @@ function DrawerScreen() {
     getStorage('accessToken').then(data => {
       if (!data) navigate('LoginScreen');
       else {
-        dispatch(getUser()).then(data => {
-          analytics().setUserId(data.payload?.id.toString());
-        });
+        dispatch(getUser())
+          .then(data => {
+            analytics().setUserId(data.payload?.id.toString());
+          })
+          .catch(() => {
+            replace('LoginScreen');
+          });
       }
     });
   }, []);

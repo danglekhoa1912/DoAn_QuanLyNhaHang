@@ -10,13 +10,14 @@ import {saveStorage} from '../../utils/storage';
 import {withParamsToastCatcher} from '../ToastCatcher';
 import {ISearchParam} from '../../type/common';
 import {Platform} from 'react-native';
+import {withParamsToastCatcher as withParamsToastCatcherWeb} from '../ToastCatcherWeb';
 
 export const loginUserWeb = createAsyncThunk(
   'profile/loginWeb',
-  async (data: ILoginRes) => {
-    return await UserApi.login(data);
-    // return result.data;
-  },
+  withParamsToastCatcherWeb(async (data: ILoginRes) => {
+    const result = await UserApi.login(data);
+    return result.data;
+  }, 'Login successfully'),
 );
 
 export const getUser = createAsyncThunk('profile/getUser', async () => {
@@ -44,6 +45,14 @@ export const getOrderHistory = createAsyncThunk(
   'profile/getOrderHistory',
   async (param: ISearchParam) => {
     const result = await UserApi.getOrderHistory(param);
+    return result;
+  },
+);
+
+export const getAllOrder = createAsyncThunk(
+  'profile/getAllOrder',
+  async (param: {date?: Date; page?: number; status?: number}) => {
+    const result = await UserApi.getAllOrder(param);
     return result;
   },
 );

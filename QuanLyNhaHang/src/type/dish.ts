@@ -24,4 +24,5 @@ export interface IDishRes {
   image: File;
   price: number;
   category: number;
+  status?: boolean;
 }

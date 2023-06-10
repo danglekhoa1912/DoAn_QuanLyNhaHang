@@ -10,6 +10,7 @@ import {useNavigate} from 'react-router-dom';
 import {styled} from '@mui/material/styles';
 import {AppDispatch, AppState} from '../../../store';
 import {IUser} from '../../../type/user';
+import {clearResolveBookingId} from '../../../store/global';
 
 const CustomizeButton = styled(Button)(() => ({
   '&.MuiButtonBase-root': {
@@ -51,6 +52,7 @@ const UserMenu = (props: IUserMenu) => {
     setOpenMenu(false);
   };
   const handleNavigateAdmin = () => {
+    dispatch(clearResolveBookingId());
     nagivate('/admin');
     setOpenMenu(false);
   };

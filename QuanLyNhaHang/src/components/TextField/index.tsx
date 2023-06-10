@@ -58,7 +58,7 @@ function TextField<T extends FieldValues>(props: ITextField<T> & InputProps) {
               placeholderTextColor={placeholderTextColor}
               textStyle={[styles.input, textStyle]}
               style={[styles.container, style]}
-              value={value}
+              value={value?.toString()}
               accessoryRight={renderIcon}
               secureTextEntry={isSecurity}
               onChangeText={onChange}

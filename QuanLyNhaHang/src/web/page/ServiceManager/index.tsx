@@ -12,6 +12,7 @@ import {
 } from '../../../store/service/thunkApi';
 import ModalEdit from './components/ModalEdit';
 import {Loading} from '../../components/Loading';
+import {isAdmin} from '../../../store/user/selector';
 
 const ServiceManager = () => {
   const [serviceList, setServiceList] = useState<IService[]>([]);
@@ -25,6 +26,8 @@ const ServiceManager = () => {
   const pIsLoading = useSelector<AppState, number>(
     state => state.global.isLoading,
   );
+
+  const pIsAdmin = useSelector<AppState, boolean>(state => isAdmin(state));
 
   const handleSelectItem = (data: any) => {
     setService(data);
@@ -95,14 +98,17 @@ const ServiceManager = () => {
             placeholderTextColor="gray"
           />
         </View>
-        <Button
-          onPress={() => {
-            handleEdit(null);
-          }}
-          title="Add Service"
-        />
+        {pIsAdmin && (
+          <Button
+            onPress={() => {
+              handleEdit(null);
+            }}
+            title="Add Service"
+          />
+        )}
       </View>
       <TabelData
+        showAction={pIsAdmin}
         handleSelectItem={handleSelectItem}
         currentPage={page}
         onChangePage={handleChangePage}
@@ -121,7 +127,7 @@ const ServiceManager = () => {
           {label: 'Name', minWidth: 70},
           {label: 'Price', minWidth: 60},
           {label: 'Status', minWidth: 10},
-          {label: 'Action', minWidth: 10},
+          {label: 'Action', minWidth: 10, hidden: !pIsAdmin},
         ]}
       />
       <ModalEdit

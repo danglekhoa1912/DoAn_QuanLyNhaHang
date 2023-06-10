@@ -26,6 +26,7 @@ const ModalEdit = ({handleClose, open, data, onReLoadData}: IModalEdit) => {
       category: 0,
       name: '',
       price: 0,
+      status: true,
     },
   });
 
@@ -64,6 +65,7 @@ const ModalEdit = ({handleClose, open, data, onReLoadData}: IModalEdit) => {
         price: data?.price,
         category: data?.categoryId?.id,
         image: await convertImageToFile(data?.image || ''),
+        status: data?.status,
       });
     })();
   }, [data, pCategoryOpts]);

@@ -4,5 +4,6 @@ import TextField from './TextField';
 import DropDown from './DropDown';
 import {ImagePicker} from './ImagePicker';
 import Header from './Header';
+import Card from './Card';
 
-export {Button, TabelData, TextField, DropDown, ImagePicker, Header};
+export {Button, TabelData, TextField, DropDown, ImagePicker, Header, Card};

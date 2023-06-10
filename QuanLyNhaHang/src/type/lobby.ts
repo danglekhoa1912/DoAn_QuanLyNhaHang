@@ -2,7 +2,7 @@ export interface ILobby {
   name: string;
   capacity: number;
   describe: string | null;
-  status: string | null;
+  status: boolean;
   price: number;
   image: string;
   id: number;
@@ -28,4 +28,5 @@ export interface ILobbyRes {
   price: number;
   image: File;
   image360: File;
+  status?: boolean;
 }

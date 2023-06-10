@@ -13,7 +13,6 @@ interface IUserList {
 
 const User = ({user, lastMessage, isSelect, onSelect}: IUserList) => {
   const profile = useSelector<AppState, IUser>(state => state.user.user);
-  console.log(user);
   return (
     <TouchableOpacity
       onPress={onSelect}

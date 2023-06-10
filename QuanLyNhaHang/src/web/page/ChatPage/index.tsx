@@ -7,7 +7,7 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
-import React, {useCallback, useEffect, useMemo, useState} from 'react';
+import React, {useCallback, useEffect, useMemo, useRef, useState} from 'react';
 import {GiftedChat} from 'react-gifted-chat';
 import {useDispatch, useSelector} from 'react-redux';
 import {AppDispatch, AppState} from '../../../store';
@@ -33,6 +33,12 @@ import {getUserById} from '../../../store/profile/thunkApi';
 import _ from 'lodash';
 import AddIcon from '@mui/icons-material/Add';
 import {COLORS} from '../../../utils/color';
+import ModalConfirmQuit from './components/ModalConfirmQuit';
+import {resetBooking} from '../../../store/booking';
+import {send} from 'process';
+import {updateOrderStatus} from '../../../store/booking/thunkApi';
+import {ORDER_STATUS} from '../../../type/booking';
+import {clearResolveBookingId} from '../../../store/global';
 
 interface IMessage {
   _id: number;
@@ -49,10 +55,15 @@ const ChatPage = () => {
     }[]
   >([]);
   const [open, setOpen] = React.useState(false);
+  const [openQuit, setOpenQuit] = React.useState(false);
   const [messages, setMessages] = useState<any[]>([]);
   const [message, setMessage] = useState('');
+  const currentMsg = useRef(0);
 
   const profile = useSelector<AppState, IUser>(state => state.user.user);
+  const bookingId = useSelector<AppState, number | undefined>(
+    state => state.global.resolveBookingId,
+  );
   const navigate = useNavigate();
   let {userId} = useParams();
 
@@ -62,13 +73,33 @@ const ChatPage = () => {
     return userList.find(user => user.user?.id === +(userId || 0));
   }, [userId, userList]);
 
-  const handleClose = () => setOpen(false);
+  const handleClose = () => {
+    setOpenQuit(true);
+  };
 
-  const onSend = async () => {
+  const handleCloseQuitPopup = () => {
+    setOpenQuit(false);
+  };
+
+  const handleQuitAction = () => {
+    dispatch(resetBooking());
+    setOpen(false);
+    setOpenQuit(false);
+  };
+
+  const renderMsgResolve = (isBookingResolved: boolean) => {
+    if (isBookingResolved) return 'Your booking has been resolved';
+    else return 'Finished the conversation';
+  };
+
+  const onSend = async (id?: number, resolve?: boolean) => {
     const newMessage = {
       _id: new Date().getTime(),
-      text: message,
+      text: !resolve
+        ? id?.toString() || message
+        : renderMsgResolve(!!bookingId),
       createdAt: new Date(),
+      type: !resolve ? (id ? 'order' : 'text') : 'resolved',
       user: {
         avatar: profile?.avatar,
         name: profile?.name,
@@ -77,7 +108,7 @@ const ChatPage = () => {
     };
     setMessage('');
     setMessages([...messages, newMessage]);
-    const {_id, text, user, createdAt} = newMessage;
+    const {_id, text, user, createdAt, type} = newMessage;
 
     try {
       const docRef = await addDoc(collection(db, 'chats'), {
@@ -85,6 +116,7 @@ const ChatPage = () => {
         user,
         createdAt: new Date(createdAt).getTime(),
         text,
+        type,
       });
       const collectionRef = collection(db, 'usersChat');
       const q = query(
@@ -93,10 +125,33 @@ const ChatPage = () => {
       );
       const collectionSnap = await getDocs(q);
       if (collectionSnap.empty) {
+        const query1 = query(
+          collectionRef,
+          where('__name__', '==', `${userId}`),
+        );
         setDoc(doc(db, 'usersChat', `${userId}-${profile?.id}`), {
-          messages: [docRef?.id],
+          messages: [
+            ...(await getDocs(query1)).docs[0].get('messages'),
+            docRef?.id,
+          ],
         });
         deleteDoc(doc(db, 'usersChat', `${userId}`));
+      } else if (resolve) {
+        setDoc(doc(db, 'usersChat', `${userId}`), {
+          messages: [...collectionSnap.docs[0].get('messages'), docRef.id],
+        });
+        deleteDoc(doc(db, 'usersChat', `${userId}-${profile?.id}`));
+        if (bookingId) {
+          dispatch(
+            updateOrderStatus({
+              id: bookingId,
+              status: ORDER_STATUS.SUCCESS,
+            }),
+          ).then(() => {
+            dispatch(clearResolveBookingId());
+            navigate('/chat');
+          });
+        }
       } else {
         setDoc(doc(db, 'usersChat', `${userId}-${profile?.id}`), {
           messages: [...collectionSnap.docs[0].get('messages'), docRef.id],
@@ -114,54 +169,116 @@ const ChatPage = () => {
   useEffect(() => {
     const collectionRef = collection(db, 'usersChat');
     const q = query(collectionRef);
-    onSnapshot(q, snapshot => {
+    getDocs(q).then(snapshot => {
       snapshot.docs.map(data => {
         const docRef = doc(
           db,
           'chats',
           `${data.get('messages')[data.get('messages').length - 1]}`,
         );
-        onSnapshot(docRef, (snapshot: any) => {
-          if (+data.id.split('-')[0]) {
-            dispatch(getUserById(+data.id.split('-')[0])).then(data => {
-              setUserList([
-                ...userList,
-                {
-                  user: data.payload,
-                  lastMessage: snapshot.data()?.text,
-                },
-              ]);
-            });
+        getDoc(docRef).then(snapshot1 => {
+          if (
+            (data.id.split('-').length === 2 &&
+              +data.id.split('-')[1] == profile?.id) ||
+            data.id.split('-').length === 1
+          ) {
+            if (
+              +data.id.split('-')[0] &&
+              snapshot1.data()?.type !== 'resolved'
+            ) {
+              dispatch(getUserById(+data.id.split('-')[0])).then(snap => {
+                setUserList(curData =>
+                  _.unionBy(
+                    [
+                      ...curData,
+                      {
+                        user: snap.payload,
+                        lastMessage: snapshot1.data()?.text,
+                      },
+                    ].reverse(),
+                    'user.id',
+                  ),
+                );
+              });
+            }
           }
         });
       });
     });
+    // onSnapshot(q, snapshot => {
+    //   snapshot.docs.map(data => {
+    //     const docRef = doc(
+    //       db,
+    //       'chats',
+    //       `${data.get('messages')[data.get('messages').length - 1]}`,
+    //     );
+    //     onSnapshot(docRef, (snapshot: any) => {
+    //       if (+data.id.split('-')[0]) {
+    //         dispatch(getUserById(+data.id.split('-')[0])).then(data => {
+    //           setUserList(curData => [
+    //             ...curData,
+    //             {
+    //               user: data.payload,
+    //               lastMessage: snapshot.data()?.text,
+    //             },
+    //           ]);
+    //         });
+    //       }
+    //     });
+    //   });
+    // });
   }, []);
 
   useEffect(() => {
-    const collectionRef = collection(db, `usersChat`);
+    if (userId && !userList.find(data => data.user.id == userId)) {
+      dispatch(getUserById(+userId)).then(data => {
+        setUserList([
+          ...userList,
+          {
+            user: data.payload,
+            lastMessage: '',
+          },
+        ]);
+      });
+    }
 
-    const q = query(collectionRef);
+    const collectionRef = collection(db, `usersChat`);
+    let result: any[] = [];
+
+    const q = query(collectionRef, where('__name__', '>=', userId || '0'));
     onSnapshot(q, snapshot => {
-      setMessages([]);
+      let messDelete = 0;
       snapshot.docs.map(data => {
         data.get('messages')?.map((message: string) => {
           const docRef = doc(db, 'chats', message);
           onSnapshot(docRef, (snapshot: any) => {
-            setMessages(mess =>
-              _.uniqBy(
-                [
-                  ...mess,
-                  {
-                    _id: message,
-                    createdAt: snapshot.data()?.createdAt,
-                    text: snapshot.data()?.text,
-                    user: snapshot.data()?.user,
-                  },
-                ],
-                '_id',
-              ),
-            );
+            if (result.findIndex(item => item?._id === snapshot.id) === -1) {
+              result = [
+                ...result,
+                {
+                  _id: snapshot.id,
+                  createdAt: snapshot.data()?.createdAt,
+                  text: snapshot.data()?.text,
+                  user: snapshot.data()?.user,
+                  type: snapshot.data()?.type,
+                },
+              ];
+            }
+            if (
+              result.length ===
+              (data.get('messages') as Array<string>).length -
+                messDelete +
+                currentMsg.current
+            ) {
+              setMessages([...result]);
+              currentMsg.current = result.length;
+            }
+            if (snapshot.data()?.type === 'resolved') {
+              messDelete += result.length;
+              result = [];
+              setMessages([...result]);
+              currentMsg.current = result.length;
+            }
           });
         });
       });
@@ -234,30 +351,51 @@ const ChatPage = () => {
                 </Text>
               </View>
               <TouchableOpacity
-                onPress={() => {
-                  setOpen(true);
-                }}
                 style={{
-                  flexDirection: 'row',
-                  alignItems: 'center',
-                  backgroundColor: COLORS.primary,
-                  padding: 12,
+                  borderColor: COLORS.primary,
+                  borderWidth: 1,
+                  backgroundColor: '#FCE4E5',
+                  padding: 8,
                   borderRadius: 8,
+                }}
+                onPress={() => {
+                  onSend(undefined, true);
                 }}>
-                <AddIcon
-                  style={{
-                    color: 'white',
-                  }}
-                />
                 <Text
                   style={{
-                    color: 'white',
-                    fontSize: 18,
-                    marginLeft: 8,
+                    color: COLORS.primary,
+                    fontWeight: 600,
                   }}>
-                  Create Order
+                  {bookingId ? 'Resolve' : 'Finished the conversation'}
                 </Text>
               </TouchableOpacity>
+              {!bookingId && (
+                <TouchableOpacity
+                  onPress={() => {
+                    setOpen(true);
+                  }}
+                  style={{
+                    flexDirection: 'row',
+                    alignItems: 'center',
+                    backgroundColor: COLORS.primary,
+                    padding: 12,
+                    borderRadius: 8,
+                  }}>
+                  <AddIcon
+                    style={{
+                      color: 'white',
+                    }}
+                  />
+                  <Text
+                    style={{
+                      color: 'white',
+                      fontSize: 18,
+                      marginLeft: 8,
+                    }}>
+                    Create Order
+                  </Text>
+                </TouchableOpacity>
+              )}
             </View>
             <FlatList
               style={{
@@ -267,6 +405,7 @@ const ChatPage = () => {
               renderItem={({item}) => {
                 return (
                   <Chat
+                    type={item?.type || 'text'}
                     avatar={item.user.avatar}
                     message={item.text}
                     isSender={profile?.id === item?.user?._id}
@@ -288,14 +427,17 @@ const ChatPage = () => {
                 onChangeText={setMessage}
                 placeholder="Type here..."
                 style={{
-                  backgroundColor: '#f5f7fb',
+                  backgroundColor: 'rgb(235,235,235)',
                   height: 40,
                   width: '80%',
                   borderRadius: 18,
                   paddingLeft: 12,
                 }}
               />
-              <TouchableOpacity onPress={onSend}>
+              <TouchableOpacity
+                onPress={() => {
+                  onSend();
+                }}>
                 <SendIcon
                   color="primary"
                   style={{
@@ -308,7 +450,12 @@ const ChatPage = () => {
           </>
         )}
       </View>
-      <ModalCreateOrder open={open} handleClose={handleClose} />
+      <ModalCreateOrder onSend={onSend} open={open} handleClose={handleClose} />
+      <ModalConfirmQuit
+        open={openQuit}
+        handleClose={handleQuitAction}
+        handleCancel={handleCloseQuitPopup}
+      />
     </View>
   );
 };

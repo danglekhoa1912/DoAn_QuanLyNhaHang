@@ -25,13 +25,14 @@ import {IUser} from '../../type/user';
 import _ from 'lodash';
 import {COLORS} from '../../utils/color';
 import {Logo} from '../../assets';
-import {goBack} from '../../utils/navigate';
+import {goBack, navigate} from '../../utils/navigate';
 
 interface IMessage {
   _id: number;
   text: string;
   createAt: any;
   user: any;
+  type: string;
 }
 
 const customtInputToolbar = (props: any) => {
@@ -51,7 +52,56 @@ const customtInputToolbar = (props: any) => {
 };
 
 const renderBubble = (props: any) => {
-  return (
+  return props.currentMessage.type === 'order' ? (
+    <TouchableOpacity
+      onPress={() => {
+        navigate('OrderHistoryDetailScreen', {id: props.currentMessage.text});
+      }}
+      style={{
+        backgroundColor: COLORS.secondary,
+        padding: 12,
+        borderRadius: 8,
+        flexDirection: 'row',
+        alignContent: 'center',
+        gap: 8,
+        marginTop: 8,
+      }}>
+      <View
+        style={{
+          padding: 4,
+          borderRadius: 25,
+          backgroundColor: 'white',
+          alignItems: 'center',
+        }}>
+        <Icon name="document-text-outline" size={30} />
+      </View>
+      <Text
+        style={{
+          fontWeight: 'bold',
+          color: 'white',
+          alignSelf: 'center',
+        }}>
+        Booking Id: #{props.currentMessage.text}
+      </Text>
+    </TouchableOpacity>
+  ) : props.currentMessage.type === 'resolved' ? (
+    <View
+      style={{
+        borderColor: COLORS.primary,
+        borderWidth: 1,
+        backgroundColor: '#FCE4E5',
+        padding: 8,
+        borderRadius: 8,
+      }}>
+      <Text
+        style={{
+          color: COLORS.primary,
+          fontWeight: 800,
+        }}>
+        {props.currentMessage.text}
+      </Text>
+    </View>
+  ) : (
     <Bubble
       {...props}
       wrapperStyle={{
@@ -88,9 +138,9 @@ const RoomChat = () => {
   const [messages, setMessages] = useState<any[]>([]);
 
   const onSend = useCallback((messages: any[] = []) => {
-    // setMessages(previousMessage =>
-    //   GiftedChat.append(previousMessage, messages),
-    // );
+    setMessages(previousMessage =>
+      GiftedChat.append(previousMessage, messages),
+    );
 
     const {_id, text, user, createdAt} = messages[0];
 
@@ -101,6 +151,7 @@ const RoomChat = () => {
         text,
         user,
         createdAt: new Date(createdAt).getTime(),
+        type: 'text',
       })
       .then(data => {
         firestore()
@@ -147,20 +198,19 @@ const RoomChat = () => {
                   createdAt: data.data()?.createdAt,
                   text: data.data()?.text,
                   user: data.data()?.user,
+                  type: data.data()?.type,
                 });
               }
               if (
                 result.length ===
                 (snap.docs[0]?.get('messages') as Array<string>).length
-              )
-                console.log('result', result);
-              setMessages(result);
+              ) {
+                setMessages([...result]);
+              }
             });
         });
       });
   }, []);
-
-  console.log('mess', messages);
 
   return (
     <>

@@ -1,7 +1,8 @@
 import {IDish} from './dish';
-import {ILobby} from './lobby';
+import {ILobby, ITypeParty} from './lobby';
 import {ISelectItem} from './common';
 import {IService} from './service';
+import {IUser} from './user';
 
 export interface IFormBooking {
   date: Date;
@@ -24,18 +25,18 @@ export interface IBookingReq {
   whId: number;
   pwtId: number;
   orderDate: Date;
-  typePay: CASH_TYPE;
+  typePay: string;
   quantity: number;
   note: string;
   menu: number[];
   service: number[];
   type_party: number;
-  paymentStatus: boolean;
+  status: number;
 }
 
 export interface IUpdateBookingStatus {
   id: number;
-  status: boolean;
+  status: ORDER_STATUS;
 }
 
 export interface ISession {
@@ -50,6 +51,12 @@ export enum CASH_TYPE {
   ZALO = 3,
 }
 
+export enum ORDER_STATUS {
+  SUCCESS = 1,
+  WAIT_CONFIRM = 2,
+  DRAW = 3,
+  WAIT_PAYMENT = 4,
+}
 export interface ITypePay {
   id: number;
   type: CASH_TYPE;
@@ -64,7 +71,7 @@ export interface IOrderHistory {
   date: Date;
   price: number;
   typeParty: number;
-  paymentstt: boolean;
+  status: number;
   typePay: string;
   countTable: number;
   note?: string;
@@ -74,4 +81,31 @@ export interface IOrderHistory {
   serviceList: {
     serviceId: IService;
   }[];
+}
+
+export interface IOrderHistoryAdmin {
+  id: number;
+  amount: number;
+  note?: string;
+  orderDate: string;
+  quantityTable: number;
+  status: ORDER_STATUS;
+  typePay: string;
+  userId: IUser;
+  whId: ILobby;
+  menuId: {
+    id: number;
+    price: number;
+    menuDishSet: {
+      dishId: IDish;
+    }[];
+  };
+  listServiceId: {
+    id: number;
+    price: number;
+    servicesDetailSet: {
+      serviceId: IService;
+    }[];
+  };
+  typeParty: ITypeParty;
 }

@@ -1,17 +1,32 @@
 import {StyleSheet, Text, TextInput, View} from 'react-native';
-import React, {useEffect, useRef, useState} from 'react';
+import React, {useEffect, useMemo, useRef, useState} from 'react';
 import {useDispatch, useSelector} from 'react-redux';
 import {AppDispatch, AppState} from '../../../store';
-import {getOrderHistory} from '../../../store/profile/thunkApi';
+import {getAllOrder, getOrderHistory} from '../../../store/profile/thunkApi';
 import {Button, TabelData} from '../../components';
 import {styled} from '@mui/material/styles';
-import {TableCell, tableCellClasses} from '@mui/material';
-import {IOrderHistory, ISession} from '../../../type/booking';
+import {
+  FormControl,
+  InputLabel,
+  MenuItem,
+  Select,
+  SelectChangeEvent,
+  TableCell,
+  tableCellClasses,
+} from '@mui/material';
+import {
+  IOrderHistory,
+  IOrderHistoryAdmin,
+  ISession,
+} from '../../../type/booking';
 import {getTypeParty} from '../../../store/booking/thunkApi';
 import {getTypeTime} from '../../../store/booking/thunkApi';
 import {ITypeParty} from '../../../type/lobby';
 import {useNavigate} from 'react-router-dom';
 import ModalEdit from './components/ModalEdit';
+import {ORDER_STATUS} from '../../../type/booking';
+import {convertBookingStatus} from '../../../utils/convertEnum';
+import {setResolveBookingId} from '../../../store/global';
 
 const StyledTableCell = styled(TableCell)(({theme}) => ({
   [`&.${tableCellClasses.head}`]: {
@@ -26,13 +41,13 @@ const StyledTableCell = styled(TableCell)(({theme}) => ({
 }));
 
 const BookingManager = () => {
-  const [bookingList, setBookingList] = useState<IOrderHistory[]>([]);
+  const [bookingList, setBookingList] = useState<IOrderHistoryAdmin[]>([]);
   const [page, setPage] = useState(0);
-  const [search, setSearch] = useState('');
   const totalItem = useRef<number>(0);
   const dispatch = useDispatch<AppDispatch>();
   const [open, setOpen] = React.useState(false);
-  const order = useRef<IOrderHistory>();
+  const order = useRef<IOrderHistoryAdmin>();
+  const [status, setStatus] = useState(1);
 
   const navigate = useNavigate();
 
@@ -42,6 +57,25 @@ const BookingManager = () => {
   const pTypeSession = useSelector<AppState, ISession[]>(
     state => state.booking.typeTime,
   );
+
+  const pStatusOpts = useMemo(() => {
+    return (
+      Object.keys(ORDER_STATUS).filter(v => {
+        return isNaN(Number(v)) && ORDER_STATUS.DRAW !== ORDER_STATUS[v];
+      }) as (keyof typeof ORDER_STATUS)[]
+    ).map(status => {
+      return {
+        id: ORDER_STATUS[status],
+        value: ORDER_STATUS[status],
+        label: convertBookingStatus(ORDER_STATUS[status]),
+      };
+    });
+  }, []);
+
+  const handleChange = (event: SelectChangeEvent) => {
+    setStatus(+event.target.value);
+    setPage(0);
+  };
 
   const handleChangePage = (event: any, newPage: number) => {
     setPage(newPage);
@@ -58,14 +92,18 @@ const BookingManager = () => {
 
   const handleClose = () => setOpen(false);
 
+  const handleContact = (id: number, bookingId: number) => {
+    dispatch(setResolveBookingId(bookingId));
+    navigate(`/chat/${id}`);
+  };
+
   const handleLoadData = () => {
     dispatch(
-      getOrderHistory({
+      getAllOrder({
         page: page + 1,
-        searchByName: search,
+        status: status,
       }),
     ).then((data: any) => {
-      console.log(data.payload.data.record);
       setBookingList(data.payload.data.record);
       totalItem.current = data.payload.data.totalRecord;
     });
@@ -100,7 +138,7 @@ const BookingManager = () => {
 
   useEffect(() => {
     handleLoadData();
-  }, [page, search]);
+  }, [page, status]);
 
   useEffect(() => {
     dispatch(getTypeParty());
@@ -119,56 +157,57 @@ const BookingManager = () => {
           alignItems: 'center',
           justifyContent: 'space-between',
         }}>
-        <View
+        <h1>Booking Manager</h1>
+        <FormControl
           style={{
-            flexDirection: 'row',
-            alignItems: 'center',
+            width: 200,
           }}>
-          <h1>Booking Manager</h1>
-          <TextInput
-            value={search}
-            onChangeText={setSearch}
+          <InputLabel>Status</InputLabel>
+          <Select
             style={{
-              backgroundColor: '#f3f5f7',
               height: 40,
-              width: 240,
-              borderRadius: 12,
-              marginLeft: 24,
-              padding: 12,
             }}
-            placeholder="Search"
-            placeholderTextColor="gray"
-          />
-        </View>
+            value={status}
+            label="Status"
+            onChange={handleChange}>
+            {pStatusOpts.map(item => (
+              <MenuItem key={item.id} value={item.id}>
+                {item.label}
+              </MenuItem>
+            ))}
+          </Select>
+        </FormControl>
       </View>
       <TabelData
+        showStatus={false}
         handleSelectItem={handleSelectItem}
-        renderData={data => {
+        renderData={(data: IOrderHistoryAdmin) => {
           return (
             <>
               <StyledTableCell align={'center'}>
-                {data.username}
-              </StyledTableCell>
-              <StyledTableCell align={'center'}>{data.hall}</StyledTableCell>
-              <StyledTableCell align={'center'}>
-                {data.countTable}
-              </StyledTableCell>
-              <StyledTableCell align={'center'}>{data.date}</StyledTableCell>
-              <StyledTableCell align={'center'}>
-                {
-                  pTypeParty.find(party => party.id === data.typeParty)
-                    ?.nameParty
-                }
+                {data.userId?.name}
               </StyledTableCell>
               <StyledTableCell align={'center'}>
-                {
+                {data.whId?.name}
+              </StyledTableCell>
+              <StyledTableCell align={'center'}>
+                {data.quantityTable}
+              </StyledTableCell>
+              <StyledTableCell align={'center'}>
+                {data.orderDate}
+              </StyledTableCell>
+              <StyledTableCell align={'center'}>
+                {data.typeParty.nameParty}
+              </StyledTableCell>
+              <StyledTableCell align={'center'}>
+                {/* {
                   pTypeSession.find(session => session.id === data.time)
                     ?.session
-                }
+                } */}
               </StyledTableCell>
               <StyledTableCell align={'center'}>{data.typePay}</StyledTableCell>
               <StyledTableCell align={'center'}>
-                {renderStatusPay(data.paymentstt)}
+                {/* {renderStatusPay(data.paymentstt)} */}
               </StyledTableCell>
             </>
           );
@@ -179,7 +218,13 @@ const BookingManager = () => {
         data={bookingList}
         menu={[
           {label: 'Detail', action: viewDetail},
-          {label: 'Remove', action: () => {}},
+          {
+            label: 'Contact to confirm',
+            action: data => {
+              handleContact(data?.userId?.id, data?.id);
+            },
+            hidden: status !== ORDER_STATUS.WAIT_CONFIRM,
+          },
         ]}
         rowTitle={[
           {label: '#', minWidth: 10},

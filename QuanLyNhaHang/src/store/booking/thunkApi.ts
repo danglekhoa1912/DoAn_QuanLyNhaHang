@@ -6,6 +6,7 @@ import {
 } from '@reduxjs/toolkit';
 import {BookingApi} from '../../apis';
 import {IBookingReq, IUpdateBookingStatus} from '../../type/booking';
+import {withParamsToastCatcher} from '../ToastCatcher';
 
 export const addOrder = createAsyncThunk(
   'booking/addOrderService',
@@ -13,6 +14,14 @@ export const addOrder = createAsyncThunk(
     const result = await BookingApi.addOrderService(order);
     return result;
   },
+);
+
+export const updateOrder = createAsyncThunk(
+  'booking/updateOrder',
+  withParamsToastCatcher(async (param: {id: number; order: IBookingReq}) => {
+    const result = await BookingApi.updateOrder(param);
+    return result;
+  }, 'Successful Party Booking '),
 );
 
 export const updateOrderStatus = createAsyncThunk(

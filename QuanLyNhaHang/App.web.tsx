@@ -37,7 +37,7 @@ const App = () => {
             <SnackbarProvider
               classes={{containerRoot: classes.snackbar}}
               maxSnack={300}
-              autoHideDuration={3000}
+              autoHideDuration={1000}
               preventDuplicate
               anchorOrigin={{horizontal: 'right', vertical: 'top'}}>
               <SnackbarUtilsConfigurator />

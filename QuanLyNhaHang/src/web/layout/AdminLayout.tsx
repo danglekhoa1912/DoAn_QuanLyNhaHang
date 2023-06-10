@@ -1,16 +1,20 @@
 import {Box, Tabs} from '@mui/material';
 import {useEffect, useState} from 'react';
-import {connect} from 'react-redux';
+import {connect, useSelector} from 'react-redux';
 import {Navigate, Outlet, useLocation, useNavigate} from 'react-router-dom';
 import TabLink from '../components/TabLink';
 import TabPanel from '../components/TabPanel';
-import {ADMIN_ROUTES} from '../router';
+import {ADMIN_ROUTES, STAFF_ROUTES} from '../router';
+import {AppState} from '../../store';
+import {isAdmin} from '../../store/user/selector';
 interface IAdminLayoutProps {}
 
 function AdminLayout({}: IAdminLayoutProps) {
   const path = useLocation();
   const [value, setValue] = useState(0);
   const navigate = useNavigate();
+
+  const pIsAdmin = useSelector<AppState>(state => isAdmin(state));
 
   useEffect(() => {
     const currentPath = path.pathname.split('/')[2];
@@ -52,7 +56,7 @@ function AdminLayout({}: IAdminLayoutProps) {
               backgroundColor: 'transparent',
             },
           }}>
-          {ADMIN_ROUTES.map((page, index) => (
+          {(pIsAdmin ? ADMIN_ROUTES : STAFF_ROUTES).map((page, index) => (
             <TabLink
               key={index}
               label={page.label}

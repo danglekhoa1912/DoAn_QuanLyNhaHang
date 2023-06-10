@@ -227,7 +227,7 @@ public class ApiAdminController {
 
     @PostMapping("/service/add")
     public ResponseEntity<?> addSerivce(@ModelAttribute ServicesRequest service){
-        Service newService=new Service(null,service.getPrice(),service.getName(),cloudinaryService.uploadImg(service.getImg(),cloudinary),service.getDescribe());
+        Service newService=new Service(null,service.getPrice(),service.getName(),cloudinaryService.uploadImg(service.getImg(),cloudinary),service.getDescribe(),service.getStatus());
         try{
           serviceRepository.save(newService);
         }catch (Exception ex){
@@ -237,7 +237,7 @@ public class ApiAdminController {
     }
     @PostMapping("/service/edit")
     public ResponseEntity<?> editService(@ModelAttribute ServicesRequest service){
-        Service newService=new Service(service.getId(),service.getPrice(),service.getName(),cloudinaryService.uploadImg(service.getImg(),cloudinary),service.getDescribe());
+        Service newService=new Service(service.getId(),service.getPrice(),service.getName(),cloudinaryService.uploadImg(service.getImg(),cloudinary),service.getDescribe(),service.getStatus());
         try{
             serviceRepository.save(newService);
         }catch (Exception ex){

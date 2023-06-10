@@ -21,6 +21,7 @@ import {sCategoryOpts} from '../../../store/dish/selector';
 import {ISelectItem} from '../../../type/common';
 import Modal from '../../components/Modal';
 import ModalEdit from './components/ModalEdit';
+import {isAdmin} from '../../../store/user/selector';
 
 const DishManager = () => {
   const [dishList, setDishList] = useState<IDish[]>([]);
@@ -35,6 +36,8 @@ const DishManager = () => {
   const pCategoryOpts = useSelector<AppState, ISelectItem[]>(state =>
     sCategoryOpts(state),
   );
+
+  const pIsAdmin = useSelector<AppState, boolean>(state => isAdmin(state));
 
   const handleChangePage = (event: any, newPage: number) => {
     setPage(newPage);
@@ -137,14 +140,17 @@ const DishManager = () => {
             </Select>
           </FormControl>
         </View>
-        <Button
-          title="Add Dish"
-          onPress={() => {
-            handleEdit(null);
-          }}
-        />
+        {pIsAdmin && (
+          <Button
+            title="Add Dish"
+            onPress={() => {
+              handleEdit(null);
+            }}
+          />
+        )}
       </View>
       <TabelData
+        showAction={pIsAdmin}
         handleSelectItem={handleSelectItem}
         currentPage={page}
         onChangePage={handleChangePage}
@@ -163,7 +169,7 @@ const DishManager = () => {
           {label: 'Name', minWidth: 70},
           {label: 'Price', minWidth: 60},
           {label: 'Status', minWidth: 10},
-          {label: 'Action', minWidth: 10},
+          {label: 'Action', minWidth: 10, hidden: !pIsAdmin},
         ]}
       />
       <ModalEdit

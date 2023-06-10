@@ -8,6 +8,7 @@ public class ServicesRequest {
     private String describe;
     private String name;
     private MultipartFile img;
+    private boolean status;
 
     public int getId() {
         return id;
@@ -47,5 +48,13 @@ public class ServicesRequest {
 
     public void setImg(MultipartFile img) {
         this.img = img;
+    }
+
+    public boolean getStatus() {
+        return status;
+    }
+
+    public void setStatus(boolean status) {
+        this.status = status;
     }
 }

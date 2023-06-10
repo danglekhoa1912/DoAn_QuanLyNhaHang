@@ -77,15 +77,14 @@ const useStyles = makeStyles({
     flex: 1,
     overflowX: 'hidden',
     overflowY: 'auto',
-    minHeight: 300,
     '&.MuiCardContent-root': {
       padding: '0 20px',
       '& > div': {
         gap: 12,
       },
     },
-    border: `1px solid gray`,
-    borderWidth: '1px 0',
+    // border: `1px solid gray`,
+    // borderWidth: '1px 0',
   },
   button: {
     fontWeight: 'bold',

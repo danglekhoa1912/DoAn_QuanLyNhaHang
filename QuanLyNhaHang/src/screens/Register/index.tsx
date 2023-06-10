@@ -75,7 +75,6 @@ const RegisterPage = () => {
   });
   const onSubmit = (data: IFormRegister) => {
     dispatch(registerUser(data)).then((data: any) => {
-      console.log(data);
       if (!data?.error) navigate('LoginScreen');
     });
   };
