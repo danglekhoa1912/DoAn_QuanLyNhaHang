@@ -349,11 +349,11 @@ public class ApiAdminController {
         return ResponseEntity.ok(weddingPartyOrder.save(wpo));
     }
     @PostMapping("order/update-payment-stt")
-    public ResponseEntity<?> updatePayment(@RequestBody Map<String,String> params){
-        int id=Integer.parseInt(params.getOrDefault("id",null));
-        String status=params.getOrDefault("status",null);
-        WeddingPartyOrders wpo=weddingPartyOrder.findById(id);
-        wpo.setTypePay(status);
+    public ResponseEntity<?> updatePayment(@RequestBody PaymentRequest params){
+        WeddingPartyOrders wpo=weddingPartyOrder.findById(params.getId());
+        wpo.setTypePay(params.getTypePay());
+        wpo.setStatus(params.getStatus());
+        wpo.setTransId(params.getTransId());
         return ResponseEntity.ok(weddingPartyOrder.save(wpo));
     }
     @GetMapping("feedback/getall")

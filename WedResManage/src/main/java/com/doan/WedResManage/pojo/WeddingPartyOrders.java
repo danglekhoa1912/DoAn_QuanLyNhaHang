@@ -79,6 +79,9 @@ public class WeddingPartyOrders implements Serializable {
     @Size(max = 45)
     @Column(name = "note")
     private String note;
+    @Size(max = 45)
+    @Column(name = "trans_id")
+    private String transId;
     @JoinColumn(name = "list_service_id", referencedColumnName = "id")
     @OneToOne(optional = false)
     //@JsonIgnore
