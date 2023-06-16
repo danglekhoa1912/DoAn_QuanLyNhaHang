@@ -20,5 +20,5 @@ public class OrderRequest {
     private String note;
     private List<Integer> service;
     private int type_party;
-
+    private String transId;
 }

@@ -209,6 +209,7 @@ public class ApiUserController {
         wedOrder.setTypePay(order.getTypePay());
         wedOrder.setNote(order.getNote());
         wedOrder.setTypeParty(typePartyRepository.findAllById(order.getType_party()).get(0));
+        wedOrder.setTransId(order.getTransId());
         WeddingPartyOrders finalOrder;
         try {
             finalOrder = weddingPartyOrders.save(wedOrder);
@@ -278,6 +279,7 @@ public class ApiUserController {
         wedOrder.setTypePay(order.getTypePay());
         wedOrder.setNote(order.getNote());
         wedOrder.setTypeParty(typePartyRepository.findAllById(order.getType_party()).get(0));
+        wedOrder.setTransId(order.getTransId());
         return ResponseEntity.ok(weddingPartyOrders.save(wedOrder));
     }
 
