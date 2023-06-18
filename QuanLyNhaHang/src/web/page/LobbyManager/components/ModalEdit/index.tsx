@@ -9,6 +9,8 @@ import {ILobby, ILobbyRes} from '../../../../../type/lobby';
 import {addLooby, updateLobby} from '../../../../../store/lobby/thunkApi';
 import {convertImageToFile} from '../../../../../utils/convertImageToFile';
 import {Loading} from '../../../../components/Loading';
+import * as yup from 'yup';
+import {yupResolver} from '@hookform/resolvers/yup';
 
 interface IModalEdit {
   handleClose: () => void;
@@ -16,6 +18,38 @@ interface IModalEdit {
   data?: ILobby;
   onReLoadData: () => void;
 }
+
+const schema = yup
+  .object({
+    capacity: yup
+      .number()
+      .required('This field is required.')
+      .min(1, 'This field is required.')
+      .typeError('Only input number'),
+    name: yup.string().required('This field is required.'),
+    price: yup
+      .number()
+      .required('This field is required.')
+      .min(1, 'This field is required.')
+      .typeError('Only input number'),
+    image: yup
+      .mixed<File>()
+      .required('This field is required.')
+      .test('check-size-thumbnail', 'Maximum 2MB.', value => {
+        if (!value) return true;
+
+        return value.size <= 2 * 1024 * 1024;
+      }),
+    image360: yup
+      .mixed<File>()
+      .required('This field is required.')
+      .test('check-size-thumbnail', 'Maximum 2MB.', value => {
+        if (!value) return true;
+
+        return value.size <= 2 * 1024 * 1024;
+      }),
+  })
+  .required();
 
 const ModalEdit = ({handleClose, open, data, onReLoadData}: IModalEdit) => {
   const {control, reset, handleSubmit, getValues} = useForm<ILobbyRes>({
@@ -26,6 +60,7 @@ const ModalEdit = ({handleClose, open, data, onReLoadData}: IModalEdit) => {
       name: '',
       status: true,
     },
+    resolver: yupResolver(schema),
   });
 
   const mode = useMemo(() => {
@@ -48,10 +83,13 @@ const ModalEdit = ({handleClose, open, data, onReLoadData}: IModalEdit) => {
         : addLooby({
             ...data,
           }),
-    ).then(() => {
-      handleClose();
-      onReLoadData();
-    });
+    )
+      .unwrap()
+      .then(() => {
+        reset({});
+        handleClose();
+        onReLoadData();
+      });
   };
 
   useEffect(() => {
@@ -65,7 +103,7 @@ const ModalEdit = ({handleClose, open, data, onReLoadData}: IModalEdit) => {
           capacity: data?.capacity,
           describe: data?.describe || '',
           image360: await convertImageToFile(data?.image360 || ''),
-          status: data?.status,
+          status: data?.status || true,
         });
       })();
     } else reset({});
@@ -76,7 +114,10 @@ const ModalEdit = ({handleClose, open, data, onReLoadData}: IModalEdit) => {
       cancelButton={{
         title: 'Cancel',
         variant: 'outlined',
-        onClick: handleClose,
+        onClick: () => {
+          reset({});
+          handleClose();
+        },
         color: 'dark',
       }}
       saveButton={{

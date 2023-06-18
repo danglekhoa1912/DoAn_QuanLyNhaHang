@@ -3,6 +3,7 @@ import BookingManager from '../page/BookingManager';
 import DishManager from '../page/DishManager';
 import LobbyManager from '../page/LobbyManager';
 import ServiceManager from '../page/ServiceManager';
+import Statistical from '../page/Statistical';
 import UserManager from '../page/UserManager';
 
 export const ADMIN_ROUTES: IRoute[] = [
@@ -30,6 +31,11 @@ export const ADMIN_ROUTES: IRoute[] = [
     label: 'User Manager',
     path: 'user-manager',
     element: <UserManager />,
+  },
+  {
+    label: 'Statistical',
+    path: 'statistical',
+    element: <Statistical />,
   },
 ];
 

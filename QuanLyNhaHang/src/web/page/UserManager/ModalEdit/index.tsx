@@ -11,6 +11,8 @@ import DatePicker from '../../../components/DatePicker';
 import moment from 'moment';
 import {addStaff, updateStaff} from '../../../../store/user/thunkApi';
 import {Loading} from '../../../components/Loading';
+import * as yup from 'yup';
+import {yupResolver} from '@hookform/resolvers/yup';
 
 interface IModalEdit {
   handleClose: () => void;
@@ -18,6 +20,31 @@ interface IModalEdit {
   data?: IUser;
   onReLoadData: () => void;
 }
+
+const schema = yup
+  .object({
+    name: yup.string().required('This field is required.'),
+    mobile: yup.string().required('Please enter your mobile').min(10).max(12),
+    email: yup
+      .string()
+      .required('Please enter your email')
+      .email('Email invalidate'),
+    avatar: yup
+      .mixed<File>()
+      .required('This field is required.')
+      .test('check-size-thumbnail', 'Maximum 2MB.', value => {
+        if (!value) return true;
+
+        return value.size <= 2 * 1024 * 1024;
+      }),
+    birthday: yup
+      .date()
+      .typeError('Please enter your birthday')
+      .test('birthday', 'You must be 18 years old to register', value => {
+        return moment(new Date()).diff(moment(value), 'years') >= 18;
+      }),
+  })
+  .required();
 
 const ModalEdit = ({handleClose, open, data, onReLoadData}: IModalEdit) => {
   const {control, reset, handleSubmit, getValues} = useForm<IUserRes>({
@@ -27,6 +54,7 @@ const ModalEdit = ({handleClose, open, data, onReLoadData}: IModalEdit) => {
       role: '',
       email: '',
     },
+    resolver: yupResolver(schema),
   });
 
   const mode = useMemo(() => {
@@ -100,25 +128,41 @@ const ModalEdit = ({handleClose, open, data, onReLoadData}: IModalEdit) => {
           <ImagePicker
             initPreviewImg={data?.avatar}
             label="Avatar"
-            disabled={false}
+            disabled={mode === 'edit'}
             control={control}
             name="avatar"
           />
           <View>
             <Text>Name</Text>
-            <TextField control={control} name="name" />
+            <TextField
+              aria-disabled={mode === 'edit'}
+              control={control}
+              name="name"
+            />
           </View>
           <View>
             <Text>Email</Text>
-            <TextField control={control} name="email" />
+            <TextField
+              aria-disabled={mode === 'edit'}
+              control={control}
+              name="email"
+            />
           </View>
           <View>
             <Text>Number phone</Text>
-            <TextField control={control} name="mobile" />
+            <TextField
+              aria-disabled={mode === 'edit'}
+              control={control}
+              name="mobile"
+            />
           </View>
           <View>
             <Text>Birth Day</Text>
-            <DatePicker control={control} name="birthday" />
+            <DatePicker
+              disabled={mode === 'edit'}
+              control={control}
+              name="birthday"
+            />
           </View>
         </View>
         <Loading

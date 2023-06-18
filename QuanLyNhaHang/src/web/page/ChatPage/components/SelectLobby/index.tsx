@@ -103,17 +103,20 @@ function SelectLobby({control}: ISelectLobby) {
         <Controller
           control={control}
           name="lobby"
-          render={({field: {onChange, value}}) => (
-            <Select
-              menuPortalTarget={document.body}
-              menuPosition={'fixed'}
-              styles={{menuPortal: base => ({...base, zIndex: 9999})}}
-              options={lobbyOpts}
-              // value={value}
-              onChange={newValue => {
-                onChange(newValue?.value);
-              }}
-            />
+          render={({field: {onChange, value}, fieldState: {error}}) => (
+            <View>
+              <Select
+                menuPortalTarget={document.body}
+                menuPosition={'fixed'}
+                styles={{menuPortal: base => ({...base, zIndex: 9999})}}
+                options={lobbyOpts}
+                // value={value}
+                onChange={newValue => {
+                  onChange(newValue?.value);
+                }}
+              />
+              {error && <Text style={styles.error}>*{error.message}</Text>}
+            </View>
           )}
         />
       </View>
@@ -132,15 +135,18 @@ function SelectLobby({control}: ISelectLobby) {
           <Controller
             control={control}
             name="time"
-            render={({field: {onChange, value}}) => (
-              <Select
-                menuPortalTarget={document.body}
-                menuPosition={'fixed'}
-                styles={{menuPortal: base => ({...base, zIndex: 9999})}}
-                options={typeTimeOpts}
-                // value={value}
-                onChange={onChange}
-              />
+            render={({field: {onChange, value}, fieldState: {error}}) => (
+              <View>
+                <Select
+                  menuPortalTarget={document.body}
+                  menuPosition={'fixed'}
+                  styles={{menuPortal: base => ({...base, zIndex: 9999})}}
+                  options={typeTimeOpts}
+                  // value={value}
+                  onChange={onChange}
+                />
+                {error && <Text style={styles.error}>*{error.message}</Text>}
+              </View>
             )}
           />
         </View>
@@ -151,15 +157,18 @@ function SelectLobby({control}: ISelectLobby) {
           <Controller
             control={control}
             name="type_party"
-            render={({field: {onChange, value}}) => (
-              <Select
-                menuPortalTarget={document.body}
-                menuPosition={'fixed'}
-                styles={{menuPortal: base => ({...base, zIndex: 9999})}}
-                options={pTypePartyOpts}
-                // value={value}
-                onChange={onChange}
-              />
+            render={({field: {onChange, value}, fieldState: {error}}) => (
+              <View>
+                <Select
+                  menuPortalTarget={document.body}
+                  menuPosition={'fixed'}
+                  styles={{menuPortal: base => ({...base, zIndex: 9999})}}
+                  options={pTypePartyOpts}
+                  // value={value}
+                  onChange={onChange}
+                />
+                {error && <Text style={styles.error}>*{error.message}</Text>}
+              </View>
             )}
           />
         </View>
@@ -184,6 +193,10 @@ const styles = StyleSheet.create({
   },
   field: {
     width: '40%',
+  },
+  error: {
+    fontSize: 12,
+    color: 'red',
   },
 });
 

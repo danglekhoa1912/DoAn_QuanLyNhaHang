@@ -19,7 +19,7 @@ import {
   IOrderHistoryAdmin,
   ISession,
 } from '../../../type/booking';
-import {getTypeParty} from '../../../store/booking/thunkApi';
+import {getTypeParty, updateOrderStatus} from '../../../store/booking/thunkApi';
 import {getTypeTime} from '../../../store/booking/thunkApi';
 import {ITypeParty} from '../../../type/lobby';
 import {useNavigate} from 'react-router-dom';
@@ -27,6 +27,9 @@ import ModalEdit from './components/ModalEdit';
 import {ORDER_STATUS} from '../../../type/booking';
 import {convertBookingStatus} from '../../../utils/convertEnum';
 import {setResolveBookingId} from '../../../store/global';
+import {refundZalo} from '../../../apis/booking';
+import moment from 'moment';
+import {APP_ID_ZALO} from '../../../utils/constant';
 
 const StyledTableCell = styled(TableCell)(({theme}) => ({
   [`&.${tableCellClasses.head}`]: {
@@ -90,11 +93,57 @@ const BookingManager = () => {
     order.current = data;
   };
 
+  const confirmCancelBooking = (data: any) => {
+    console.log(data);
+    const timestamp = new Date().getTime();
+    const uid = timestamp + '' + (111 + Math.random() * 888);
+    const mrefundid = moment().format('YYMMDD') + '_' + APP_ID_ZALO + '_' + uid;
+    refundZalo(data?.amount, data?.transId, mrefundid, timestamp)
+      .then(res => {
+        dispatch(
+          updateOrderStatus({
+            id: data?.id,
+            status: ORDER_STATUS.CANCELED,
+            transId: mrefundid,
+          }),
+        ).then(() => {
+          handleLoadData();
+        });
+      })
+      .catch(e => {
+        console.log(e);
+      });
+  };
+
   const handleClose = () => setOpen(false);
 
   const handleContact = (id: number, bookingId: number) => {
-    dispatch(setResolveBookingId(bookingId));
     navigate(`/chat/${id}`);
+  };
+
+  const handleConfirmPayment = (data: any) => {
+    dispatch(
+      updateOrderStatus({
+        id: data?.id,
+        status: ORDER_STATUS.SUCCESS,
+      }),
+    ).then(() => {
+      handleLoadData();
+    });
+  };
+
+  const handleConfirmBooking = (data: any) => {
+    dispatch(
+      updateOrderStatus({
+        id: data?.id,
+        status:
+          data?.typePay === 'Cash'
+            ? ORDER_STATUS.WAIT_PAYMENT
+            : ORDER_STATUS.SUCCESS,
+      }),
+    ).then(() => {
+      handleLoadData();
+    });
   };
 
   const handleLoadData = () => {
@@ -219,11 +268,31 @@ const BookingManager = () => {
         menu={[
           {label: 'Detail', action: viewDetail},
           {
-            label: 'Contact to confirm',
+            label: 'Contact',
             action: data => {
               handleContact(data?.userId?.id, data?.id);
             },
+          },
+          {
+            label: 'Confirm Booking',
+            action: data => {
+              handleConfirmBooking(data);
+            },
             hidden: status !== ORDER_STATUS.WAIT_CONFIRM,
+          },
+          {
+            label: 'Confirm Cancel',
+            action: data => {
+              confirmCancelBooking(data);
+            },
+            hidden: status !== ORDER_STATUS.WAIT_CONFIRM_CANCEL,
+          },
+          {
+            label: 'Confirm Payment',
+            action: data => {
+              handleConfirmPayment(data);
+            },
+            hidden: status !== ORDER_STATUS.WAIT_PAYMENT,
           },
         ]}
         rowTitle={[

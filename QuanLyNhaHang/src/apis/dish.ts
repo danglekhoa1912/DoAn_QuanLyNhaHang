@@ -37,7 +37,7 @@ export const addDish = (dish: IDishRes) => {
   formData.append('categoryId', dish.category.toString());
   formData.append('price', dish.price.toString());
   formData.append('image', dish.image);
-  formData.append('status', dish.status);
+  formData.append('status', dish.status || true);
   return AxiosClient.post('admin/dish/add', formData, {
     headers: {
       'Content-Type': 'multipart/form-data',
@@ -52,7 +52,7 @@ export const updateDish = (dish: IDishRes) => {
   formData.append('categoryId', dish.category.toString());
   formData.append('price', dish.price.toString());
   formData.append('image', dish.image);
-  formData.append('status', dish.status);
+  formData.append('status', dish.status || true);
   return AxiosClient.post(`admin/dish/edit`, formData, {
     headers: {
       'Content-Type': 'multipart/form-data',

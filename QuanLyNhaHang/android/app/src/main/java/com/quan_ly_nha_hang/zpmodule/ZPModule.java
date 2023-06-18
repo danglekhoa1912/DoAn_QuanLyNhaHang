@@ -14,6 +14,7 @@ import com.facebook.react.bridge.ReactContextBaseJavaModule;
 import com.facebook.react.bridge.ReactMethod;
 import com.facebook.react.bridge.WritableMap;
 import com.facebook.react.modules.core.DeviceEventManagerModule;
+import com.quan_ly_nha_hang.Api.Refund;
 
 import vn.zalopay.sdk.listeners.PayOrderListener;
 import vn.zalopay.sdk.ZaloPayError;
@@ -65,10 +66,12 @@ public class ZPModule extends ReactContextBaseJavaModule {
         }
     };
 
+
     BaseActivityEventListener activityEventListener = new BaseActivityEventListener(){
         @Override
         public void onNewIntent(Intent intent) {
             super.onNewIntent(intent);
+            ZaloPaySDK.getInstance().onResult(intent);
         }
     };
 
@@ -77,6 +80,7 @@ public class ZPModule extends ReactContextBaseJavaModule {
         mReactContext = reactContext;
         reactContext.addActivityEventListener(activityEventListener);
     }
+
 
     @Override
     public String getName() {
@@ -90,6 +94,7 @@ public class ZPModule extends ReactContextBaseJavaModule {
 
         ZaloPaySDK.getInstance().payOrder(currentActivity, zpTransToken, "demozpdk://app", listener);
     }
+
 
     @ReactMethod
     public void installApp() {

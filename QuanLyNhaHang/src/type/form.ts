@@ -9,9 +9,10 @@ export interface IFormRegister {
   email: string;
   password: string;
   name: string;
-  birthday: Date;
+  birthday: Date | string;
   mobile: string;
   avatar: string;
+  confirmPassword?: string;
 }
 
 export interface IFormUpdateUser {

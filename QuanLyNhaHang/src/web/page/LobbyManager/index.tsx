@@ -27,7 +27,7 @@ const LobbyManager = () => {
   const totalItem = useRef<number>(0);
   const dispatch = useDispatch<AppDispatch>();
   const [open, setOpen] = React.useState(false);
-  const [lobby, setLobby] = useState<ILobby>();
+  const [lobby, setLobby] = useState<ILobby | undefined>();
   const [time, setTime] = useState();
   const [date, setDate] = useState<moment.Moment>();
 
@@ -53,7 +53,10 @@ const LobbyManager = () => {
     });
   };
 
-  const handleClose = () => setOpen(false);
+  const handleClose = () => {
+    setLobby(undefined);
+    setOpen(false);
+  };
 
   const pTypeTimeOpts = useSelector<AppState, ISelectItem[]>(state =>
     sTypeTimeOpts(state),

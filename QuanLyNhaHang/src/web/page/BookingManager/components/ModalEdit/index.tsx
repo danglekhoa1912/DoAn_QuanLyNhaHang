@@ -147,14 +147,6 @@ const ModalEdit = ({handleClose, open, data, onReLoadData}: IModalEdit) => {
             <Text>{data?.amount} VND</Text>
           </View>
         </View>
-        <Divider />
-        <Button
-          style={{
-            width: '100%',
-          }}
-          title="Update status payment"
-          onPress={handleUpdateStatus}
-        />
       </View>
     </Modal>
   );

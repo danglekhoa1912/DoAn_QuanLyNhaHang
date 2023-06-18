@@ -30,21 +30,40 @@ import {IDish} from '../../../../../type/dish';
 import {IService} from '../../../../../type/service';
 import {useParams} from 'react-router-dom';
 import {send} from 'process';
+import {getLobbyById} from '../../../../../store/lobby/thunkApi';
 
 const steps = ['Select Lobby', 'Select Dish', 'Select Service', 'Confirm'];
 
 const schema = yup
   .object({
-    time: yup.object().test('checkEmpty', 'Test' || '', value => {
-      return !_.isEmpty(value);
-    }),
-    type_party: yup.object().test('checkEmpty', 'Test' || '', value => {
-      return !_.isEmpty(value);
-    }),
+    time: yup
+      .object()
+      .test('checkEmpty', 'This field is required' || '', value => {
+        return !_.isEmpty(value);
+      }),
+    type_party: yup
+      .object()
+      .test('checkEmpty', 'This field is required' || '', value => {
+        return !_.isEmpty(value);
+      }),
+    lobby: yup
+      .object()
+      .test('checkEmpty', 'This field is required' || '', value => {
+        return !_.isEmpty(value);
+      }),
     quantityTable: yup
       .number()
-      .required('Test' || '')
-      .min(1, 'Test' || ''),
+      .test(
+        'checkLobby',
+        'Please select the lobby first' || '',
+        (value, context) => {
+          return !_.isEmpty(context.parent.lobby);
+        },
+      )
+      .required('This field is required' || '')
+      .typeError('Only input number')
+      .min(1, 'This field is required' || ''),
+
     // .max(
     //   pLobbyInOrder.capacity,
     //   `${'Test'} ${pLobbyInOrder.capacity}` || '',
@@ -53,7 +72,7 @@ const schema = yup
   .required();
 
 interface IModalCreateOrder {
-  handleClose: () => void;
+  handleClose: (created?: boolean) => void;
   open: boolean;
   onSend: (id?: number) => Promise<void>;
 }
@@ -127,7 +146,7 @@ export default function ModalCreateOrder({
         onSend(data?.payload?.data?.id);
       });
 
-      handleClose();
+      handleClose(true);
     }
   };
 

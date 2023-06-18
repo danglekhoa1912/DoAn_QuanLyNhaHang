@@ -32,7 +32,7 @@ export const addService = (service: IServiceRes) => {
   formdata.append('describe', service.serviceDescribe);
   formdata.append('price', service.price);
   formdata.append('img', service.image);
-  formdata.append('status', service.status);
+  formdata.append('status', service.status || true);
   return AxiosClient.post('admin/service/add', formdata, {
     headers: {
       'Content-Type': 'multipart/form-data',
@@ -47,7 +47,7 @@ export const updateService = (service: IServiceRes) => {
   formdata.append('describe', service.serviceDescribe);
   formdata.append('price', service.price);
   formdata.append('img', service.image);
-  formdata.append('status', service.status);
+  formdata.append('status', service.status || true);
 
   return AxiosClient.post('admin/service/edit', formdata, {
     headers: {

@@ -32,11 +32,13 @@ export interface IBookingReq {
   service: number[];
   type_party: number;
   status: number;
+  transId?: string;
 }
 
 export interface IUpdateBookingStatus {
   id: number;
   status: ORDER_STATUS;
+  transId?: string;
 }
 
 export interface ISession {
@@ -56,6 +58,8 @@ export enum ORDER_STATUS {
   WAIT_CONFIRM = 2,
   DRAW = 3,
   WAIT_PAYMENT = 4,
+  WAIT_CONFIRM_CANCEL = 5,
+  CANCELED = 6,
 }
 export interface ITypePay {
   id: number;
@@ -81,6 +85,7 @@ export interface IOrderHistory {
   serviceList: {
     serviceId: IService;
   }[];
+  transId?: string;
 }
 
 export interface IOrderHistoryAdmin {

@@ -296,7 +296,7 @@ public class ApiUserController {
                 });
             } else {
                 weddingPartyOrders.searchWeddingPartyOrdersByUserId(user, pageable).getContent().forEach(item -> {
-                    if (item.getStatus() != 6) {
+                    if (item.getStatus() !=3) {
                         OrderResponse temp = new OrderResponse(item);
                         orderResponseList.add(temp);
                     }

@@ -161,7 +161,7 @@ const UserManager = () => {
         totalItem={totalItem.current}
         data={userList}
         menu={[
-          {label: 'Edit', action: handleEdit},
+          {label: 'Detail', action: handleEdit},
           {label: 'Remove', action: () => {}},
         ]}
         rowTitle={[

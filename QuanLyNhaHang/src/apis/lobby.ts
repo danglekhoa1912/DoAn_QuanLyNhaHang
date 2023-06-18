@@ -39,7 +39,7 @@ export const addLooby = (lobby: ILobbyRes) => {
   formdata.append('price', lobby.price.toString());
   formdata.append('image', lobby.image);
   formdata.append('image360', lobby.image360);
-  formdata.append('status', lobby.status);
+  formdata.append('status', lobby.status || true);
   return AxiosClient.post('admin/weddinghall/add', formdata, {
     headers: {
       'Content-Type': 'multipart/form-data',
@@ -56,7 +56,7 @@ export const updateLobby = (lobby: ILobbyRes) => {
   formdata.append('price', lobby.price.toString());
   formdata.append('image', lobby.image);
   formdata.append('image360', lobby.image360);
-  formdata.append('status', lobby.status);
+  formdata.append('status', lobby.status || true);
   return AxiosClient.post('admin/weddinghall/edit', formdata, {
     headers: {
       'Content-Type': 'multipart/form-data',

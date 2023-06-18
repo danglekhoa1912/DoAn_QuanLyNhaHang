@@ -88,6 +88,7 @@ public class ApiAdminController {
         dish.setPrice(params.getPrice());
         dish.setImage(cloudinaryService.uploadImg(params.getImage(), cloudinary));
         dish.setCategoryId(categoryDish);
+        dish.setStatus(true);
         try {
             Dish update = dishRepository.save(dish);
             return ResponseEntity.ok(update);
@@ -329,9 +330,18 @@ public class ApiAdminController {
         return ResponseEntity.ok(detail);
     }
     @GetMapping("statistical/hall/search")
-    public ResponseEntity<?> statisticalSearch(@RequestBody Map<String,Date> params) {
-        Date dateStart = params.getOrDefault("start", null);
-        Date dateEnd = params.getOrDefault("end", null);
+    public ResponseEntity<?> statisticalSearch(@RequestParam Map<String,String> params) throws ParseException {
+        Instant dateStartParam = Instant.parse(params.getOrDefault("start", null));
+        Instant dateEndParam = Instant.parse(params.getOrDefault("end", null));
+
+        LocalDate start = dateStartParam == null ? null : dateStartParam.atZone(ZoneId.systemDefault()).toLocalDate();
+        LocalDate end = dateEndParam == null ? null : dateEndParam.atZone(ZoneId.systemDefault()).toLocalDate();
+
+        Date dateStart=start == null ? null : (new SimpleDateFormat("yyyy-MM-dd").parse(start.toString()));
+        Date dateEnd=end == null ? null : (new SimpleDateFormat("yyyy-MM-dd").parse(end.toString()));
+
+//        Date dateStart = params.getOrDefault("start", null);
+//        Date dateEnd = params.getOrDefault("end", null);
         List<StatisHallResponse> detail = new ArrayList<>();
         weddingHall.findAll().forEach(item -> {
             int total = weddingPartyOrder.findByOrderDateBetweenAndWhId(dateStart, dateEnd, item).stream().mapToInt(WeddingPartyOrders::getAmount).sum();
@@ -344,8 +354,10 @@ public class ApiAdminController {
     public ResponseEntity<?> updateStatusPayment(@RequestBody Map<String,String> params){
         int id=Integer.parseInt(params.getOrDefault("id",null));
         int status=Integer.parseInt(params.getOrDefault("status",null));
+        String transId = String.valueOf(params.getOrDefault("transId","")) ;
         WeddingPartyOrders wpo=weddingPartyOrder.findById(id);
         wpo.setStatus(status);
+        wpo.setTransId(transId);
         return ResponseEntity.ok(weddingPartyOrder.save(wpo));
     }
     @PostMapping("order/update-payment-stt")
@@ -382,6 +394,7 @@ public class ApiAdminController {
         user.setPassword(encoder.encode(userRequest.getPassword()));
         user.setAvatar(cloudinaryService.uploadImg(userRequest.getAvt(), cloudinary));
         user.setRole("ROLE_STAFF");
+        user.setToken("");
         userRepository.save(user);
         return ResponseEntity.ok("Đăng ký thành công");
     }

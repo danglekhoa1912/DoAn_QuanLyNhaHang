@@ -20,17 +20,23 @@ import {ICategory} from '../../type/dish';
 import {goBack, navigate} from '../../utils/navigate';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import {convertBookingStatus} from '../../utils/convertEnum';
-import {getTypeParty, getTypeTime} from '../../store/booking/thunkApi';
+import {
+  getTypeParty,
+  getTypeTime,
+  requestCancelBooking,
+} from '../../store/booking/thunkApi';
 import {updateInfoBooking} from '../../store/booking';
 import {ILobby, ITypeParty} from '../../type/lobby';
 import {getLobbyList} from '../../store/lobby/thunkApi';
 import {sTypePartyOpts, sTypeTimeOpts} from '../../store/booking/selector';
 import {ISelectItem} from '../../type/common';
+import {checkRefundStatus} from '../../apis/booking';
 
 const OrderHistoryDetailPage = ({route}: OrderHistoryDetailScreenRouteProp) => {
   const {id} = route.params;
   const theme = useTheme();
   const dispatch = useDispatch<AppDispatch>();
+  const [statusRefund, setStatusRefund] = useState('');
   const [order, setOrder] = useState<IOrderHistory>();
   const styles = useStyleSheet(themedStyles);
   const [lobbyList, setLobbyList] = useState<ILobby[]>([]);
@@ -80,6 +86,16 @@ const OrderHistoryDetailPage = ({route}: OrderHistoryDetailScreenRouteProp) => {
     navigate('BookingScreen');
   };
 
+  const handleRequestCancel = () => {
+    if (order?.id) {
+      dispatch(requestCancelBooking(order?.id)).then(() => {
+        dispatch(getOrderHistoryById(id)).then(data => {
+          setOrder(data.payload);
+        });
+      });
+    }
+  };
+
   useEffect(() => {
     dispatch(getOrderHistoryById(id)).then(data => {
       setOrder(data.payload);
@@ -99,6 +115,19 @@ const OrderHistoryDetailPage = ({route}: OrderHistoryDetailScreenRouteProp) => {
       setLobbyList(data?.payload?.record);
     });
   }, [order]);
+
+  useEffect(() => {
+    if (order?.transId) {
+      console.log(order.transId);
+      checkRefundStatus(order.transId).then(data => {
+        setStatusRefund(
+          data.data?.returncode === 1
+            ? 'Đã hoàn tiền'
+            : data.data?.returnmessage,
+        );
+      });
+    }
+  }, [order?.transId]);
 
   return (
     <>
@@ -125,7 +154,9 @@ const OrderHistoryDetailPage = ({route}: OrderHistoryDetailScreenRouteProp) => {
                         {order.typePay}
                       </TitleAndText>
                       <TitleAndText title="Tình trạng đơn">
-                        {convertBookingStatus(order.status)}
+                        {order.status === ORDER_STATUS.CANCELED
+                          ? statusRefund
+                          : convertBookingStatus(order.status)}
                       </TitleAndText>
                     </>
                   )}
@@ -156,6 +187,11 @@ const OrderHistoryDetailPage = ({route}: OrderHistoryDetailScreenRouteProp) => {
               {order.status === ORDER_STATUS.DRAW && (
                 <View>
                   <Button onPress={handleEdit} title="Chinh sua" />
+                </View>
+              )}
+              {order.status === ORDER_STATUS.WAIT_CONFIRM && (
+                <View>
+                  <Button onPress={handleRequestCancel} title="Hủy đặt bàn" />
                 </View>
               )}
             </View>

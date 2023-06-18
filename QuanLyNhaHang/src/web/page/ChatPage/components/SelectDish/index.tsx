@@ -24,7 +24,25 @@ import {getDishList} from '../../../../../store/dish/thunkApi';
 import {addDishToMenu, removeDishToMenu} from '../../../../../store/booking';
 import {COLORS} from '../../../../../utils/color';
 import CloseIcon from '@mui/icons-material/Close';
+import {makeStyles} from '@mui/styles';
+
 // import './selectDish.css';
+
+const useStyles = makeStyles({
+  wrapDish: {
+    display: 'flex',
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    '&:hover $iconRemove': {
+      display: 'flex',
+    },
+  },
+  iconRemove: {
+    display: 'none',
+    cursor: 'pointer',
+  },
+});
 
 interface ICardDish {
   dish: IDish;
@@ -88,6 +106,8 @@ const CardDish = ({dish}: ICardDish) => {
 };
 
 const SelectDish = () => {
+  const styles = useStyles();
+
   const dispatch = useDispatch<AppDispatch>();
   const [search, setSearch] = useState('');
   const totalPage = useRef<number>(0);
@@ -159,14 +179,7 @@ const SelectDish = () => {
             {pDishListInMenu
               ?.filter(dish => dish.categoryId.id === category.id)
               ?.map(dish => (
-                <div
-                  className="wrap-dish"
-                  style={{
-                    display: 'flex',
-                    flexDirection: 'row',
-                    justifyContent: 'space-between',
-                    alignItems: 'center',
-                  }}>
+                <div className={styles.wrapDish}>
                   <Text
                     style={{
                       fontWeight: '300',
@@ -176,7 +189,13 @@ const SelectDish = () => {
                     }}>
                     - {dish.name}
                   </Text>
-                  <CloseIcon className="icon-remove" color="error" />
+                  <CloseIcon
+                    onClick={() => {
+                      dispatch(removeDishToMenu(dish));
+                    }}
+                    className={styles.iconRemove}
+                    color="error"
+                  />
                 </div>
               ))}
           </View>

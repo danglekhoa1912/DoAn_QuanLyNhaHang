@@ -41,6 +41,7 @@ const UserMenu = (props: IUserMenu) => {
   const nagivate = useNavigate();
   const ref = useRef<HTMLDivElement>(null);
   const pUser = useSelector<AppState, IUser>(state => state.user?.user);
+  const isAdmin = localStorage.getItem('role') === 'ROLE_ADMIN';
   const dispatch = useDispatch<AppDispatch>();
 
   const handleLogout = async () => {
@@ -110,10 +111,12 @@ const UserMenu = (props: IUserMenu) => {
                 <PermIdentityIcon fontSize="small" />
                 <span>Admin</span>
               </CustomizeButton>
-              <CustomizeButton fullWidth onClick={handleNavigateDashboard}>
-                <ChatIcon fontSize="small" />
-                <span>Chat</span>
-              </CustomizeButton>
+              {!isAdmin && (
+                <CustomizeButton fullWidth onClick={handleNavigateDashboard}>
+                  <ChatIcon fontSize="small" />
+                  <span>Chat</span>
+                </CustomizeButton>
+              )}
             </div>
           </Box>
         </Zoom>

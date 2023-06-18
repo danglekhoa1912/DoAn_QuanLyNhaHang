@@ -3,13 +3,17 @@ import {CASH_TYPE, ORDER_STATUS} from '../type/booking';
 export const convertBookingStatus = (status: ORDER_STATUS) => {
   switch (status) {
     case ORDER_STATUS.WAIT_PAYMENT:
-      return 'Chưa Thanh Toán';
+      return 'Unpaid';
     case ORDER_STATUS.WAIT_CONFIRM:
-      return 'Chờ Liên Hệ';
+      return 'Waiting for Contact';
     case ORDER_STATUS.SUCCESS:
-      return 'Đặt Thành Công';
+      return 'Book Success';
+    case ORDER_STATUS.WAIT_CONFIRM_CANCEL:
+      return 'Waiting for Cancellation Confirmation';
+    case ORDER_STATUS.CANCELED:
+      return 'Cancelled';
     default:
-      return 'Đặt Thành Công';
+      return 'Book Success';
   }
 };
 

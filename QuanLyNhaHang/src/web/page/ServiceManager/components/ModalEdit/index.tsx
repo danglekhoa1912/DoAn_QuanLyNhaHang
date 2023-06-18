@@ -9,6 +9,8 @@ import {IService, IServiceRes} from '../../../../../type/service';
 import {addService, updateService} from '../../../../../store/service/thunkApi';
 import {convertImageToFile} from '../../../../../utils/convertImageToFile';
 import {Loading} from '../../../../components/Loading';
+import * as yup from 'yup';
+import {yupResolver} from '@hookform/resolvers/yup';
 
 interface IModalEdit {
   handleClose: () => void;
@@ -16,6 +18,25 @@ interface IModalEdit {
   data?: IService;
   onReloadData: () => void;
 }
+
+const schema = yup
+  .object({
+    name: yup.string().required('This field is required.'),
+    price: yup
+      .number()
+      .required('This field is required.')
+      .min(1, 'This field is required.')
+      .typeError('Only input number'),
+    image: yup
+      .mixed<File>()
+      .required('This field is required.')
+      .test('check-size-thumbnail', 'Maximum 2MB.', value => {
+        if (!value) return true;
+
+        return value.size <= 2 * 1024 * 1024;
+      }),
+  })
+  .required();
 
 const ModalEdit = ({handleClose, open, data, onReloadData}: IModalEdit) => {
   const {control, reset, handleSubmit, getValues} = useForm<IServiceRes>({
@@ -26,6 +47,7 @@ const ModalEdit = ({handleClose, open, data, onReloadData}: IModalEdit) => {
       serviceDescribe: '',
       status: true,
     },
+    resolver: yupResolver(schema),
   });
 
   const mode = useMemo(() => {
@@ -48,10 +70,12 @@ const ModalEdit = ({handleClose, open, data, onReloadData}: IModalEdit) => {
         : addService({
             ...data,
           }),
-    ).then(data => {
-      onClose();
-      onReloadData();
-    });
+    )
+      .unwrap()
+      .then(data => {
+        onClose();
+        onReloadData();
+      });
   };
 
   useEffect(() => {

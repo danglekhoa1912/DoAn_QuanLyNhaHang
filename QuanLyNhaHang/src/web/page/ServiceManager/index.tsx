@@ -21,7 +21,7 @@ const ServiceManager = () => {
   const totalItem = useRef<number>(0);
   const dispatch = useDispatch<AppDispatch>();
   const [open, setOpen] = React.useState(false);
-  const [service, setService] = useState<IService>();
+  const [service, setService] = useState<IService | undefined>();
 
   const pIsLoading = useSelector<AppState, number>(
     state => state.global.isLoading,
@@ -47,7 +47,10 @@ const ServiceManager = () => {
     });
   };
 
-  const handleClose = () => setOpen(false);
+  const handleClose = () => {
+    setService(undefined);
+    setOpen(false);
+  };
 
   const handleLoadData = () => {
     dispatch(

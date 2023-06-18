@@ -76,7 +76,7 @@ const BookingPage = ({
         }),
       quantityTable: yup
         .number()
-        .required(t('validate.capacity.empty') || '')
+        .typeError(t('validate.capacity.empty') || '')
         .min(1, t('validate.capacity.empty') || '')
         .max(
           pLobbyInOrder.capacity,
@@ -98,7 +98,7 @@ const BookingPage = ({
   } = useForm<IFormBooking>({
     defaultValues: {
       date: pBookingInfo?.date || moment(new Date()).add(1, 'd').toDate(),
-      quantityTable: pBookingInfo?.quantityTable || 0,
+      quantityTable: pBookingInfo?.quantityTable || '',
       time: pBookingInfo?.time || {},
       type_party: pBookingInfo?.type_party || {},
     },
@@ -154,7 +154,7 @@ const BookingPage = ({
   useEffect(() => {
     reset({
       date: pBookingInfo?.date || moment(new Date()).add(1, 'd').toDate(),
-      quantityTable: pBookingInfo?.quantityTable || 0,
+      quantityTable: pBookingInfo?.quantityTable || '',
       time: pBookingInfo?.time || {},
       type_party: pBookingInfo?.type_party || {},
     });

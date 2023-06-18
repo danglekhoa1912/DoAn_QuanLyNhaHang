@@ -16,6 +16,14 @@ export const addOrder = createAsyncThunk(
   },
 );
 
+export const requestCancelBooking = createAsyncThunk(
+  'booking/requestCancelBooking',
+  withParamsToastCatcher(async (id: number) => {
+    const result = await BookingApi.requestCancelBooking(id);
+    return result;
+  }, 'Sent a request to cancel the party booking'),
+);
+
 export const updateOrder = createAsyncThunk(
   'booking/updateOrder',
   withParamsToastCatcher(async (param: {id: number; order: IBookingReq}) => {

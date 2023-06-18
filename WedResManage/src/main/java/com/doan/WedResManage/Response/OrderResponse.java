@@ -26,6 +26,7 @@ public class OrderResponse {
     private Set<MenuDish> dishList;
     private Set<ServicesDetail> serviceList;
     private WeddingPartyOrders weddingPartyOrders;
+    private String transId;
 
     public OrderResponse(WeddingPartyOrders whp) {
         this.id = whp.getId();
@@ -41,5 +42,6 @@ public class OrderResponse {
         this.serviceList = whp.getListServiceId().getServicesDetailSet();
         this.typeParty = whp.getTypeParty().getId();
         this.username=whp.getUserId().getName();
+        this.transId=whp.getTransId();
     }
 }

@@ -36,7 +36,7 @@ import {ITypeParty} from '../../type/lobby';
 import {addOrder, updateOrder} from '../../store/booking/thunkApi';
 import {IUser} from '../../type/user';
 import {useTranslation} from 'react-i18next';
-import {paymentZalo} from '../../apis/booking';
+import {paymentZalo, refundZalo} from '../../apis/booking';
 import toast from '../../utils/toast';
 import {replace} from '../../utils/navigate';
 import analytics from '@react-native-firebase/analytics';
@@ -105,7 +105,11 @@ const BookingDetailPage = ({
     return pTypeParty.find(type => type.id === order.type_party.id);
   }, [order]);
 
-  const createOrder = (paymentStatus: boolean) => {
+  const createOrder = (
+    paymentStatus: boolean,
+    transId?: string,
+    typePayment: CASH_TYPE,
+  ) => {
     if (order.id) {
       pEditOrder({
         id: order.id,
@@ -123,7 +127,8 @@ const BookingDetailPage = ({
           service: order.service.serviceList.map(service => service.id),
           type_party: order.type_party.value,
           whId: order.lobby.id,
-          typePay: convertPaymentType(order.type_pay),
+          typePay: convertPaymentType(typePayment),
+          transId: transId || '',
         },
       }).then(() => {
         pResetBooking();
@@ -146,7 +151,8 @@ const BookingDetailPage = ({
         service: order.service.serviceList.map(service => service.id),
         type_party: order.type_party.value,
         whId: order.lobby.id,
-        typePay: convertPaymentType(order.type_pay),
+        typePay: convertPaymentType(typePayment),
+        transId: transId || '',
       }).then(() => {
         pResetBooking();
         analytics().logAddPaymentInfo({
@@ -161,13 +167,13 @@ const BookingDetailPage = ({
   const handlePayment = () => {
     switch (order.type_pay) {
       case CASH_TYPE.CASH:
-        createOrder(false);
+        createOrder(false, '', CASH_TYPE.CASH);
         break;
       case CASH_TYPE.MOMO:
-        paymentZalo(total).then(data => {
-          const payZP = NativeModules.PayZaloBridge;
-          payZP.payOrder(data.data.zp_trans_token);
-        });
+        // paymentZalo(total).then(data => {
+        //   const payZP = NativeModules.PayZaloBridge;
+        //   payZP.payOrder(data.data.zp_trans_token);
+        // });
         break;
       case CASH_TYPE.ZALO:
         paymentZalo(total).then(data => {
@@ -176,7 +182,7 @@ const BookingDetailPage = ({
         });
         break;
       default:
-        createOrder(false);
+        createOrder(false, '', CASH_TYPE.CASH);
     }
   };
 
@@ -184,7 +190,7 @@ const BookingDetailPage = ({
     payZaloBridgeEmitter.addListener('EventPayZalo', data => {
       if (data.returnCode == 1) {
         toast.success('Pay success!');
-        createOrder(true);
+        createOrder(true, data.transactionId, CASH_TYPE.ZALO);
       } else {
         toast.error('Pay errror! ' + data.message);
       }

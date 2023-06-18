@@ -31,7 +31,7 @@ const DishManager = () => {
   const [category, setCategory] = useState(1);
   const dispatch = useDispatch<AppDispatch>();
   const [open, setOpen] = React.useState(false);
-  const [dish, setDish] = useState<IDish>();
+  const [dish, setDish] = useState<IDish | undefined>();
 
   const pCategoryOpts = useSelector<AppState, ISelectItem[]>(state =>
     sCategoryOpts(state),
@@ -61,7 +61,10 @@ const DishManager = () => {
     });
   };
 
-  const handleClose = () => setOpen(false);
+  const handleClose = () => {
+    setDish(undefined);
+    setOpen(false);
+  };
 
   const handleLoadData = () => {
     dispatch(

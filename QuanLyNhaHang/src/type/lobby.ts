@@ -28,5 +28,5 @@ export interface ILobbyRes {
   price: number;
   image: File;
   image360: File;
-  status?: boolean;
+  status: boolean;
 }

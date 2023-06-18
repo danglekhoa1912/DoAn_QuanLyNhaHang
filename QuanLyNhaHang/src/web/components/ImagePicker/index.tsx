@@ -108,7 +108,7 @@ export function ImagePicker<T extends FieldValues>({
     <Controller
       control={control}
       name={name as Path<T>}
-      render={({field: {onChange}}) => (
+      render={({field: {onChange}, fieldState: {error}}) => (
         <Box m="12px 0" color={red[700]}>
           <Label disabled={disabled}>
             {label}
@@ -206,17 +206,14 @@ export function ImagePicker<T extends FieldValues>({
               </ButtonsPreviewContainer>
             </BoxPreviewContainer>
           )}
-          {/* 
+
           <FormHelperText
             error={!!error}
             sx={{
-              pl: "16px",
-              fontSize: "12px",
-              fontWeight: 400
-            }}
-          >
+              fontSize: '12px',
+            }}>
             {error?.message?.toString()}
-          </FormHelperText> */}
+          </FormHelperText>
         </Box>
       )}
     />

@@ -7,7 +7,14 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
-import React, {useCallback, useEffect, useMemo, useRef, useState} from 'react';
+import React, {
+  useCallback,
+  useEffect,
+  useId,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
 import {GiftedChat} from 'react-gifted-chat';
 import {useDispatch, useSelector} from 'react-redux';
 import {AppDispatch, AppState} from '../../../store';
@@ -24,6 +31,7 @@ import {
   deleteDoc,
   getDoc,
   getDocs,
+  documentId,
 } from 'firebase/firestore';
 import {db} from '../../firebase';
 import {Send as SendIcon} from '@mui/icons-material';
@@ -58,7 +66,6 @@ const ChatPage = () => {
   const [openQuit, setOpenQuit] = React.useState(false);
   const [messages, setMessages] = useState<any[]>([]);
   const [message, setMessage] = useState('');
-  const currentMsg = useRef(0);
 
   const profile = useSelector<AppState, IUser>(state => state.user.user);
   const bookingId = useSelector<AppState, number | undefined>(
@@ -73,8 +80,9 @@ const ChatPage = () => {
     return userList.find(user => user.user?.id === +(userId || 0));
   }, [userId, userList]);
 
-  const handleClose = () => {
-    setOpenQuit(true);
+  const handleClose = (created?: boolean) => {
+    if (created) setOpen(false);
+    else setOpenQuit(true);
   };
 
   const handleCloseQuitPopup = () => {
@@ -129,11 +137,10 @@ const ChatPage = () => {
           collectionRef,
           where('__name__', '==', `${userId}`),
         );
+        const snap = await getDocs(query1);
+        const listMsg = !snap.empty ? snap.docs[0]?.get('messages') : [];
         setDoc(doc(db, 'usersChat', `${userId}-${profile?.id}`), {
-          messages: [
-            ...(await getDocs(query1)).docs[0].get('messages'),
-            docRef?.id,
-          ],
+          messages: [...listMsg, docRef?.id],
         });
         deleteDoc(doc(db, 'usersChat', `${userId}`));
       } else if (resolve) {
@@ -141,17 +148,7 @@ const ChatPage = () => {
           messages: [...collectionSnap.docs[0].get('messages'), docRef.id],
         });
         deleteDoc(doc(db, 'usersChat', `${userId}-${profile?.id}`));
-        if (bookingId) {
-          dispatch(
-            updateOrderStatus({
-              id: bookingId,
-              status: ORDER_STATUS.SUCCESS,
-            }),
-          ).then(() => {
-            dispatch(clearResolveBookingId());
-            navigate('/chat');
-          });
-        }
+        navigate('/chat');
       } else {
         setDoc(doc(db, 'usersChat', `${userId}-${profile?.id}`), {
           messages: [...collectionSnap.docs[0].get('messages'), docRef.id],
@@ -230,6 +227,8 @@ const ChatPage = () => {
   }, []);
 
   useEffect(() => {
+    setMessages([]);
+
     if (userId && !userList.find(data => data.user.id == userId)) {
       dispatch(getUserById(+userId)).then(data => {
         setUserList([
@@ -244,43 +243,43 @@ const ChatPage = () => {
 
     const collectionRef = collection(db, `usersChat`);
     let result: any[] = [];
-
-    const q = query(collectionRef, where('__name__', '>=', userId || '0'));
+    const q = query(collectionRef, where(documentId(), '>=', userId || '0'));
     onSnapshot(q, snapshot => {
       let messDelete = 0;
       snapshot.docs.map(data => {
-        data.get('messages')?.map((message: string) => {
-          const docRef = doc(db, 'chats', message);
-          onSnapshot(docRef, (snapshot: any) => {
-            if (result.findIndex(item => item?._id === snapshot.id) === -1) {
-              result = [
-                ...result,
-                {
-                  _id: snapshot.id,
-                  createdAt: snapshot.data()?.createdAt,
-                  text: snapshot.data()?.text,
-                  user: snapshot.data()?.user,
-                  type: snapshot.data()?.type,
-                },
-              ];
-            }
-            if (
-              result.length ===
-              (data.get('messages') as Array<string>).length -
-                messDelete +
-                currentMsg.current
-            ) {
-              setMessages([...result]);
-              currentMsg.current = result.length;
-            }
-            if (snapshot.data()?.type === 'resolved') {
-              messDelete += result.length;
-              result = [];
-              setMessages([...result]);
-              currentMsg.current = result.length;
-            }
+        if (userId && data.id.includes(userId)) {
+          data.get('messages')?.map((message: string, index: number) => {
+            const docRef = doc(db, 'chats', message);
+            onSnapshot(docRef, (snapshot: any) => {
+              if (result.findIndex(item => item?._id === snapshot.id) === -1) {
+                result = [
+                  ...result,
+                  {
+                    _id: snapshot.id,
+                    createdAt: snapshot.data()?.createdAt,
+                    text: snapshot.data()?.text,
+                    user: snapshot.data()?.user,
+                    type: snapshot.data()?.type,
+                  },
+                ];
+              }
+              if (snapshot.data()?.type === 'resolved') {
+                messDelete += result.length;
+                result = [];
+                //   currentMsg.current = result.length;
+                // return;
+              }
+              //    else if (
+              //     result.length ===
+              //     (data.get('messages') as Array<string>).length - messDelete
+              //   ) {
+              //     setMessages([...result]);
+              //   }
+              if ((data.get('messages') as Array<string>).length - 1 === index)
+                setMessages([...result]);
+            });
           });
-        });
+        }
       });
     });
   }, [userId]);

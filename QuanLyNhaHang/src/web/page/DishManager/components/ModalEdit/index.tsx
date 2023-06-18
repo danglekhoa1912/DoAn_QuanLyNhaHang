@@ -12,6 +12,8 @@ import {sCategoryOpts} from '../../../../../store/dish/selector';
 import {addDish, updateDish} from '../../../../../store/dish/thunkApi';
 import {convertImageToFile} from '../../../../../utils/convertImageToFile';
 import {Loading} from '../../../../components/Loading';
+import * as yup from 'yup';
+import {yupResolver} from '@hookform/resolvers/yup';
 
 interface IModalEdit {
   handleClose: () => void;
@@ -20,14 +22,37 @@ interface IModalEdit {
   onReLoadData: () => void;
 }
 
+const schema = yup
+  .object({
+    category: yup.number().required('This field is required.'),
+    name: yup.string().required('This field is required.'),
+    price: yup
+      .number()
+      .required('This field is required.')
+      .min(1, 'This field is required.')
+      .typeError('Only input number'),
+    image: yup
+      .mixed<File>()
+      .required('This field is required.')
+      .test('check-size-thumbnail', 'Maximum 2MB.', value => {
+        if (!value) return true;
+
+        return value.size <= 2 * 1024 * 1024;
+      }),
+  })
+  .required();
+
+const defaultValue = {
+  category: 0,
+  name: '',
+  price: 0,
+  status: true,
+};
+
 const ModalEdit = ({handleClose, open, data, onReLoadData}: IModalEdit) => {
-  const {control, reset, handleSubmit, getValues} = useForm<IDishRes>({
-    defaultValues: {
-      category: 0,
-      name: '',
-      price: 0,
-      status: true,
-    },
+  const {control, reset, handleSubmit, getValues, watch} = useForm<IDishRes>({
+    defaultValues: defaultValue,
+    resolver: yupResolver(schema),
   });
 
   const mode = useMemo(() => {
@@ -51,10 +76,13 @@ const ModalEdit = ({handleClose, open, data, onReLoadData}: IModalEdit) => {
             ...data,
           })
         : addDish({...data}),
-    ).then(() => {
-      handleClose();
-      onReLoadData();
-    });
+    )
+      .unwrap()
+      .then(() => {
+        reset(defaultValue);
+        handleClose();
+        onReLoadData();
+      });
   };
 
   useEffect(() => {
@@ -75,7 +103,10 @@ const ModalEdit = ({handleClose, open, data, onReLoadData}: IModalEdit) => {
       cancelButton={{
         title: 'Cancel',
         variant: 'outlined',
-        onClick: handleClose,
+        onClick: () => {
+          reset(defaultValue);
+          handleClose();
+        },
         color: 'dark',
       }}
       saveButton={{

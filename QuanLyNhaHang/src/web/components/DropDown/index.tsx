@@ -20,22 +20,25 @@ function DropDown<T extends FieldValues>({
     <Controller
       control={control}
       name={name as Path<T>}
-      render={({field: {onChange, value}}) => (
-        <Select
-          {...otherProps}
-          labelId="demo-simple-select-label"
-          id="demo-simple-select"
-          value={value}
-          label="Category"
-          onChange={e => {
-            onChange(+e.target.value);
-          }}>
-          {options.map(item => (
-            <MenuItem key={item.id} value={item.id}>
-              {item.label}
-            </MenuItem>
-          ))}
-        </Select>
+      render={({field: {onChange, value}, fieldState: {error}}) => (
+        <View>
+          <Select
+            {...otherProps}
+            labelId="demo-simple-select-label"
+            id="demo-simple-select"
+            value={value}
+            label="Category"
+            onChange={e => {
+              onChange(+e.target.value);
+            }}>
+            {options.map(item => (
+              <MenuItem key={item.id} value={item.id}>
+                {item.label}
+              </MenuItem>
+            ))}
+          </Select>
+          {error && <Text style={styles.error}>*{error.message}</Text>}
+        </View>
       )}
     />
   );
@@ -43,4 +46,9 @@ function DropDown<T extends FieldValues>({
 
 export default DropDown;
 
-const styles = StyleSheet.create({});
+const styles = StyleSheet.create({
+  error: {
+    fontSize: 12,
+    color: 'red',
+  },
+});

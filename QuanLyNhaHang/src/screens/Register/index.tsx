@@ -42,11 +42,15 @@ const schema = yup
     name: yup.string().required('Please enter your name'),
     birthday: yup
       .date()
-      .test('birthday', 'Please choose a valid date of birth', value => {
+      .typeError('Please enter your birthday')
+      .test('birthday', 'You must be 18 years old to register', value => {
         return moment(new Date()).diff(moment(value), 'years') >= 18;
       }),
     mobile: yup.string().required('Please enter your mobile').min(10).max(12),
     avatar: yup.string().required('Please choise your avatar'),
+    confirmPassword: yup
+      .string()
+      .oneOf([yup.ref('password'), null], 'Passwords must match'),
   })
   .required();
 
@@ -67,9 +71,10 @@ const RegisterPage = () => {
       email: '',
       name: '',
       mobile: '',
-      birthday: new Date(),
+      birthday: '',
       avatar: '',
       password: '',
+      confirmPassword: '',
     },
     resolver: yupResolver(schema),
   });
@@ -139,6 +144,14 @@ const RegisterPage = () => {
                 control={control}
                 name="password"
                 placeholder="Password"
+              />
+              <TextField
+                colorError="white"
+                styleContainer={styles.text_field}
+                secureTextEntry
+                control={control}
+                name="confirmPassword"
+                placeholder="Confirm Password"
               />
             </View>
             <View>
